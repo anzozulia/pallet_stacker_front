@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 
 Phase: 02 (coordinate-mapping-fixture-viewer) — EXECUTING
 Plan: 2 of 2
-Status: Paused at blocking human-verify checkpoint (Task 4) — Tasks 1-3 done & committed
+Status: Re-paused at blocking human-verify checkpoint (Task 4) — defect FIXED (presets now reframe; clipping resolved), regression guard strengthened & all gates green; awaiting human visual sign-off
 Last activity: 2026-06-04
 
 Progress: [████████░░] 83%
@@ -106,6 +106,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-04T00:16:00.000Z
-Stopped at: 02-02 Task 4 — blocking human-verify checkpoint (viewer visual + camera-feel sign-off). Tasks 1-3 green: vitest (13/13), code-split build gate, Playwright e2e (2/2). Awaiting "approved".
+Last session: 2026-06-04T00:30:00.000Z
+Stopped at: 02-02 Task 4 — RE-PAUSED at blocking human-verify checkpoint after fixing the orchestrator-found defect. The ISO/TOP/FRONT presets did NOT reframe (screenshots pixel-identical) and the framing clipped the scene top. Fix (commits 3e8e5ce, 92fe9ea, c33069c): removed the conflicting drei <Bounds> wrapper so CameraPresets owns all bbox-derived framing, widened FRAMING_K 2.0→2.6 to clear the 45° fov frame with margin, added gl.preserveDrawingBuffer + a window.__cameraState hook, and strengthened e2e/result-viewer.spec.ts to assert ISO/TOP/FRONT yield DISTINCT camera positions + differing canvas PNGs (proven to fail on a simulated non-reframing build, received distance 0). All gates green: vitest (13/13), tsc 0 errors, build + code-split gate PASS (three in lazy chunk only), Playwright e2e (2/2). Awaiting human "approved" on the re-screenshot.
 Resume file: .planning/phases/02-coordinate-mapping-fixture-viewer/02-02-PLAN.md (Task 4)
