@@ -172,7 +172,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase                                  | Plans Complete | Status      | Completed  |
 | -------------------------------------- | -------------- | ----------- | ---------- |
 | 1. Scaffolding & Version Lock          | 4/4            | Complete    | 2026-06-03 |
-| 2. Coordinate Mapping & Fixture Viewer | 2/2            | Complete    | 2026-06-04 |
+| 2. Coordinate Mapping & Fixture Viewer | 2/2 | Complete    | 2026-06-03 |
 | 3. Pure Transform Core                 | 0/TBD          | Not started | -          |
 | 4. Config Form & Local Persistence     | 0/TBD          | Not started | -          |
 | 5. API Client & Async Polling          | 0/TBD          | Not started | -          |

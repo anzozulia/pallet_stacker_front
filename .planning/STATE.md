@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Phase 2 complete (02-02 finalized) — ready for Phase 3
-last_updated: "2026-06-04T01:15:00.000Z"
-last_activity: 2026-06-04
+status: planning
+stopped_at: "02-02 COMPLETE. The blocking human-verify checkpoint (Task 4) was APPROVED after the found-and-fixed preset-reframe defect (commits 3e8e5ce, 92fe9ea, c33069c — dropped the conflicting drei <Bounds>, widened FRAMING_K 2.0→2.6, strengthened the e2e reframe guard). SUMMARY written (02-02-SUMMARY.md), STATE/ROADMAP/REQUIREMENTS updated, RESULT-01 + RESULT-02 marked complete. Re-confirmed at finalization: vitest src/lib 13/13, tsc 0 errors. Phase 2 done — next is planning Phase 3 (Pure Transform Core)."
+last_updated: "2026-06-03T22:48:28.722Z"
+last_activity: 2026-06-03
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 6
   completed_plans: 6
-  percent: 100
+  percent: 29
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 
 ## Current Position
 
-Phase: 02 (coordinate-mapping-fixture-viewer) — COMPLETE
-Plan: 2 of 2 — done
+Phase: 3
+Plan: Not started
 Status: Phase 2 complete. 02-02 human-verify checkpoint APPROVED after a found-and-fixed preset-reframe defect; SUMMARY written, all gates green. RESULT-01 + RESULT-02 delivered. Ready to plan Phase 3 (Pure Transform Core).
-Last activity: 2026-06-04
+Last activity: 2026-06-03
 
 Progress: [██████████] 100%
 
@@ -36,7 +36,7 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 4
+- Total plans completed: 6
 - Average duration: — min
 - Total execution time: 0.0 hours
 
@@ -45,6 +45,7 @@ Progress: [██████████] 100%
 | Phase | Plans | Total | Avg/Plan |
 | ----- | ----- | ----- | -------- |
 | 01    | 4     | -     | -        |
+| 02 | 2 | - | - |
 
 **Recent Trend:**
 
