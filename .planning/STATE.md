@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-06-03T16:46:07.012Z"
+last_updated: "2026-06-03T16:59:19.149Z"
 last_activity: 2026-06-03 -- Completed Phase 01 Plan 01 (scaffolding + version lock)
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
-  percent: 25
+  completed_plans: 2
+  percent: 0
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 ## Current Position
 
 Phase: 01 (scaffolding-version-lock) — EXECUTING
-Plan: 2 of 4
-Status: Executing Phase 01 (Plan 01 complete)
+Plan: 3 of 4
+Status: Ready to execute
 Last activity: 2026-06-03 -- Completed Phase 01 Plan 01 (scaffolding + version lock)
 
 Progress: [██░░░░░░░░] 25%
@@ -52,6 +52,7 @@ Progress: [██░░░░░░░░] 25%
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 01 P01-02 | ~12min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,7 @@ Recent decisions affecting current work:
 - [01-01]: VITE_API_URL typed but NOT consumed in Phase 1 (no API client until Phase 5) — only the type seam established (D-16).
 - [01-01]: Tailwind v4 @theme kept minimal (fonts + #4f46e5 accent only); full mockup palette deferred to Phases 4/6 (D-07).
 - [01-01]: Supply-chain checkpoint (T-1-SC) human-approved — clean lockfile resolution confirmed before later waves build on it.
+- [Phase ?]: Code-split boundary established: /result is React.lazy-loaded so three/r3f/drei live only in the lazy chunk; scripts/check-code-split.mjs enforces it as a build gate (01-02)
 
 ### Pending Todos
 
@@ -92,6 +94,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-03T16:00:23.655Z
+Last session: 2026-06-03T16:59:05.085Z
 Stopped at: Completed 01-01-PLAN.md
 Resume file: None

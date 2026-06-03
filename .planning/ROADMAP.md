@@ -44,7 +44,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02-PLAN.md — Wave 2: app shell + react-router 7 SPA routing, eager `/` + lazy code-split `/result` empty r3f Canvas, signposted dirs (SC-2, code-split)
+- [x] 01-02-PLAN.md — Wave 2: app shell + react-router 7 SPA routing, eager `/` + lazy code-split `/result` empty r3f Canvas, signposted dirs (SC-2, code-split)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -161,7 +161,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Scaffolding & Version Lock | 1/4 | In Progress|  |
+| 1. Scaffolding & Version Lock | 2/4 | In Progress|  |
 | 2. Coordinate Mapping & Fixture Viewer | 0/TBD | Not started | - |
 | 3. Pure Transform Core | 0/TBD | Not started | - |
 | 4. Config Form & Local Persistence | 0/TBD | Not started | - |
