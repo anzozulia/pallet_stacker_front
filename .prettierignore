@@ -4,3 +4,9 @@ playwright-report
 test-results
 public/fonts
 package-lock.json
+
+# GSD planning artifacts are tool-generated and contain literal executable
+# command blocks (e.g. <automated>node -e "require('src/lib/__fixtures__/…')").
+# Prettier's markdown formatter reflows these and rewrites `__token__` as bold
+# `**token**`, corrupting the embedded paths/commands. Never format them.
+.planning/
