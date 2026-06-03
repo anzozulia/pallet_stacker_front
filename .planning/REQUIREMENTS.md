@@ -1,0 +1,109 @@
+# Requirements: Palletize
+
+**Defined:** 2026-06-03
+**Core Value:** A user can describe their pallet and boxes and get back a correct, explorable 3D packing plan in seconds — with zero signup and a single self-hostable Docker container.
+
+## v1 Requirements
+
+Requirements for the initial release. Each maps to a roadmap phase.
+
+### Pallet Configuration
+
+- [ ] **PALLET-01**: User can set the pallet length, width, and max stack height (mm)
+- [ ] **PALLET-02**: User can set the pallet max weight (kg) and max overhang (mm)
+
+### Box Catalog
+
+- [ ] **BOX-01**: User can add, edit, and remove box types in a catalog
+- [ ] **BOX-02**: User can set each box type's dimensions (L/W/H, mm), unit weight (kg), and quantity
+- [ ] **BOX-03**: User can set max-load-on-top per box type and mark a type fragile (fragile = nothing stacked on top)
+- [ ] **BOX-04**: User can choose a rotation mode per box type from the API's three modes (any orientation / keep upright / fixed)
+- [ ] **BOX-05**: App shows a live running total of box types and units and warns when the unit count is large
+- [ ] **BOX-06**: App validates pallet and box inputs and blocks submitting an invalid configuration with clear messages
+
+### Packing Job
+
+- [ ] **PACK-01**: User can submit the configuration to run a packing calculation
+- [ ] **PACK-02**: App expands each box type's quantity into individual, uniquely-identified boxes before calling the API
+- [ ] **PACK-03**: User can set how many pallets the solver may use (max_pallets)
+- [ ] **PACK-04**: App shows a loading state and polls the asynchronous job until it reaches a terminal state
+- [ ] **PACK-05**: User can cancel an in-progress packing job, and polling stops cleanly
+- [ ] **PACK-06**: App distinguishes job failure, timeout, unreachable/CORS errors, and "some items unpacked" — none crash the app
+
+### Result & Visualization
+
+- [ ] **RESULT-01**: User can view a 3D visualization of the packed pallet, with boxes coloured by type and a legend
+- [ ] **RESULT-02**: User can orbit, zoom, and pan the 3D scene and switch between ISO / TOP / FRONT camera presets
+- [ ] **RESULT-03**: User can view summary stats: pallets used, utilisation, unpacked count, and total weight
+- [ ] **RESULT-04**: User can switch between generated pallets and see each one's 3D layout and stats
+- [ ] **RESULT-05**: User can browse a per-box placement list (id, type, position, size, orientation, weight) with hover highlighting linked to the 3D scene
+- [ ] **RESULT-06**: User can see which items could not be packed, each with its reason
+
+### Stability Diagnostics
+
+- [ ] **DIAG-01**: User can see each pallet's centre-of-gravity indicated in the 3D scene
+- [ ] **DIAG-02**: User can see per-box support information (support ratio) returned by the API
+
+### Export & Local Persistence
+
+- [ ] **DATA-01**: User can export the packing result as JSON and as a printable report
+- [ ] **DATA-02**: User can save the current configuration locally and reload it after a page refresh (localStorage)
+
+### Self-Hosting & Deployment
+
+- [ ] **HOST-01**: App builds into a single Docker image that serves the static SPA and handles deep-link refresh (SPA fallback)
+- [ ] **HOST-02**: The API base URL is configurable at build time via `VITE_API_URL`, with the CORS requirement documented
+- [ ] **HOST-03**: Project is published on GitHub with a README/docs sufficient to self-host in minutes
+
+## v2 Requirements
+
+Deferred to a future release. Tracked but not in the current roadmap.
+
+### Configuration
+
+- **CFG-V2-01**: Standard pallet presets (EUR / GMA / etc.) — *low cost; consider pulling into v1 during planning*
+- **CFG-V2-02**: Duplicate an existing box type
+- **CFG-V2-03**: CSV import / export of the box catalog
+
+### Result
+
+- **RES-V2-01**: 2D top-down layer view
+- **RES-V2-02**: Step-by-step load sequence (requires inferring a physical load order)
+- **RES-V2-03**: PNG snapshot of the 3D scene
+- **RES-V2-04**: True PDF export (vs print-CSS)
+
+### Sharing
+
+- **SHR-V2-01**: Share a configuration via URL (deferred until the config schema is stable)
+
+## Out of Scope
+
+Explicitly excluded. Documented to prevent scope creep.
+
+| Feature | Reason |
+|---------|--------|
+| User accounts / login / registration | "Just a tool as is" — stateless v1; may be added later |
+| Server-side calculation history | No backend of our own in v1; client is stateless over the API |
+| The packing algorithm itself | Owned by the existing API; the frontend never computes placements |
+| 6-way granular rotation UI | API only supports 3 modes; richer UI would imply control the API ignores |
+| CoG envelope as an input constraint | API accepts no CoG limit; CoG is an output diagnostic only |
+| mm/in unit toggle | API contract is mm/kg; runtime conversion adds rounding bugs for marginal benefit |
+| Manual drag-and-drop placement editor | The solver is authoritative; overriding it would require client-side physics |
+| Native mobile apps | Web-first, responsive where practical |
+
+## Traceability
+
+Which phases cover which requirements. Populated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| (populated by roadmapper) | — | Pending |
+
+**Coverage:**
+- v1 requirements: 25 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 25 ⚠️
+
+---
+*Requirements defined: 2026-06-03*
+*Last updated: 2026-06-03 after initial definition*
