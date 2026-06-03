@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  pull_request: {}
+  push:
+    branches: [master]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      # npm ci enforces the committed lockfile (no ad-hoc resolution) — the supply-chain pin.
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      # Playwright browser binaries are a separate download from the npm package (Pitfall 5).
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
