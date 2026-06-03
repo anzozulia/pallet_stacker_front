@@ -14,7 +14,7 @@ Palletize wraps an existing asynchronous packing API in a free, no-login, single
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Scaffolding & Version Lock** - Lock the React 19.2.x / r3f 9 / drei 10 / three 0.184.0 quartet, wire Vite + TS + Tailwind + test tooling, build/serve a skeleton (completed 2026-06-03)
-- [ ] **Phase 2: Coordinate Mapping & Fixture Viewer** - Capture a real `done` response, lock the API↔Three.js mapping with golden tests, render a static 3D scene matching the mockup
+- [x] **Phase 2: Coordinate Mapping & Fixture Viewer** - Capture a real `done` response, lock the API↔Three.js mapping with golden tests, render a static 3D scene matching the mockup (completed 2026-06-04)
 - [ ] **Phase 3: Pure Transform Core** - Build and fully unit-test the request-builder (qty expansion + rotation mapping) and result-mapper (grouping + diagnostics)
 - [ ] **Phase 4: Config Form & Local Persistence** - Editable pallet + box catalog form with validation, live unit count, and localStorage that survives refresh
 - [ ] **Phase 5: API Client & Async Polling** - Typed client, submit-then-poll job lifecycle, loading screen, cancel, and all four terminal states handled
@@ -79,7 +79,7 @@ Plans:
 
 **Wave 2** _(blocked on Wave 1 completion)_
 
-- [ ] 02-02-PLAN.md — Wave 2: dark-overlay @theme tokens + bbox camera-preset math, the drei viewer scene on /result (wood pallet, coloured edged boxes, legend, ISO/TOP/FRONT), Playwright Canvas + preset e2e, human visual sign-off (RESULT-01 viewer half + RESULT-02)
+- [x] 02-02-PLAN.md — Wave 2: dark-overlay @theme tokens + bbox camera-preset math, the drei viewer scene on /result (wood pallet, coloured edged boxes, legend, ISO/TOP/FRONT), Playwright Canvas + preset e2e, human visual sign-off (RESULT-01 viewer half + RESULT-02)
       **UI hint**: yes
       **Research flag:** NEEDS deeper research during planning — `orientation.perm` gather-vs-scatter semantics and whether `position.z` / `dimensions` are pre- or post-orientation must be resolved from the real captured response (first sub-task), not guessed.
 
@@ -172,7 +172,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase                                  | Plans Complete | Status      | Completed  |
 | -------------------------------------- | -------------- | ----------- | ---------- |
 | 1. Scaffolding & Version Lock          | 4/4            | Complete    | 2026-06-03 |
-| 2. Coordinate Mapping & Fixture Viewer | 0/2            | Not started | -          |
+| 2. Coordinate Mapping & Fixture Viewer | 2/2            | Complete    | 2026-06-04 |
 | 3. Pure Transform Core                 | 0/TBD          | Not started | -          |
 | 4. Config Form & Local Persistence     | 0/TBD          | Not started | -          |
 | 5. API Client & Async Polling          | 0/TBD          | Not started | -          |

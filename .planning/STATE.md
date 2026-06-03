@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 2 context gathered
-last_updated: "2026-06-03T21:08:34.192Z"
-last_activity: 2026-06-03
+stopped_at: Phase 2 complete (02-02 finalized) — ready for Phase 3
+last_updated: "2026-06-04T01:15:00.000Z"
+last_activity: 2026-06-04
 progress:
   total_phases: 7
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 6
-  completed_plans: 5
-  percent: 83
+  completed_plans: 6
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 
 ## Current Position
 
-Phase: 02 (coordinate-mapping-fixture-viewer) — EXECUTING
-Plan: 2 of 2
-Status: Re-paused at blocking human-verify checkpoint (Task 4) — defect FIXED (presets now reframe; clipping resolved), regression guard strengthened & all gates green; awaiting human visual sign-off
+Phase: 02 (coordinate-mapping-fixture-viewer) — COMPLETE
+Plan: 2 of 2 — done
+Status: Phase 2 complete. 02-02 human-verify checkpoint APPROVED after a found-and-fixed preset-reframe defect; SUMMARY written, all gates green. RESULT-01 + RESULT-02 delivered. Ready to plan Phase 3 (Pure Transform Core).
 Last activity: 2026-06-04
 
-Progress: [████████░░] 83%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ _Updated after each plan completion_
 | Phase 01 P01-03 | ~8min | 2 tasks | 6 files |
 | Phase 01 P01-04 | ~10min | 3 tasks | 6 files |
 | Phase 02 P01 | 3 | 3 tasks | 7 files |
+| Phase 02 P02 | ~18min | 4 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,10 @@ Recent decisions affecting current work:
 - [Phase ?]: [02-01]: mapPlacement consumes only position(min-corner)+post-orientation dimensions; orientation.perm NEVER re-applied — pinned by D003 rotated golden (size [150,300,600], center [-425,950,-100])
 - [Phase ?]: [02-01]: Pure src/lib math modules (mapping.ts, palette.ts) import three only as type / not at all to preserve the code-split build gate
 - [Phase ?]: [02-01]: Golden fixture committed under src/lib/__fixtures__/ (2 pallets, 7 unpacked, perm [2,0,1]); zod deferred to Phase 5, fixture types hand-written
+- [02-02]: Camera presets derived from the live scene Box3 (presetFromBbox), NEVER the mockup's hardcoded vectors (D-11); presets scale with the fixture bbox
+- [02-02]: drei <Bounds> auto-fit and an explicit presetFromBbox camera driver are mutually exclusive — Bounds silently re-fits and cancels preset re-targeting. CameraPresets is the single framing owner; FRAMING_K widened 2.0→2.6 to clear the 45° fov frame (carry into Phase 6)
+- [02-02]: Viewer overlay chrome is absolute-positioned DOM over the Canvas (pointer-events:none except buttons), not drei <Html>
+- [02-02]: Preset e2e asserts ISO/TOP/FRONT yield DISTINCT camera positions + differing canvas PNGs — a deterministic non-reframing regression guard
 
 ### Pending Todos
 
@@ -106,6 +111,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-04T00:30:00.000Z
-Stopped at: 02-02 Task 4 — RE-PAUSED at blocking human-verify checkpoint after fixing the orchestrator-found defect. The ISO/TOP/FRONT presets did NOT reframe (screenshots pixel-identical) and the framing clipped the scene top. Fix (commits 3e8e5ce, 92fe9ea, c33069c): removed the conflicting drei <Bounds> wrapper so CameraPresets owns all bbox-derived framing, widened FRAMING_K 2.0→2.6 to clear the 45° fov frame with margin, added gl.preserveDrawingBuffer + a window.__cameraState hook, and strengthened e2e/result-viewer.spec.ts to assert ISO/TOP/FRONT yield DISTINCT camera positions + differing canvas PNGs (proven to fail on a simulated non-reframing build, received distance 0). All gates green: vitest (13/13), tsc 0 errors, build + code-split gate PASS (three in lazy chunk only), Playwright e2e (2/2). Awaiting human "approved" on the re-screenshot.
-Resume file: .planning/phases/02-coordinate-mapping-fixture-viewer/02-02-PLAN.md (Task 4)
+Last session: 2026-06-04T01:15:00.000Z
+Stopped at: 02-02 COMPLETE. The blocking human-verify checkpoint (Task 4) was APPROVED after the found-and-fixed preset-reframe defect (commits 3e8e5ce, 92fe9ea, c33069c — dropped the conflicting drei <Bounds>, widened FRAMING_K 2.0→2.6, strengthened the e2e reframe guard). SUMMARY written (02-02-SUMMARY.md), STATE/ROADMAP/REQUIREMENTS updated, RESULT-01 + RESULT-02 marked complete. Re-confirmed at finalization: vitest src/lib 13/13, tsc 0 errors. Phase 2 done — next is planning Phase 3 (Pure Transform Core).
+Resume file: None — ready to plan Phase 3
