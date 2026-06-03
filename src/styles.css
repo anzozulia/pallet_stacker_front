@@ -20,4 +20,13 @@
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --color-accent: #4f46e5;
+
+  /* dark 3D-overlay group (D-08) — ported verbatim from design/result.html :root.
+     Scene-material colours (wood/lights/grid/box palette) are NOT tokens; they live
+     as module constants in the viewer because they are 3D-material values, not
+     reusable UI tokens. */
+  --color-d-bg: #0c0f17; /* scene background base / fog colour */
+  --color-d-border: #222838; /* overlay chip + button borders */
+  --color-d-text: #e6e8ee; /* primary overlay text (titles) */
+  --color-d-text-2: #838b9e; /* secondary overlay text (tags, hints, legend) */
 }
