@@ -33,7 +33,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. `npm run test` runs a passing Vitest sample and `npm run test:e2e` runs a passing Playwright smoke test
   4. The skeleton builds to static assets and serves from a multi-stage Docker image on a non-root nginx
   5. `VITE_API_URL` is read from the environment at build time and a Vite dev proxy routes API calls without CORS errors locally
-**Plans**: TBD
+**Plans**: 4 plans (walking skeleton, sequential waves 1→4)
+Plans:
+- [ ] 01-01-PLAN.md — Wave 1: version-locked package.json + lockfile, TS/Vite config (proxy + env + Tailwind v4 + path aliases), self-hosted fonts, flat ESLint/Prettier (SC-1, SC-5 config, quality gate)
+- [ ] 01-02-PLAN.md — Wave 2: app shell + react-router 7 SPA routing, eager `/` + lazy code-split `/result` empty r3f Canvas, signposted dirs (SC-2, code-split)
+- [ ] 01-03-PLAN.md — Wave 3: test harness — Vitest (jsdom) sample + Playwright preview-build smoke asserting the `/result` Canvas mounts with no WebGL errors (SC-3, SC-2 live)
+- [ ] 01-04-PLAN.md — Wave 4: multi-stage non-root nginx Docker image + SPA fallback, GitHub Actions CI, husky/lint-staged, MIT LICENSE (SC-4, SC-5 deploy)
 **UI hint**: yes
 
 ### Phase 2: Coordinate Mapping & Fixture Viewer
@@ -123,7 +128,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Scaffolding & Version Lock | 0/TBD | Not started | - |
+| 1. Scaffolding & Version Lock | 0/4 | Planned | - |
 | 2. Coordinate Mapping & Fixture Viewer | 0/TBD | Not started | - |
 | 3. Pure Transform Core | 0/TBD | Not started | - |
 | 4. Config Form & Local Persistence | 0/TBD | Not started | - |
