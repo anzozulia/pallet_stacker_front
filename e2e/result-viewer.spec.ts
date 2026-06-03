@@ -100,9 +100,10 @@ test.describe('presets', () => {
     await expect(front).not.toHaveClass(accent);
 
     // ----- THE REGRESSION GUARD -----
-    // 1) Camera positions must be DISTINCT between the three presets. On the old
-    //    non-reframing build these were identical (Bounds re-fit every frame), so
-    //    every pairwise distance was ~0 — this assertion would FAIL there.
+    // 1) Camera positions must be DISTINCT between the three presets. On a
+    //    non-reframing build (presets that never move the camera) these collapse to
+    //    one framing, so every pairwise distance is ~0 — this assertion FAILS there
+    //    (verified: simulated regression yields received distance 0).
     const MIN_CAM_DELTA = 1; // mm; presets are hundreds of mm apart, so this is generous
     expect(l2(top_.cam.position, front_.cam.position)).toBeGreaterThan(MIN_CAM_DELTA);
     expect(l2(top_.cam.position, iso_.cam.position)).toBeGreaterThan(MIN_CAM_DELTA);
