@@ -41,7 +41,7 @@ A user can describe their pallet and boxes and get back a correct, explorable 3D
 - Server-side calculation history or saved jobs — no backend persistence in v1; this is a stateless client over the API. May be added later.
 - The packing algorithm itself — owned by the existing API (`packerapi.anzozulia.xyz`); the frontend never computes placements.
 - 6-way granular rotation control — the API only supports 3 modes (`all` / `this_side_up` / `none`); the UI will mirror those three, not the 6 chips in the mockup.
-- CoG envelope as an *input* constraint — the API does not accept a CoG limit; centre-of-gravity is an *output* only, surfaced as a diagnostic.
+- CoG envelope as an _input_ constraint — the API does not accept a CoG limit; centre-of-gravity is an _output_ only, surfaced as a diagnostic.
 - Native mobile apps — web-first, responsive where practical.
 
 ## Context
@@ -50,7 +50,7 @@ A user can describe their pallet and boxes and get back a correct, explorable 3D
 - **Design mockups** in `design/` (`config.html`, `loading.html`, `result.html`) — high-fidelity vanilla HTML/CSS/JS + Three.js. They are the visual north star and overall vision, not the implementation; they will be reimplemented in the chosen stack and adjusted as the API dictates. Design is explicitly subject to change.
 - **API returns more than the mockup shows** — per-item `support_ratio`, `supported_by`, `supports`, and per-pallet `cog`. v1 surfaces these as stability diagnostics.
 - **Quantity gap** — the catalog groups boxes by type with a quantity; the API expects individual boxes with unique IDs, so the client expands them before submitting.
-- **Extensibility** — accounts, history, and registration are anticipated future additions. Architect cleanly so they *can* be added, but do not build them now.
+- **Extensibility** — accounts, history, and registration are anticipated future additions. Architect cleanly so they _can_ be added, but do not build them now.
 
 ## Constraints
 
@@ -66,20 +66,21 @@ A user can describe their pallet and boxes and get back a correct, explorable 3D
 
 <!-- Decisions that constrain future work. Add throughout project lifecycle. -->
 
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| React + Vite + TypeScript + react-three-fiber | Dynamic catalog UI, type-safe API contract, large contributor pool, r3f wraps existing Three.js scene declaratively | — Pending |
-| Build-time `VITE_API_URL` for API base URL | Simplest path chosen over a runtime nginx proxy; accept rebuild-to-reconfigure and a CORS requirement | — Pending |
-| Simplify rotation UI to the API's 3 modes | The 6-chip mockup implies control the API can't honor; mirror `all` / `this_side_up` / `none` honestly | — Pending |
-| Include all four optional features in v1 (multi-pallet, export, local save/load, stability diagnostics) | They are high-value, low-coupling, and the API already returns the needed data | — Pending |
-| Async submit-then-poll integration with the pack API | Required by the API's job model; aligns with the mockup loading screen | — Pending |
-| No accounts / no server-side persistence in v1 | "Just a tool as is"; keep it stateless and self-hostable, leave room to add later | — Pending |
+| Decision                                                                                                | Rationale                                                                                                           | Outcome                                                                                                                                 |
+| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| React + Vite + TypeScript + react-three-fiber                                                           | Dynamic catalog UI, type-safe API contract, large contributor pool, r3f wraps existing Three.js scene declaratively | ✓ Realized in Phase 1 — version-locked quartet (React 19.2.7 / r3f 9.6.1 / drei 10.7.7 / three 0.184.0 exact) builds, runs, and serves  |
+| Build-time `VITE_API_URL` for API base URL                                                              | Simplest path chosen over a runtime nginx proxy; accept rebuild-to-reconfigure and a CORS requirement               | ✓ Seam wired in Phase 1 — typed `import.meta.env.VITE_API_URL`, Docker build-arg bake, `/api` dev proxy (live grep deferred to Phase 5) |
+| Simplify rotation UI to the API's 3 modes                                                               | The 6-chip mockup implies control the API can't honor; mirror `all` / `this_side_up` / `none` honestly              | — Pending                                                                                                                               |
+| Include all four optional features in v1 (multi-pallet, export, local save/load, stability diagnostics) | They are high-value, low-coupling, and the API already returns the needed data                                      | — Pending                                                                                                                               |
+| Async submit-then-poll integration with the pack API                                                    | Required by the API's job model; aligns with the mockup loading screen                                              | — Pending                                                                                                                               |
+| No accounts / no server-side persistence in v1                                                          | "Just a tool as is"; keep it stateless and self-hostable, leave room to add later                                   | — Pending                                                                                                                               |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
 **After each phase transition** (via `/gsd-transition`):
+
 1. Requirements invalidated? → Move to Out of Scope with reason
 2. Requirements validated? → Move to Validated with phase reference
 3. New requirements emerged? → Add to Active
@@ -87,10 +88,12 @@ This document evolves at phase transitions and milestone boundaries.
 5. "What This Is" still accurate? → Update if drifted
 
 **After each milestone** (via `/gsd-complete-milestone`):
+
 1. Full review of all sections
 2. Core Value check — still the right priority?
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-03 after initialization*
+
+_Last updated: 2026-06-03 — Phase 1 (Scaffolding & Version Lock) complete: version-locked Vite + React + TS + r3f project builds, runs in dev, serves from a non-root nginx Docker image, with unit + E2E test tooling wired._
