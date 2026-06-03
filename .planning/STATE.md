@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-06-03T16:59:19.149Z"
+last_updated: "2026-06-03T17:06:43.597Z"
 last_activity: 2026-06-03 -- Completed Phase 01 Plan 01 (scaffolding + version lock)
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 ## Current Position
 
 Phase: 01 (scaffolding-version-lock) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-06-03 -- Completed Phase 01 Plan 01 (scaffolding + version lock)
 
@@ -53,6 +53,7 @@ Progress: [██░░░░░░░░] 25%
 
 *Updated after each plan completion*
 | Phase 01 P01-02 | ~12min | 2 tasks | 11 files |
+| Phase 01 P01-03 | ~8min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,9 @@ Recent decisions affecting current work:
 - [01-01]: Tailwind v4 @theme kept minimal (fonts + #4f46e5 accent only); full mockup palette deferred to Phases 4/6 (D-07).
 - [01-01]: Supply-chain checkpoint (T-1-SC) human-approved — clean lockfile resolution confirmed before later waves build on it.
 - [Phase ?]: Code-split boundary established: /result is React.lazy-loaded so three/r3f/drei live only in the lazy chunk; scripts/check-code-split.mjs enforces it as a build gate (01-02)
+- [Phase ?]: Plan 01-03: Vitest config in its own file MUST re-register tsconfigPaths() — Vitest does not inherit vite.config.ts plugins (alias-in-tests Pitfall 4)
+- [Phase ?]: Plan 01-03: jsdom tests stay WebGL-free (e2e/** excluded, no Canvas import); the r3f Canvas-mount assertion runs only in the Playwright preview-build smoke (Pitfall 2)
+- [Phase ?]: Plan 01-03: Playwright webServer runs 'npm run build && npm run preview' so the e2e smoke tests the real static production build, not the dev server
 
 ### Pending Todos
 
@@ -94,6 +98,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-03T16:59:05.085Z
+Last session: 2026-06-03T17:05:36.786Z
 Stopped at: Completed 01-01-PLAN.md
 Resume file: None
