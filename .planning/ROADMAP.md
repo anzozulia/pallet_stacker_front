@@ -75,7 +75,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Wave 1: commit the captured golden fixture + pure src/lib/ coordinate-mapping (golden non-rotated/rotated + AABB tests) + deterministic box-type palette (RESULT-01 data/math half; locked-risk resolution)
+- [x] 02-01-PLAN.md — Wave 1: commit the captured golden fixture + pure src/lib/ coordinate-mapping (golden non-rotated/rotated + AABB tests) + deterministic box-type palette (RESULT-01 data/math half; locked-risk resolution)
 
 **Wave 2** _(blocked on Wave 1 completion)_
 

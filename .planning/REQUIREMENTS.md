@@ -32,7 +32,7 @@ Requirements for the initial release. Each maps to a roadmap phase.
 
 ### Result & Visualization
 
-- [ ] **RESULT-01**: User can view a 3D visualization of the packed pallet, with boxes coloured by type and a legend
+- [x] **RESULT-01**: User can view a 3D visualization of the packed pallet, with boxes coloured by type and a legend
 - [ ] **RESULT-02**: User can orbit, zoom, and pan the 3D scene and switch between ISO / TOP / FRONT camera presets
 - [ ] **RESULT-03**: User can view summary stats: pallets used, utilisation, unpacked count, and total weight
 - [ ] **RESULT-04**: User can switch between generated pallets and see each one's 3D layout and stats
@@ -111,7 +111,7 @@ Which phases cover which requirements. Populated during roadmap creation.
 | PACK-04 | Phase 5 | Pending |
 | PACK-05 | Phase 5 | Pending |
 | PACK-06 | Phase 5 | Pending |
-| RESULT-01 | Phase 2 | Pending |
+| RESULT-01 | Phase 2 | Complete |
 | RESULT-02 | Phase 2 | Pending |
 | RESULT-03 | Phase 6 | Pending |
 | RESULT-04 | Phase 6 | Pending |

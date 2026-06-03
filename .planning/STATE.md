@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 2 context gathered
-last_updated: '2026-06-03T19:56:20.533Z'
-last_activity: 2026-06-03 -- Phase 02 planning complete
+last_updated: "2026-06-03T21:08:34.192Z"
+last_activity: 2026-06-03
 progress:
   total_phases: 7
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
-  percent: 14
+  total_plans: 6
+  completed_plans: 5
+  percent: 83
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-03)
 
 **Core value:** A user can describe their pallet and boxes and get back a correct, explorable 3D packing plan in seconds — zero signup, single self-hostable Docker container.
-**Current focus:** Phase 01 — scaffolding-version-lock
+**Current focus:** Phase 02 — coordinate-mapping-fixture-viewer
 
 ## Current Position
 
-Phase: 2
-Plan: Not started
+Phase: 02 (coordinate-mapping-fixture-viewer) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-06-03 -- Phase 02 planning complete
+Last activity: 2026-06-03
 
-Progress: [██████████] 100% (Phase 01 plans)
+Progress: [████████░░] 83%
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ _Updated after each plan completion_
 | Phase 01 P01-02 | ~12min | 2 tasks | 11 files |
 | Phase 01 P01-03 | ~8min | 2 tasks | 6 files |
 | Phase 01 P01-04 | ~10min | 3 tasks | 6 files |
+| Phase 02 P01 | 3 | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [01-04]: Docker serve = nginx-unprivileged:alpine on 8080 (UID 101), no USER root / no port 80 — rootless-Docker / k8s runAsNonRoot friendly (D-14).
 - [Phase ?]: [01-04]: VITE_API_URL baked at build (ARG/ENV before npm run build); reconfig = rebuild; runtime envsubst override deferred to Phase 7 (D-16, SC-5).
 - [Phase ?]: [01-04]: SPA deep-link fallback (try_files /index.html) exercised in Phase 1, not Phase 7 — the #1 self-host gotcha (D-05).
+- [Phase ?]: [02-01]: mapPlacement consumes only position(min-corner)+post-orientation dimensions; orientation.perm NEVER re-applied — pinned by D003 rotated golden (size [150,300,600], center [-425,950,-100])
+- [Phase ?]: [02-01]: Pure src/lib math modules (mapping.ts, palette.ts) import three only as type / not at all to preserve the code-split build gate
+- [Phase ?]: [02-01]: Golden fixture committed under src/lib/__fixtures__/ (2 pallets, 7 unpacked, perm [2,0,1]); zod deferred to Phase 5, fixture types hand-written
 
 ### Pending Todos
 
@@ -102,6 +106,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-03T18:52:33.991Z
+Last session: 2026-06-03T21:08:15.248Z
 Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-coordinate-mapping-fixture-viewer/02-CONTEXT.md
+Resume file: None
