@@ -69,9 +69,19 @@ Decimal phases appear between their surrounding integers in numeric order.
 3. A static viewer renders the fixture as a 3D pallet with boxes coloured by type and a legend, visually matching `design/result.html`
 4. A user can orbit, zoom, and pan the static scene and switch between ISO / TOP / FRONT camera presets
 
-**Plans**: TBD
-**UI hint**: yes
-**Research flag:** NEEDS deeper research during planning — `orientation.perm` gather-vs-scatter semantics and whether `position.z` / `dimensions` are pre- or post-orientation must be resolved from the real captured response (first sub-task), not guessed.
+**Plans**: 2 plans (inside-out, sequential waves 1→2)
+
+Plans:
+
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — Wave 1: commit the captured golden fixture + pure src/lib/ coordinate-mapping (golden non-rotated/rotated + AABB tests) + deterministic box-type palette (RESULT-01 data/math half; locked-risk resolution)
+
+**Wave 2** _(blocked on Wave 1 completion)_
+
+- [ ] 02-02-PLAN.md — Wave 2: dark-overlay @theme tokens + bbox camera-preset math, the drei viewer scene on /result (wood pallet, coloured edged boxes, legend, ISO/TOP/FRONT), Playwright Canvas + preset e2e, human visual sign-off (RESULT-01 viewer half + RESULT-02)
+      **UI hint**: yes
+      **Research flag:** NEEDS deeper research during planning — `orientation.perm` gather-vs-scatter semantics and whether `position.z` / `dimensions` are pre- or post-orientation must be resolved from the real captured response (first sub-task), not guessed.
 
 ### Phase 3: Pure Transform Core
 
@@ -162,7 +172,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase                                  | Plans Complete | Status      | Completed  |
 | -------------------------------------- | -------------- | ----------- | ---------- |
 | 1. Scaffolding & Version Lock          | 4/4            | Complete    | 2026-06-03 |
-| 2. Coordinate Mapping & Fixture Viewer | 0/TBD          | Not started | -          |
+| 2. Coordinate Mapping & Fixture Viewer | 0/2            | Not started | -          |
 | 3. Pure Transform Core                 | 0/TBD          | Not started | -          |
 | 4. Config Form & Local Persistence     | 0/TBD          | Not started | -          |
 | 5. API Client & Async Polling          | 0/TBD          | Not started | -          |
