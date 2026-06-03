@@ -29,5 +29,10 @@ export default tseslint.config(
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
   },
+  {
+    // Node-environment scripts + root config files (build tooling, not browser code).
+    files: ['scripts/**/*.{js,mjs,cjs}', '*.{js,mjs,cjs}'],
+    languageOptions: { globals: globals.node },
+  },
   prettier, // MUST be last — disables stylistic rules that conflict with prettier
 );
