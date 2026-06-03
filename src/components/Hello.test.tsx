@@ -2,8 +2,8 @@ import { render, screen } from '@testing-library/react';
 import { expect, test } from 'vitest';
 // Imported via the `@/` alias on purpose: this proves the alias resolves inside
 // Vitest (not just Vite) — the test-config tsconfigPaths() seam (Pitfall 4).
-// NOTE: never import ResultPage/Canvas/@react-three here — jsdom has no WebGL,
-// so the Canvas-mount assertion lives only in the Playwright smoke (Pitfall 2).
+// Keep jsdom tests free of any 3D/WebGL imports — jsdom has no WebGL context, so
+// the live render assertion belongs only in the Playwright smoke (Pitfall 2).
 import Hello from '@/components/Hello';
 
 test('renders the Palletize heading', () => {
