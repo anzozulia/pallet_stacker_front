@@ -97,13 +97,50 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated by roadmapper) | — | Pending |
+| PALLET-01 | Phase 4 | Pending |
+| PALLET-02 | Phase 4 | Pending |
+| BOX-01 | Phase 4 | Pending |
+| BOX-02 | Phase 4 | Pending |
+| BOX-03 | Phase 4 | Pending |
+| BOX-04 | Phase 4 | Pending |
+| BOX-05 | Phase 4 | Pending |
+| BOX-06 | Phase 4 | Pending |
+| PACK-01 | Phase 5 | Pending |
+| PACK-02 | Phase 3 | Pending |
+| PACK-03 | Phase 4 | Pending |
+| PACK-04 | Phase 5 | Pending |
+| PACK-05 | Phase 5 | Pending |
+| PACK-06 | Phase 5 | Pending |
+| RESULT-01 | Phase 2 | Pending |
+| RESULT-02 | Phase 2 | Pending |
+| RESULT-03 | Phase 6 | Pending |
+| RESULT-04 | Phase 6 | Pending |
+| RESULT-05 | Phase 6 | Pending |
+| RESULT-06 | Phase 6 | Pending |
+| DIAG-01 | Phase 6 | Pending |
+| DIAG-02 | Phase 6 | Pending |
+| DATA-01 | Phase 7 | Pending |
+| DATA-02 | Phase 4 | Pending |
+| HOST-01 | Phase 7 | Pending |
+| HOST-02 | Phase 7 | Pending |
+| HOST-03 | Phase 7 | Pending |
+
+**Note:** BOX-04 (rotation mode) spans two phases by nature — the request-builder *mapping* of the three modes is delivered/tested in Phase 3, and the *user-facing rotation choice* is delivered in Phase 4. It is assigned to Phase 4 above (the phase where the user-observable behavior lands) to keep a one-phase-per-requirement mapping; Phase 3's success criteria reference the underlying mapping.
 
 **Coverage:**
-- v1 requirements: 25 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 25 ⚠️
+- v1 requirements: 27 total (the prior "25" summary undercounted the enumerated IDs — all 27 listed IDs are now mapped)
+- Mapped to phases: 27 ✓
+- Unmapped: 0 ✓
+
+Phase distribution:
+- Phase 1 (Scaffolding & Version Lock): 0 requirements (foundational only)
+- Phase 2 (Coordinate Mapping & Fixture Viewer): RESULT-01, RESULT-02
+- Phase 3 (Pure Transform Core): PACK-02 (+ BOX-04 mapping)
+- Phase 4 (Config Form & Local Persistence): PALLET-01, PALLET-02, BOX-01, BOX-02, BOX-03, BOX-04, BOX-05, BOX-06, PACK-03, DATA-02
+- Phase 5 (API Client & Async Polling): PACK-01, PACK-04, PACK-05, PACK-06
+- Phase 6 (Result Page & 3D Wiring): RESULT-03, RESULT-04, RESULT-05, RESULT-06, DIAG-01, DIAG-02
+- Phase 7 (Edge States, Exports & Self-Hosting): DATA-01, HOST-01, HOST-02, HOST-03
 
 ---
 *Requirements defined: 2026-06-03*
-*Last updated: 2026-06-03 after initial definition*
+*Last updated: 2026-06-03 after roadmap creation (traceability populated)*
