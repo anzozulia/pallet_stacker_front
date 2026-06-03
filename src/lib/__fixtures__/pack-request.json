@@ -1,0 +1,321 @@
+{
+  "boxes": [
+    {
+      "id": "D000",
+      "length": 600,
+      "width": 300,
+      "height": 150,
+      "weight": 5.0,
+      "rotations": "all"
+    },
+    {
+      "id": "D001",
+      "length": 600,
+      "width": 300,
+      "height": 150,
+      "weight": 5.0,
+      "rotations": "all"
+    },
+    {
+      "id": "D002",
+      "length": 600,
+      "width": 300,
+      "height": 150,
+      "weight": 5.0,
+      "rotations": "all"
+    },
+    {
+      "id": "D003",
+      "length": 600,
+      "width": 300,
+      "height": 150,
+      "weight": 5.0,
+      "rotations": "all"
+    },
+    {
+      "id": "D004",
+      "length": 600,
+      "width": 300,
+      "height": 150,
+      "weight": 5.0,
+      "rotations": "all"
+    },
+    {
+      "id": "D005",
+      "length": 600,
+      "width": 300,
+      "height": 150,
+      "weight": 5.0,
+      "rotations": "all"
+    },
+    {
+      "id": "D006",
+      "length": 600,
+      "width": 300,
+      "height": 150,
+      "weight": 5.0,
+      "rotations": "all"
+    },
+    {
+      "id": "D007",
+      "length": 600,
+      "width": 300,
+      "height": 150,
+      "weight": 5.0,
+      "rotations": "all"
+    },
+    {
+      "id": "D008",
+      "length": 600,
+      "width": 300,
+      "height": 150,
+      "weight": 5.0,
+      "rotations": "all"
+    },
+    {
+      "id": "D009",
+      "length": 600,
+      "width": 300,
+      "height": 150,
+      "weight": 5.0,
+      "rotations": "all"
+    },
+    {
+      "id": "D010",
+      "length": 600,
+      "width": 300,
+      "height": 150,
+      "weight": 5.0,
+      "rotations": "all"
+    },
+    {
+      "id": "D011",
+      "length": 600,
+      "width": 300,
+      "height": 150,
+      "weight": 5.0,
+      "rotations": "all"
+    },
+    {
+      "id": "T000",
+      "length": 250,
+      "width": 250,
+      "height": 700,
+      "weight": 7.0,
+      "rotations": "this_side_up"
+    },
+    {
+      "id": "T001",
+      "length": 250,
+      "width": 250,
+      "height": 700,
+      "weight": 7.0,
+      "rotations": "this_side_up"
+    },
+    {
+      "id": "T002",
+      "length": 250,
+      "width": 250,
+      "height": 700,
+      "weight": 7.0,
+      "rotations": "this_side_up"
+    },
+    {
+      "id": "T003",
+      "length": 250,
+      "width": 250,
+      "height": 700,
+      "weight": 7.0,
+      "rotations": "this_side_up"
+    },
+    {
+      "id": "T004",
+      "length": 250,
+      "width": 250,
+      "height": 700,
+      "weight": 7.0,
+      "rotations": "this_side_up"
+    },
+    {
+      "id": "T005",
+      "length": 250,
+      "width": 250,
+      "height": 700,
+      "weight": 7.0,
+      "rotations": "this_side_up"
+    },
+    {
+      "id": "T006",
+      "length": 250,
+      "width": 250,
+      "height": 700,
+      "weight": 7.0,
+      "rotations": "this_side_up"
+    },
+    {
+      "id": "T007",
+      "length": 250,
+      "width": 250,
+      "height": 700,
+      "weight": 7.0,
+      "rotations": "this_side_up"
+    },
+    {
+      "id": "T008",
+      "length": 250,
+      "width": 250,
+      "height": 700,
+      "weight": 7.0,
+      "rotations": "this_side_up"
+    },
+    {
+      "id": "T009",
+      "length": 250,
+      "width": 250,
+      "height": 700,
+      "weight": 7.0,
+      "rotations": "this_side_up"
+    },
+    {
+      "id": "T010",
+      "length": 250,
+      "width": 250,
+      "height": 700,
+      "weight": 7.0,
+      "rotations": "this_side_up"
+    },
+    {
+      "id": "T011",
+      "length": 250,
+      "width": 250,
+      "height": 700,
+      "weight": 7.0,
+      "rotations": "this_side_up"
+    },
+    {
+      "id": "F000",
+      "length": 350,
+      "width": 350,
+      "height": 350,
+      "weight": 9.0,
+      "rotations": "none"
+    },
+    {
+      "id": "F001",
+      "length": 350,
+      "width": 350,
+      "height": 350,
+      "weight": 9.0,
+      "rotations": "none"
+    },
+    {
+      "id": "F002",
+      "length": 350,
+      "width": 350,
+      "height": 350,
+      "weight": 9.0,
+      "rotations": "none"
+    },
+    {
+      "id": "F003",
+      "length": 350,
+      "width": 350,
+      "height": 350,
+      "weight": 9.0,
+      "rotations": "none"
+    },
+    {
+      "id": "F004",
+      "length": 350,
+      "width": 350,
+      "height": 350,
+      "weight": 9.0,
+      "rotations": "none"
+    },
+    {
+      "id": "F005",
+      "length": 350,
+      "width": 350,
+      "height": 350,
+      "weight": 9.0,
+      "rotations": "none"
+    },
+    {
+      "id": "F006",
+      "length": 350,
+      "width": 350,
+      "height": 350,
+      "weight": 9.0,
+      "rotations": "none"
+    },
+    {
+      "id": "F007",
+      "length": 350,
+      "width": 350,
+      "height": 350,
+      "weight": 9.0,
+      "rotations": "none"
+    },
+    {
+      "id": "F008",
+      "length": 350,
+      "width": 350,
+      "height": 350,
+      "weight": 9.0,
+      "rotations": "none"
+    },
+    {
+      "id": "F009",
+      "length": 350,
+      "width": 350,
+      "height": 350,
+      "weight": 9.0,
+      "rotations": "none"
+    },
+    {
+      "id": "F010",
+      "length": 350,
+      "width": 350,
+      "height": 350,
+      "weight": 9.0,
+      "rotations": "none"
+    },
+    {
+      "id": "F011",
+      "length": 350,
+      "width": 350,
+      "height": 350,
+      "weight": 9.0,
+      "rotations": "none"
+    },
+    {
+      "id": "F012",
+      "length": 350,
+      "width": 350,
+      "height": 350,
+      "weight": 9.0,
+      "rotations": "none"
+    },
+    {
+      "id": "F013",
+      "length": 350,
+      "width": 350,
+      "height": 350,
+      "weight": 9.0,
+      "rotations": "none"
+    }
+  ],
+  "pallet": {
+    "length": 1000,
+    "width": 800,
+    "height": 1000,
+    "max_weight": 250,
+    "max_overhang": 0
+  },
+  "options": {
+    "max_pallets": 2,
+    "time_budget_s": 25,
+    "seed": 7,
+    "support_ratio": 0.8
+  }
+}
