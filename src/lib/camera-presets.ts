@@ -22,9 +22,12 @@ export interface CameraPreset {
 
 export type PresetKind = 'ISO' | 'TOP' | 'FRONT';
 
-// Framing factor: how many bbox-radii back the camera sits. ~2.0 keeps the whole
-// bbox comfortably in frame with margin. Tunable; scales the distance with the box.
-const FRAMING_K = 2.0;
+// Framing factor: how many bbox-radii back the camera sits. At the viewer's 45°
+// fov the visible half-extent at distance d is ~0.414·d, so the bounding SPHERE
+// (radius r) needs d ≳ r/0.414 ≈ 2.4r just to touch the frame edges. 2.6 leaves a
+// comfortable margin around the whole scene (pallet + boxes) so nothing is clipped
+// at the viewport edges in any preset. Tunable; scales the distance with the box.
+const FRAMING_K = 2.6;
 
 function radiusOf(size: Vec3Tuple): number {
   // Half the diagonal length of the bbox — a scale-invariant "size" of the scene.

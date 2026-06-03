@@ -86,6 +86,18 @@ export function CameraPresets({ boxesRef, preset, presetNonce, onBbox }: CameraP
     camera.position.lerpVectors(a.fromPos, a.toPos, e);
     controls.target.lerpVectors(a.fromTarget, a.toTarget, e);
     controls.update();
+
+    // Test-only camera-state hook: the strengthened preset-reframe e2e reads this
+    // to assert ISO/TOP/FRONT produce DISTINCT camera positions (a non-reframing
+    // regression would leave these identical). DEV/preview only; harmless in prod.
+    if (typeof window !== 'undefined') {
+      (window as Window & { __cameraState?: unknown }).__cameraState = {
+        position: [camera.position.x, camera.position.y, camera.position.z],
+        target: [controls.target.x, controls.target.y, controls.target.z],
+        settled: k >= 1,
+      };
+    }
+
     if (k >= 1) anim.current = null;
   });
 

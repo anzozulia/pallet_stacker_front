@@ -8,7 +8,6 @@
 // the lazy chunk and out of the Configure bundle (Pitfall 3 / code-split gate).
 
 import { useMemo, useRef, useState } from 'react';
-import { Bounds } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { type Group } from 'three';
 import { Boxes, buildPalette } from '@/components/viewer/Boxes';
@@ -57,7 +56,10 @@ export default function ResultPage() {
         data-testid="r3f-canvas"
         shadows
         dpr={[1, 2]}
-        gl={{ antialias: true }}
+        // preserveDrawingBuffer keeps the rendered framebuffer readable after the
+        // draw call so Playwright canvas screenshots capture real pixels — the
+        // strengthened preset-reframe e2e diffs ISO/TOP/FRONT canvas images.
+        gl={{ antialias: true, preserveDrawingBuffer: true }}
         camera={{ fov: 45, near: 1, far: 20000, position: [2000, 1600, 2200] }}
       >
         <fog attach="fog" args={['#0c0f17', 2800, 5600]} />
@@ -83,10 +85,12 @@ export default function ResultPage() {
 
         <Pallet length={d.L} width={d.W} />
 
-        {/* Auto-frame the real fixture (D-12). */}
-        <Bounds fit clip observe margin={1.2}>
-          <Boxes ref={boxesRef} pallet={pallet0} palette={palette} />
-        </Bounds>
+        {/* CameraPresets OWNS all framing (D-11/D-12): it measures the boxes-group
+            bbox post-mount and drives the camera/target to presetFromBbox(...).
+            A drei <Bounds observe> wrapper here would re-fit the camera every frame
+            and fight the preset animation, snapping every preset back to one
+            identical Bounds-fit framing — so it is intentionally absent. */}
+        <Boxes ref={boxesRef} pallet={pallet0} palette={palette} />
 
         <CameraPresets boxesRef={boxesRef} preset={active} presetNonce={presetNonce} />
       </Canvas>
