@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-06-03T17:06:43.597Z"
-last_activity: 2026-06-03 -- Completed Phase 01 Plan 01 (scaffolding + version lock)
+status: verifying
+stopped_at: Completed 01-04-PLAN.md (Phase 01 ready for verification)
+last_updated: '2026-06-03T17:15:37.188Z'
+last_activity: 2026-06-03 -- Completed Phase 01 Plan 04 (Docker + CI + hooks + LICENSE); Phase 01 ready for verification
 progress:
   total_phases: 7
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 3
-  percent: 0
+  completed_plans: 4
+  percent: 14
 ---
 
 # Project State
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 
 Phase: 01 (scaffolding-version-lock) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
-Last activity: 2026-06-03 -- Completed Phase 01 Plan 01 (scaffolding + version lock)
+Status: Phase complete — ready for verification
+Last activity: 2026-06-03 -- Completed Phase 01 Plan 04 (Docker + CI + hooks + LICENSE)
 
-Progress: [██░░░░░░░░] 25%
+Progress: [██████████] 100% (Phase 01 plans)
 
 ## Performance Metrics
 
@@ -43,17 +43,18 @@ Progress: [██░░░░░░░░] 25%
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| - | - | - | - |
+| ----- | ----- | ----- | -------- |
+| -     | -     | -     | -        |
 
 **Recent Trend:**
 
 - Last 5 plans: —
 - Trend: —
 
-*Updated after each plan completion*
+_Updated after each plan completion_
 | Phase 01 P01-02 | ~12min | 2 tasks | 11 files |
 | Phase 01 P01-03 | ~8min | 2 tasks | 6 files |
+| Phase 01 P01-04 | ~10min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -71,8 +72,11 @@ Recent decisions affecting current work:
 - [01-01]: Supply-chain checkpoint (T-1-SC) human-approved — clean lockfile resolution confirmed before later waves build on it.
 - [Phase ?]: Code-split boundary established: /result is React.lazy-loaded so three/r3f/drei live only in the lazy chunk; scripts/check-code-split.mjs enforces it as a build gate (01-02)
 - [Phase ?]: Plan 01-03: Vitest config in its own file MUST re-register tsconfigPaths() — Vitest does not inherit vite.config.ts plugins (alias-in-tests Pitfall 4)
-- [Phase ?]: Plan 01-03: jsdom tests stay WebGL-free (e2e/** excluded, no Canvas import); the r3f Canvas-mount assertion runs only in the Playwright preview-build smoke (Pitfall 2)
+- [Phase ?]: Plan 01-03: jsdom tests stay WebGL-free (e2e/\*\* excluded, no Canvas import); the r3f Canvas-mount assertion runs only in the Playwright preview-build smoke (Pitfall 2)
 - [Phase ?]: Plan 01-03: Playwright webServer runs 'npm run build && npm run preview' so the e2e smoke tests the real static production build, not the dev server
+- [Phase ?]: [01-04]: Docker serve = nginx-unprivileged:alpine on 8080 (UID 101), no USER root / no port 80 — rootless-Docker / k8s runAsNonRoot friendly (D-14).
+- [Phase ?]: [01-04]: VITE_API_URL baked at build (ARG/ENV before npm run build); reconfig = rebuild; runtime envsubst override deferred to Phase 7 (D-16, SC-5).
+- [Phase ?]: [01-04]: SPA deep-link fallback (try_files /index.html) exercised in Phase 1, not Phase 7 — the #1 self-host gotcha (D-05).
 
 ### Pending Todos
 
@@ -92,12 +96,12 @@ None yet.
 
 Items acknowledged and carried forward from previous milestone close:
 
-| Category | Item | Status | Deferred At |
-|----------|------|--------|-------------|
-| *(none)* | | | |
+| Category | Item                                                                                                                                                                                                                                                                               | Status              | Deferred At |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ----------- |
+| CI/Infra | Confirm the live GitHub Actions green-run (both jobs) — no git remote is configured yet, so nothing has been pushed. The 01-04 blocking human-verify checkpoint was approved on local CI-proxy + live Docker/SPA-fallback evidence; the actual Actions run confirms on first push. | Pending (no remote) | 01-04       |
 
 ## Session Continuity
 
-Last session: 2026-06-03T17:05:36.786Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-06-03T17:15:37.185Z
+Stopped at: Completed 01-04-PLAN.md (Phase 01 ready for verification)
 Resume file: None
