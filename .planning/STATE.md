@@ -27,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 
 Phase: 02 (coordinate-mapping-fixture-viewer) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
-Last activity: 2026-06-03
+Status: Paused at blocking human-verify checkpoint (Task 4) — Tasks 1-3 done & committed
+Last activity: 2026-06-04
 
 Progress: [████████░░] 83%
 
@@ -106,6 +106,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-03T21:08:15.248Z
-Stopped at: Phase 2 context gathered
-Resume file: None
+Last session: 2026-06-04T00:16:00.000Z
+Stopped at: 02-02 Task 4 — blocking human-verify checkpoint (viewer visual + camera-feel sign-off). Tasks 1-3 green: vitest (13/13), code-split build gate, Playwright e2e (2/2). Awaiting "approved".
+Resume file: .planning/phases/02-coordinate-mapping-fixture-viewer/02-02-PLAN.md (Task 4)
