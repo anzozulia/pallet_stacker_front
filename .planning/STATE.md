@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 1 context gathered
-last_updated: "2026-06-03T16:36:15.865Z"
-last_activity: 2026-06-03 — Roadmap created (7-phase risk-first Vertical MVP)
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-06-03T16:46:07.012Z"
+last_activity: 2026-06-03 -- Completed Phase 01 Plan 01 (scaffolding + version lock)
 progress:
   total_phases: 7
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 4
+  completed_plans: 1
+  percent: 25
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-03)
 
 **Core value:** A user can describe their pallet and boxes and get back a correct, explorable 3D packing plan in seconds — zero signup, single self-hostable Docker container.
-**Current focus:** Phase 1 — Scaffolding & Version Lock
+**Current focus:** Phase 01 — scaffolding-version-lock
 
 ## Current Position
 
-Phase: 1 of 7 (Scaffolding & Version Lock)
-Plan: 0 of TBD in current phase
-Status: Ready to execute
-Last activity: 2026-06-03 — Roadmap created (7-phase risk-first Vertical MVP)
+Phase: 01 (scaffolding-version-lock) — EXECUTING
+Plan: 2 of 4
+Status: Executing Phase 01 (Plan 01 complete)
+Last activity: 2026-06-03 -- Completed Phase 01 Plan 01 (scaffolding + version lock)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 25%
 
 ## Performance Metrics
 
@@ -63,6 +63,10 @@ Recent decisions affecting current work:
 - [Roadmap]: Risk-first Vertical MVP, built inside-out — pure transforms proven before any UI depends on them.
 - [Roadmap]: Phase 1 is foundational scaffolding only (no v1 requirement fully delivered there); acceptable for a version-lock phase.
 - [Roadmap]: Version quartet (React 19.2.x / r3f 9 / drei 10 / three 0.184.0 exact) treated as a single locked unit, never auto-upgraded.
+- [01-01]: Hand-authored package.json (no `npm create vite`) to prevent `^latest` pulling react >=19.3 (violates r3f 9 peer cap); three pinned exactly (no caret).
+- [01-01]: VITE_API_URL typed but NOT consumed in Phase 1 (no API client until Phase 5) — only the type seam established (D-16).
+- [01-01]: Tailwind v4 @theme kept minimal (fonts + #4f46e5 accent only); full mockup palette deferred to Phases 4/6 (D-07).
+- [01-01]: Supply-chain checkpoint (T-1-SC) human-approved — clean lockfile resolution confirmed before later waves build on it.
 
 ### Pending Todos
 
@@ -89,5 +93,5 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-06-03T16:00:23.655Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-scaffolding-version-lock/01-CONTEXT.md
+Stopped at: Completed 01-01-PLAN.md
+Resume file: None
