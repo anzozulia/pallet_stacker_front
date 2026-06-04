@@ -31,6 +31,7 @@ import { classifyFetchError } from '@/api/errors';
 import { tallyCatalog } from '@/lib/config-tally';
 import ErrorCard, { type ErrorCardKind } from '@/features/loading/ErrorCard';
 import type { PackRequest } from '@/types/pack-contract';
+import type { JobStatus } from '@/api/pack-schema';
 
 /** The navigation payload ConfigForm hands over (C-05): the built request + the id→type recovery map. */
 interface LoadingNavState {
@@ -43,7 +44,7 @@ interface LoadingNavState {
  * fixed strings — NO fake %, NO cycling mockup flavor-text array. While the submit is still in flight
  * (no job_id yet) we show a neutral "Submitting…"; `done` is handled by navigation, not text.
  */
-const STATUS_SUBLINE: Record<string, string> = {
+const STATUS_SUBLINE: Partial<Record<JobStatus, string>> = {
   queued: 'Queued',
   running: 'Packing…',
 };
