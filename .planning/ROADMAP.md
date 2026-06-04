@@ -131,7 +131,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 04-01-PLAN.md — Wave 1: install rhf/zod/@hookform/resolvers (supply-chain gate), extend BoxType with label/maxLoad/fragile (D-08), port the light config @theme tokens, author the two zod schemas (strict submit + lenient restore) + DEFAULT_CONFIG/makeDefaultBoxType (D-09)
+- [x] 04-01-PLAN.md — Wave 1: install rhf/zod/@hookform/resolvers (supply-chain gate), extend BoxType with label/maxLoad/fragile (D-08), port the light config @theme tokens, author the two zod schemas (strict submit + lenient restore) + DEFAULT_CONFIG/makeDefaultBoxType (D-09)
 
 **Wave 2** _(blocked on Wave 1; the two pure-lib slices run in parallel — no file overlap)_
 

@@ -9,14 +9,14 @@ Requirements for the initial release. Each maps to a roadmap phase.
 
 ### Pallet Configuration
 
-- [ ] **PALLET-01**: User can set the pallet length, width, and max stack height (mm)
-- [ ] **PALLET-02**: User can set the pallet max weight (kg) and max overhang (mm)
+- [x] **PALLET-01**: User can set the pallet length, width, and max stack height (mm)
+- [x] **PALLET-02**: User can set the pallet max weight (kg) and max overhang (mm)
 
 ### Box Catalog
 
 - [ ] **BOX-01**: User can add, edit, and remove box types in a catalog
-- [ ] **BOX-02**: User can set each box type's dimensions (L/W/H, mm), unit weight (kg), and quantity
-- [ ] **BOX-03**: User can set max-load-on-top per box type and mark a type fragile (fragile = nothing stacked on top)
+- [x] **BOX-02**: User can set each box type's dimensions (L/W/H, mm), unit weight (kg), and quantity
+- [x] **BOX-03**: User can set max-load-on-top per box type and mark a type fragile (fragile = nothing stacked on top)
 - [x] **BOX-04**: User can choose a rotation mode per box type from the API's three modes (any orientation / keep upright / fixed)
 - [ ] **BOX-05**: App shows a live running total of box types and units and warns when the unit count is large
 - [ ] **BOX-06**: App validates pallet and box inputs and blocks submitting an invalid configuration with clear messages
@@ -25,7 +25,7 @@ Requirements for the initial release. Each maps to a roadmap phase.
 
 - [ ] **PACK-01**: User can submit the configuration to run a packing calculation
 - [x] **PACK-02**: App expands each box type's quantity into individual, uniquely-identified boxes before calling the API
-- [ ] **PACK-03**: User can set how many pallets the solver may use (max_pallets)
+- [x] **PACK-03**: User can set how many pallets the solver may use (max_pallets)
 - [ ] **PACK-04**: App shows a loading state and polls the asynchronous job until it reaches a terminal state
 - [ ] **PACK-05**: User can cancel an in-progress packing job, and polling stops cleanly
 - [ ] **PACK-06**: App distinguishes job failure, timeout, unreachable/CORS errors, and "some items unpacked" — none crash the app
@@ -47,7 +47,7 @@ Requirements for the initial release. Each maps to a roadmap phase.
 ### Export & Local Persistence
 
 - [ ] **DATA-01**: User can export the packing result as JSON and as a printable report
-- [ ] **DATA-02**: User can save the current configuration locally and reload it after a page refresh (localStorage)
+- [x] **DATA-02**: User can save the current configuration locally and reload it after a page refresh (localStorage)
 
 ### Self-Hosting & Deployment
 
@@ -97,17 +97,17 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PALLET-01 | Phase 4 | Pending |
-| PALLET-02 | Phase 4 | Pending |
+| PALLET-01 | Phase 4 | Complete |
+| PALLET-02 | Phase 4 | Complete |
 | BOX-01 | Phase 4 | Pending |
-| BOX-02 | Phase 4 | Pending |
-| BOX-03 | Phase 4 | Pending |
+| BOX-02 | Phase 4 | Complete |
+| BOX-03 | Phase 4 | Complete |
 | BOX-04 | Phase 4 | Complete |
 | BOX-05 | Phase 4 | Pending |
 | BOX-06 | Phase 4 | Pending |
 | PACK-01 | Phase 5 | Pending |
 | PACK-02 | Phase 3 | Complete |
-| PACK-03 | Phase 4 | Pending |
+| PACK-03 | Phase 4 | Complete |
 | PACK-04 | Phase 5 | Pending |
 | PACK-05 | Phase 5 | Pending |
 | PACK-06 | Phase 5 | Pending |
@@ -120,7 +120,7 @@ Which phases cover which requirements. Populated during roadmap creation.
 | DIAG-01 | Phase 6 | Pending |
 | DIAG-02 | Phase 6 | Pending |
 | DATA-01 | Phase 7 | Pending |
-| DATA-02 | Phase 4 | Pending |
+| DATA-02 | Phase 4 | Complete |
 | HOST-01 | Phase 7 | Pending |
 | HOST-02 | Phase 7 | Pending |
 | HOST-03 | Phase 7 | Pending |
