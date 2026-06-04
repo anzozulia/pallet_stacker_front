@@ -140,7 +140,7 @@ Plans:
 
 **Wave 3** _(blocked on Wave 1)_
 
-- [ ] 04-04-PLAN.md — Wave 3: shared UI primitives — NumberField, Switch (role=switch), SegmentedControl (3-mode rotation, C-03), Card, SectionLabel; three-free
+- [x] 04-04-PLAN.md — Wave 3: shared UI primitives — NumberField, Switch (role=switch), SegmentedControl (3-mode rotation, C-03), Card, SectionLabel; three-free
 
 **Wave 4** _(blocked on Waves 1-3; the two UI slices run in parallel — no file overlap)_
 
