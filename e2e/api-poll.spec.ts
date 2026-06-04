@@ -9,8 +9,10 @@ import { dirname, join } from 'node:path';
 // happy path (Configure→loading→result) plus each non-success terminal path (failed / timeout /
 // unreachable) and the cancel path, all without a crash.
 //
-// URL matching: the production build bakes `API_BASE = VITE_API_URL` (unset here) so requests resolve
-// to `<origin>/api/v1/...`; the path-suffix globs below intercept them regardless of the baked origin.
+// URL matching: the production build bakes `API_BASE = VITE_API_URL` (set to the preview origin
+// http://localhost:4173 in playwright.config.ts, since WR-01 makes an UNSET value throw at module
+// load) so requests resolve to `<origin>/api/v1/...`; the path-suffix globs below intercept them
+// regardless of the baked origin — NO request ever leaves for a live API.
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 // The committed real done corpus (has 7 unpacked_items — the unpacked-is-SUCCESS case).
