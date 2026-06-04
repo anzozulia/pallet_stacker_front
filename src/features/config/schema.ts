@@ -33,6 +33,16 @@ const kg = z
 // Closed rotation domain — mirrors RotationMode (src/types/config.ts).
 const rotation = z.enum(['free', 'uprightOnly', 'fixed']);
 
+// Lenient numeric for the RESTORE guard only (Pitfall 4 / DATA-02). RHF leaves numeric
+// `<input>` values as STRINGS on the form (Pattern 1 — the strict submit schema coerces
+// them), so the auto-saved draft persists numbers AS STRINGS (e.g. `"1234"`). The restore
+// guard must therefore accept a string-or-number and normalise to a number so a partial,
+// string-shaped draft round-trips (a `z.number()`-only guard would reject the string blob
+// and silently discard the user's work on reload). Structure/type only — NO business rules:
+// an empty string / non-numeric coerces to `NaN` and is left as-is (still structurally a
+// number field) so an in-progress blank field still round-trips.
+const looseNumber = z.union([z.number(), z.string()]).transform((v) => Number(v));
+
 // Strict box-type element: full D-02 rules. `maxLoad` allows 0 (fragile boxes carry no
 // load); `id` must not lead with a digit so the typeKeyOf parse-fallback stays correct (C-06).
 const boxTypeSubmit = z.object({
@@ -76,25 +86,25 @@ export const packConfigSubmitSchema = z.object({
  */
 export const packConfigShapeSchema = z.object({
   pallet: z.object({
-    length: z.number(),
-    width: z.number(),
-    height: z.number(),
-    maxWeight: z.number(),
-    maxOverhang: z.number(),
+    length: looseNumber,
+    width: looseNumber,
+    height: looseNumber,
+    maxWeight: looseNumber,
+    maxOverhang: looseNumber,
   }),
   boxTypes: z.array(
     z.object({
       id: z.string(),
       label: z.string(),
-      length: z.number(),
-      width: z.number(),
-      height: z.number(),
-      weight: z.number(),
-      quantity: z.number(),
-      maxLoad: z.number(),
+      length: looseNumber,
+      width: looseNumber,
+      height: looseNumber,
+      weight: looseNumber,
+      quantity: looseNumber,
+      maxLoad: looseNumber,
       fragile: z.boolean(),
       rotation,
     }),
   ),
-  maxPallets: z.number(),
+  maxPallets: looseNumber,
 });
