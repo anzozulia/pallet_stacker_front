@@ -18,8 +18,8 @@ Requirements for the initial release. Each maps to a roadmap phase.
 - [x] **BOX-02**: User can set each box type's dimensions (L/W/H, mm), unit weight (kg), and quantity
 - [x] **BOX-03**: User can set max-load-on-top per box type and mark a type fragile (fragile = nothing stacked on top)
 - [x] **BOX-04**: User can choose a rotation mode per box type from the API's three modes (any orientation / keep upright / fixed)
-- [ ] **BOX-05**: App shows a live running total of box types and units and warns when the unit count is large
-- [ ] **BOX-06**: App validates pallet and box inputs and blocks submitting an invalid configuration with clear messages
+- [x] **BOX-05**: App shows a live running total of box types and units and warns when the unit count is large
+- [x] **BOX-06**: App validates pallet and box inputs and blocks submitting an invalid configuration with clear messages
 
 ### Packing Job
 
@@ -103,8 +103,8 @@ Which phases cover which requirements. Populated during roadmap creation.
 | BOX-02 | Phase 4 | Complete |
 | BOX-03 | Phase 4 | Complete |
 | BOX-04 | Phase 4 | Complete |
-| BOX-05 | Phase 4 | Pending |
-| BOX-06 | Phase 4 | Pending |
+| BOX-05 | Phase 4 | Complete |
+| BOX-06 | Phase 4 | Complete |
 | PACK-01 | Phase 5 | Pending |
 | PACK-02 | Phase 3 | Complete |
 | PACK-03 | Phase 4 | Complete |
