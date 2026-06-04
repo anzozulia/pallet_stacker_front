@@ -16,8 +16,19 @@ import type { PackRequest } from '@/types/pack-contract';
 /**
  * The resolved API origin. Empty in dev (relative path → Vite proxy, no CORS); the baked
  * VITE_API_URL origin in a production build. Resolved ONCE at module load.
+ *
+ * Fail LOUD in a production build with no VITE_API_URL (WR-01): without this guard every fetch
+ * URL would silently become `"undefined/api/v1/..."` (a broken request that looks like a generic
+ * network error). Under dev/test `import.meta.env.DEV` is true (Vitest sets it), so the guard is
+ * never tripped and the base is '' — the relative path the dev proxy / MSW intercept.
  */
-export const API_BASE: string = import.meta.env.DEV ? '' : import.meta.env.VITE_API_URL;
+const rawBase = import.meta.env.DEV ? '' : import.meta.env.VITE_API_URL;
+if (!import.meta.env.DEV && !rawBase) {
+  throw new Error(
+    'VITE_API_URL must be set at build time for production builds (docker build --build-arg VITE_API_URL=...).',
+  );
+}
+export const API_BASE: string = rawBase ?? '';
 
 /** POST endpoint path — this client owns the `/api/v1` prefix (the env var is origin-only). */
 export const PACK_PATH = '/api/v1/pack';
