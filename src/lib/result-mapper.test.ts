@@ -95,7 +95,7 @@ describe('mapDoneResponse map-primary recovery (D-07 / Pitfall 2)', () => {
 describe('mapDoneResponse non-mutating (Pitfall 5)', () => {
   it('does not inject a typeId property onto the source fixture items', () => {
     mapDoneResponse(done);
-    const sourceItem = done.result.pallets[0].items[0] as Record<string, unknown>;
+    const sourceItem = done.result.pallets[0].items[0] as unknown as Record<string, unknown>;
     expect('typeId' in sourceItem).toBe(false);
   });
 });
