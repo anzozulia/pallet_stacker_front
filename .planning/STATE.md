@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: gaps_found
-stopped_at: Phase 5 verification — 2 blockers found (CR-01/CR-02, poll safety-cap)
-last_updated: "2026-06-05T00:45:00.000Z"
+status: complete
+stopped_at: Phase 5 complete (re-verified 4/4 after CR-01/CR-02 gap closure)
+last_updated: "2026-06-05T01:25:00.000Z"
 last_activity: 2026-06-05
 progress:
   total_phases: 7
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 20
   completed_plans: 20
-  percent: 57
+  percent: 71
 ---
 
 # Project State
@@ -21,22 +21,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-03)
 
 **Core value:** A user can describe their pallet and boxes and get back a correct, explorable 3D packing plan in seconds — zero signup, single self-hostable Docker container.
-**Current focus:** Phase 05 — api-client-async-polling
+**Current focus:** Phase 6 — result-page-&-3d-wiring (next)
 
 ## Current Position
 
-Phase: 05 (api-client-async-polling) — VERIFICATION GAPS
-Plan: 4 of 4 executed
-Status: All 4 plans executed; phase verification found 2 blockers (CR-01/CR-02, poll safety-cap) — gap closure needed
+Phase: 6
+Plan: Not started
+Status: Phase 5 complete — re-verified 4/4 after CR-01/CR-02 poll safety-cap gap closure; 2 optional human-UAT items persisted (05-HUMAN-UAT.md)
 Last activity: 2026-06-05
 
-Progress: [█████████░] 90%
+Progress: [███████░░░] 71%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 23
+- Total plans completed: 27
 - Average duration: — min
 - Total execution time: 0.0 hours
 
@@ -48,6 +48,7 @@ Progress: [█████████░] 90%
 | 02 | 2 | - | - |
 | 03 | 3 | - | - |
 | 04 | 7 | - | - |
+| 05 | 4 | - | - |
 
 **Recent Trend:**
 

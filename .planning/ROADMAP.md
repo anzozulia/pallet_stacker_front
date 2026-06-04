@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Coordinate Mapping & Fixture Viewer** - Capture a real `done` response, lock the API↔Three.js mapping with golden tests, render a static 3D scene matching the mockup (completed 2026-06-04)
 - [x] **Phase 3: Pure Transform Core** - Build and fully unit-test the request-builder (qty expansion + rotation mapping) and result-mapper (grouping + diagnostics) (completed 2026-06-04)
 - [x] **Phase 4: Config Form & Local Persistence** - Editable pallet + box catalog form with validation, live unit count, and localStorage that survives refresh (7 plans, waves 1→5) (completed 2026-06-04)
-- [ ] **Phase 5: API Client & Async Polling** - Typed client, submit-then-poll job lifecycle, loading screen, cancel, and all four terminal states handled (all 4 plans executed; verification 2026-06-05 found 2 blockers — CR-01/CR-02 poll safety-cap — gap closure pending)
+- [x] **Phase 5: API Client & Async Polling** - Typed client, submit-then-poll job lifecycle, loading screen, cancel, and all four terminal states handled (verification found 2 poll safety-cap blockers — CR-01/CR-02 — fixed in gap closure; re-verified 4/4, 2 optional human-UAT items) (completed 2026-06-05)
 - [ ] **Phase 6: Result Page & 3D Wiring** - Full vertical: real result → mapper → viewer + summary rail, multi-pallet switcher, placement list, unpacked panel, CoG + support diagnostics
 - [ ] **Phase 7: Edge States, Exports & Self-Hosting** - Graceful failure screens, JSON + printable export, single Docker image with SPA fallback, GitHub docs
 
@@ -232,6 +232,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Coordinate Mapping & Fixture Viewer | 2/2 | Complete    | 2026-06-03 |
 | 3. Pure Transform Core                 | 3/3 | Complete    | 2026-06-04 |
 | 4. Config Form & Local Persistence     | 7/7 | Complete    | 2026-06-04 |
-| 5. API Client & Async Polling          | 4/4 | Complete   | 2026-06-04 |
+| 5. API Client & Async Polling          | 4/4 | Complete    | 2026-06-04 |
 | 6. Result Page & 3D Wiring             | 0/TBD          | Not started | -          |
 | 7. Edge States, Exports & Self-Hosting | 0/TBD          | Not started | -          |
