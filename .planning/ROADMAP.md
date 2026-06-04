@@ -166,7 +166,26 @@ Plans:
 3. A user can cancel an in-progress job and polling stops cleanly with no leaked intervals or in-flight requests on unmount
 4. Job failure, timeout, unreachable/CORS errors, and "some items unpacked" are each distinguished in the UI and none crash the app
 
-**Plans**: TBD
+**Plans**: 4 plans (sequential waves 1→4 — contracts → engine → happy-path slice → failure/cancel/e2e)
+
+Plans:
+
+**Wave 1**
+
+- [ ] 05-01-PLAN.md — Wave 1: supply-chain checkpoint (react-query 5.101.0 + msw 2.14.6, T-5-SC) + the three-free contract layer — zod network-boundary schema (C-02), PackError taxonomy + CORS/abort bucketing (D-07), AbortSignal fetch client (D-11/C-04), MSW transport + isolated QueryClient render helper (Wave-0 infra) (PACK-01/04/06)
+
+**Wave 2** _(blocked on Wave 1)_
+
+- [ ] 05-02-PLAN.md — Wave 2: the submit-then-poll engine — useSubmitJob (useMutation) + usePollJob (useQuery + terminal-aware refetchInterval + ~120-140s safety cap, C-01/D-09) + the app-wide QueryClientProvider (PACK-01/04/05)
+
+**Wave 3** _(blocked on Wave 2)_
+
+- [ ] 05-03-PLAN.md — Wave 3: the happy-path vertical slice — LoadingPage (comet spinner + tally-derived summary + honest real-status sub-line, D-01) on the eager three-free /loading route (D-03) + the ConfigForm Run seam swap (console.log → navigate('/loading'), C-03/C-05) + done→navigate('/result',replace) (PACK-01/04)
+
+**Wave 4** _(blocked on Wave 3)_
+
+- [ ] 05-04-PLAN.md — Wave 4: the failure/cancel slice — distinguish failed/timeout/unreachable-CORS + unpacked-is-success (D-07), ErrorCard with Retry/Back, Cancel/Back/unmount clean abort (D-04/D-08/SC-3), Playwright route-intercepted e2e + code-split gate + human sign-off (PACK-05/06)
+
 **UI hint**: yes
 
 ### Phase 6: Result Page & 3D Wiring
@@ -213,6 +232,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Coordinate Mapping & Fixture Viewer | 2/2 | Complete    | 2026-06-03 |
 | 3. Pure Transform Core                 | 3/3 | Complete    | 2026-06-04 |
 | 4. Config Form & Local Persistence     | 7/7 | Complete    | 2026-06-04 |
-| 5. API Client & Async Polling          | 0/TBD          | Not started | -          |
+| 5. API Client & Async Polling          | 0/4            | Planned     | -          |
 | 6. Result Page & 3D Wiring             | 0/TBD          | Not started | -          |
 | 7. Edge States, Exports & Self-Hosting | 0/TBD          | Not started | -          |
