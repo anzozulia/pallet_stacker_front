@@ -88,6 +88,11 @@ export default function LoadingPage() {
   // in-flight POST imperatively (SC-3); re-created on each (re)fire so a Retry gets a fresh signal.
   const controllerRef = useRef<AbortController | null>(null);
   // Fire the POST once on mount (guarded against StrictMode dev double-invoke); Retry re-arms it.
+  // INVARIANT (WR-05): this page is mounted fresh per navigation to /loading — the router never
+  // reuses a single LoadingPage instance across two different nav states (each Run navigates anew,
+  // and Cancel/Back unmount it). So `firedRef` need not reset on a nav-state change; it is reset
+  // implicitly by remount. If the route config ever changes to reuse this component across nav
+  // states, this guard must be re-keyed on the request identity or the new POST would never fire.
   const firedRef = useRef(false);
   // Cancelled: drop the jobId so the poll query disables (no leaked interval), and suppress any
   // in-flight error from flashing an error card while we navigate home.
