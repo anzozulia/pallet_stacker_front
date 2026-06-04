@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-05-PLAN.md
-last_updated: "2026-06-04T17:19:42.380Z"
+stopped_at: Completed 04-06-PLAN.md
+last_updated: "2026-06-04T17:22:30.000Z"
 last_activity: 2026-06-04
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 16
-  completed_plans: 14
-  percent: 88
+  completed_plans: 15
+  percent: 94
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 ## Current Position
 
 Phase: 04 (config-form-local-persistence) — EXECUTING
-Plan: 6 of 7
+Plan: 7 of 7
 Status: Ready to execute
 Last activity: 2026-06-04
 
-Progress: [█████████░] 88%
+Progress: [█████████░] 94%
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ _Updated after each plan completion_
 | Phase 04 P04-03 | 7min | 1 tasks | 2 files |
 | Phase 04 P04-04 | 6min | 2 tasks | 7 files |
 | Phase 04 P04-05 | 9min | 2 tasks | 4 files |
+| Phase 04 P04-06 | ~6min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 4 supply-chain gate (T-4-SC): rhf/zod/@hookform/resolvers human-approved, pinned exact, npm ci clean (04-01).
 - [Phase ?]: [04-03]: localStorage restore guard uses LENIENT packConfigShapeSchema (drafts round-trip) not the strict submit schema (Pitfall 4 / D-04); never-throwing version-guard + safeParse falls back to DEFAULT_CONFIG (D-07 / T-4-PERSIST)
 - [Phase 04]: [04-05]: BoxRow reads RHF via useFormContext (not prop-drilled) and registers numeric fields as strings for schema coercion (Pattern 1); fragile↔maxLoad stashes prior maxLoad in a per-session ref (D-08); rows keyed on field.id; scrollIntoView guarded so jsdom never throws
+- [Phase 04]: [04-06]: PalletCard binds pallet.length/width/height/maxWeight/maxOverhang + top-level maxPallets via register (useFormContext); Max pallets replaces the mockup's CoG-envelope field (C-04/D-10/PACK-03) and the Allow-overhang boolean is omitted (numeric maxOverhang covers it); no-CoG pinned by test (T-4-06); formState.errors pre-wired into NumberField error props for the Plan-07 resolver
 
 ### Pending Todos
 
@@ -131,6 +133,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-04T17:19:42.374Z
-Stopped at: Completed 04-05-PLAN.md
+Last session: 2026-06-04T17:22:30.000Z
+Stopped at: Completed 04-06-PLAN.md
 Resume file: None
