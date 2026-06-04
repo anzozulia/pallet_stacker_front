@@ -1,10 +1,11 @@
 ---
 phase: 4
 slug: config-form-local-persistence
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-06-04
+reviewed_at: 2026-06-04
 ---
 
 # Phase 4 — UI Design Contract
@@ -22,7 +23,7 @@ created: 2026-06-04
 | Tool | none |
 | Preset | not applicable |
 | Component library | none — hand-built primitives (`NumberField`, `Switch`, `SegmentedControl`, `Card`, `SectionLabel`) per 04-RESEARCH structure. No Radix/Base UI; the mockup's native `<input>`/`<button>`/checkbox patterns are ported with Tailwind utilities. |
-| Icon library | none (inline SVG, ~14–15px stroke icons ported from the mockup: arrow-right for Run, plus for Add, trash for Remove). `stroke-width:1.3–1.6`, `stroke="currentColor"`. |
+| Icon library | none (inline SVG, ~14–15px stroke icons ported from the mockup: arrow-right for Run, plus for Add, trash for Remove). `stroke-width:1.3–1.6`, `stroke="currentColor"`. Icon-only controls carry an explicit `aria-label` (see Accessibility convention below). |
 | Font | Inter (sans, self-hosted `/fonts/Inter.woff2`) + JetBrains Mono (mono, self-hosted `/fonts/JetBrainsMono.woff2`). Both already wired in `src/styles.css`. Mono is used for numeric inputs, unit affixes, id tags, step numbers, and the running-total meta line. |
 
 **Why no shadcn:** The locked stack (CLAUDE.md) is React 19 + Tailwind v4 CSS-first `@theme` with mockup CSS-variable tokens ported per-phase; there is no `components.json` and shadcn is not part of the stack. Registry safety gate is not applicable. Running in `--auto` — this is recorded, not asked.
@@ -31,7 +32,7 @@ created: 2026-06-04
 
 ## Spacing Scale
 
-The mockup uses a near-8pt rhythm with a few odd values (e.g. 22px, 26px, 18px) carried over from the hand-built design. For the port, **snap to the 4px grid** while preserving the mockup's visual proportions. Declared tokens (Tailwind default scale, all multiples of 4):
+The mockup uses a near-8pt rhythm with a few odd values (e.g. 22px, 26px, 18px) carried over from the hand-built design. For the port, **snap everything to the standard scale** while preserving the mockup's visual proportions. The declared spacing scale uses ONLY standard-set values (4, 8, 16, 24, 32, 48, 64) — no off-scale values appear here:
 
 | Token | Value | Usage |
 |-------|-------|-------|
@@ -40,37 +41,53 @@ The mockup uses a near-8pt rhythm with a few odd values (e.g. 22px, 26px, 18px) 
 | md | 16px | Default field-internal spacing, box-list row gap, dims-3 inter-input gap |
 | lg | 24px | Card-body vertical rhythm, box-row stack gap, grid row/col gap |
 | xl | 32px | Section-label top margins (mockup 34px → 32px), card-to-card gap |
-| 2xl | 48px | Page-head bottom margin (mockup 38px → snap to 48px or keep 40px), wrap top padding (44px → 48px) |
+| 2xl | 48px | Page-head bottom margin (mockup 38px → snap to 48px), wrap top padding (44px → 48px) |
 | 3xl | 64px | Reserved for major page-level breaks; sticky-footer bottom clearance region |
 
-**Exceptions (documented snaps from the mockup, NOT new tokens):**
-- Topbar height: **56px** (fixed chrome height from mockup — a layout constant, not a spacing token).
-- Switch control track: **38×22px** (full) / **32×18px** (sm, per-row fragile) — component dimensions, not spacing.
-- Card horizontal padding: **28px** (mockup `card-body` / `card-head` padding) — snaps to 28 (already a 4-multiple).
-- Content max-width: **960px** centred (`wrap` max-width).
-- Card border-radius: **14px** (cards), **10px** (`--radius`), **7px** (`--radius-sm`, inputs/buttons/chips). Radii are tokens (below), not spacing.
-- Where the mockup uses 22px / 26px / 18px gaps, planner may use 24px / 16px uniformly; visual parity is preserved.
+**Snap rule:** where the mockup uses 22px / 26px / 18px / 34px / 38px / 44px gaps, planner snaps to the nearest standard-set token (typically 16 / 24 / 32 / 48). Visual parity is preserved; no new spacing tokens are introduced.
 
-**Radius tokens (port from mockup `:root`):** `--radius: 10px`, `--radius-sm: 7px`, card radius `14px`. Add to `@theme` as `--radius-*`.
+---
+
+## Named Component Constants (NOT part of the spacing scale)
+
+These are fixed layout/chrome dimensions, not rhythm spacing. They are off the 4/8/16/24/32/48/64 scale by design and MUST be expressed as named constants, never as spacing utilities:
+
+| Constant | Value | Notes |
+|----------|-------|-------|
+| `--topbar-height` | 56px | Fixed chrome height from mockup. |
+| `--card-body-padding` | 28px | Card horizontal padding (mockup `card-body` / `card-head`). **NOT part of the spacing scale** — a named card constant. |
+| Switch track (full) | 38×22px | Fragile/pallet toggle control dimensions. |
+| Switch track (sm) | 32×18px | Per-row fragile toggle dimensions. |
+| Content max-width | 960px | `wrap` centred max-width. |
+| Per-type swatch | 13×13px | Box-type colour swatch (see Color). |
+
+**Radius tokens (port from mockup `:root`):** `--radius: 10px`, `--radius-sm: 7px`, card radius `14px` (`--radius-lg`). Radii are tokens, not spacing. Add to `@theme` as `--radius-*`.
 
 ---
 
 ## Typography
 
-Ported from the mockup. **Exactly 4 sizes-by-role + 2 weights** for the design contract (the mockup's many micro-sizes like 12.5/13.5/14.5px are collapsed to the 4 roles below; planner uses the role, not the decimal).
+Ported from the mockup. **Exactly 4 sizes + exactly 2 weights** form the design contract. The mockup's many micro-sizes (12.5 / 13.5 / 14.5px) and intermediate weights (450/500) are collapsed into these four roles and two weights — planner uses the role, never a decimal size or an intermediate weight.
 
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Display (page H1 `Packing task`) | 22px | 600 (semibold) | 1.2 |
 | Heading (card H2, box-row name) | 14px | 600 (semibold) | 1.3 |
 | Body / input text | 14px | 400 (regular) | 1.5 |
-| Label / meta / hint | 12px | 500 (field labels) / 400 (hints) | 1.4 |
+| Mono numeric input value | 13px | 400 (regular) | 1.4 |
+| Label / meta / hint / affix / tag | 12px | 600 (label) / 400 (hint, meta, affix, tag) | 1.4 |
 
-**Declared font sizes (4):** 22, 14, 13, 12 (px). **Declared weights (2):** regular **400** + semibold **600**. (The mockup also uses 450/500 as intermediate weights; for the contract collapse to **400** body / **500** labels-and-buttons / **600** headings — if the checker enforces strictly 2 weights, treat 500 as the "medium" label weight and 600 as heading; planner: prefer 400 + 600, use 500 only for field `<label>` and `.btn` text to match the mockup, noted as the single permitted intermediate.)
+**Declared font sizes (exactly 4):** **22** (display), **14** (heading + body), **13** (mono numeric input), **12** (label / meta / hint / affix / id-tag / chip). No other sizes are permitted.
 
-**Mono usage (JetBrains Mono, 400/500):** all numeric `<input>` values, unit affixes (`mm`/`kg`/`pcs`/`%`-removed), the `id-tag` chips, topbar step numbers, the brand `pack studio` sub-label, and the footer running-total meta line. Mono numeric input size **13px**; affix/tag size **11px**; meta line **12–13px**.
+**Declared font weights (exactly 2):**
+- **400 (regular)** — body text, input values, hints, running-total meta, unit affixes, id-tags, step numbers.
+- **600 (semibold)** — all headings (H1/H2/box-row name), field `<label>` text, section labels, and button text (`Run packing`, `Save draft`, `Add box type`).
 
-Base body: **14px / line-height 1.5**, `letter-spacing: -0.006em` (port from mockup `body`). Headings: `letter-spacing: -0.01em` to `-0.02em`.
+No intermediate weight (450/500) exists in the contract. Anything the mockup rendered at 450/500 maps to **600** if it is a label/heading/button, otherwise to **400**.
+
+**Mono usage (JetBrains Mono — uses only 400/600, same two weights):** all numeric `<input>` values (**13px / 400**), unit affixes (`mm`/`kg`/`pcs`), the `id-tag` chips, topbar step numbers, the brand `pack studio` sub-label, and the footer running-total meta line — all at **12px / 400** except numeric inputs at 13px. Any mono label/header element uses **600**.
+
+Base body: **14px / line-height 1.5 / weight 400**, `letter-spacing: -0.006em` (port from mockup `body`). Headings: `letter-spacing: -0.01em` to `-0.02em`.
 
 ---
 
@@ -127,9 +144,20 @@ Ported verbatim from `design/config.html` `:root`. The 60/30/10 split for the Co
 | Validation — box does not fit pallet (D-01 hard block) | `"{label}" cannot fit the pallet in any allowed orientation` (inline on the offending box row, `--danger`; surfaces on Run attempt then live-updates). |
 | Validation — empty catalog on Run | `Add at least one box type` (form-level, near the catalog card / footer). |
 | Error timing | Errors first surface on **Run attempt** (`mode:'onSubmit'`), then live-update per field (`reValidateMode:'onChange'`) — least noisy while typing (D-04). Persistence always captures work-in-progress even when invalid. |
-| Destructive — remove box type | Trash icon-button per row (no confirmation dialog — single-click remove matches the mockup; removal is non-destructive of persisted external data and is undoable by re-adding). Icon hover turns `--danger` (`#dc2626`) on `#f0eded` bg as the only destructive-intent affordance. |
+| Destructive — remove box type | Trash icon-button per row (no confirmation dialog — single-click remove matches the mockup; removal is non-destructive of persisted external data and is undoable by re-adding). Icon hover turns `--danger` (`#dc2626`) on `#f0eded` bg as the only destructive-intent affordance. Carries `aria-label="Remove {label}"` (see Accessibility). |
 
 **Tone:** plain, operational, lowercase-after-first-word. No marketing voice. Units always shown via the mono affix (`mm` / `kg` / `pcs`), never inside the label.
+
+---
+
+## Accessibility Conventions
+
+| Control | Convention |
+|---------|------------|
+| Remove box-type (icon-only trash) | MUST set `aria-label="Remove {label}"`, interpolating the box type's `label` (e.g. `aria-label="Remove Carton A"`). Falls back to `aria-label="Remove box type"` when the row has no label yet. |
+| Any other icon-only control | Every icon-only `<button>` MUST carry a descriptive `aria-label` (verb + target). Icons themselves are `aria-hidden="true"`. Controls with visible text (`Run packing`, `Save draft`, `Add box type`) do NOT need an `aria-label`. |
+| Rotation segmented control | Accessible radio-group semantics: arrow-key navigation between segments, Enter/Space selects; exactly one selected at all times. |
+| Switch (fragile/pallet toggles) | Role `switch` with accessible name from its visible label; reflects on/off via `aria-checked`. |
 
 ---
 
@@ -139,7 +167,7 @@ Ported verbatim from `design/config.html` `:root`. The 60/30/10 split for the Co
 |-------------|----------|
 | Page shell (D-05) | Topbar (brand + glyph + `pack studio` sub-label, Configure/Result **step nav** with Configure active, primary Run on the right) → page-head → **Card: Pallet configuration** → **Card: Box catalog** → **sticky footer** (running total left, `Save draft` ghost + `Run packing` primary right). Phases 5/6 slot into this shell. Step-nav `Result` is inactive/non-clickable this phase (no result yet). |
 | Add box type | Append a new row (`makeDefaultBoxType()`), **scroll the new row into view (smooth, center)** and **focus + select the name input** — port the mockup's `addBox()` behaviour in RHF. |
-| Remove box type | Single-click trash icon removes the row; running total recomputes live. Removing the last row reveals the empty-catalog state. |
+| Remove box type | Single-click trash icon (`aria-label="Remove {label}"`) removes the row; running total recomputes live. Removing the last row reveals the empty-catalog state. |
 | fragile ↔ maxLoad (D-08) | Toggling **Fragile ON** disables the `Max load on top` input and sets it to `0` (stash the prior value in-session). Toggling **OFF** re-enables and restores the prior value (`makeDefaultBoxType().maxLoad` if unknown, e.g. after reload). Disabled input shows muted styling (reduced opacity, `--text-3`). |
 | Rotation segmented control | 3 mutually-exclusive segments; exactly one selected; default `Any orientation`. Selected segment: `--accent-weak` bg + `--accent-text`. Keyboard: arrow-key navigation between segments, Enter/Space selects (accessible radio-group semantics). |
 | Run gate (D-06) | Button disabled while invalid. On valid click: run pure `checkAllBoxesFit(config)`; on fit-failure map to inline row errors and stay blocked; on pass, `buildPackRequest(config)` → `console.log` the JSON. No spinner/loading state this phase (that is Phase 5). |
@@ -164,13 +192,15 @@ No component registry is used. All UI primitives are hand-built with Tailwind v4
 
 Planner/executor: add the **light config-form token group** to the existing `@theme` block (the dark `--color-d-*` group stays). Map mockup `:root` vars → Tailwind theme vars:
 
-- `--color-bg: #f7f8fa`, `--color-surface: #ffffff`, `--color-surface-2: #fcfcfd`
+- **Color:** `--color-bg: #f7f8fa`, `--color-surface: #ffffff`, `--color-surface-2: #fcfcfd`
 - `--color-border: #ededf1`, `--color-border-strong: #dfe1e6`
 - `--color-text: #1a1c20`, `--color-text-2: #5c6069`, `--color-text-3: #8a8f99`
 - `--color-accent: #4f46e5` (already present — keep), `--color-accent-weak: #ecebfd`, `--color-accent-text: #4338ca`
 - `--color-danger: #dc2626`
-- `--radius: 10px`, `--radius-sm: 7px` (+ card `14px` as a one-off or `--radius-lg`)
-- Shadows: `--shadow: 0 1px 2px rgba(16,18,22,.04), 0 1px 1px rgba(16,18,22,.03)` and `--shadow-pop` (define for future use)
+- **Radius:** `--radius: 10px`, `--radius-sm: 7px`, `--radius-lg: 14px` (card)
+- **Component constants (NOT spacing):** `--topbar-height: 56px`, `--card-body-padding: 28px`
+- **Shadows:** `--shadow: 0 1px 2px rgba(16,18,22,.04), 0 1px 1px rgba(16,18,22,.03)` and `--shadow-pop` (define for future use)
+- **Type contract reminder:** only 4 sizes (22 / 14 / 13 / 12) and 2 weights (400 / 600) — no intermediate weight, no 11px.
 
 (`--font-sans` / `--font-mono` already declared — no change.)
 
