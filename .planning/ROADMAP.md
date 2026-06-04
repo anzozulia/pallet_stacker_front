@@ -96,7 +96,20 @@ Plans:
 3. The result-mapper groups packed boxes by type and by pallet and exposes per-pallet CoG and per-box support-ratio fields from the fixture
 4. All transform functions have co-located passing unit tests and import zero React or IO modules
 
-**Plans**: TBD
+**Plans**: 3 plans (interface-first foundation → 2 parallel vertical transform slices)
+
+Plans:
+
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Wave 1: pure type foundation — `src/types/config.ts` (PackConfig/BoxType/PalletConfig/RotationMode, D-01/D-05/D-06) + `src/types/pack-contract.ts` (PackRequest/BoxRequest/PackOptions + consolidated done-response interfaces, D-02) + `fixture-types.ts` re-export shim (PACK-02, BOX-04 contract seam)
+
+**Wave 2** _(blocked on Wave 1 completion; the two slices run in parallel — no file overlap)_
+
+- [ ] 03-02-PLAN.md — Wave 2: request-builder vertical slice — failing tests → `buildPackRequest` (qty expansion, stable unique `{typeId}-{index}` ids + O(1) `idToType` map, D-07) + `rotationToApi` total table (free/uprightOnly/fixed → all/this_side_up/none) + baked options (25/7/0.8, D-03) (PACK-02 / SC-1, BOX-04 / SC-2)
+- [ ] 03-03-PLAN.md — Wave 2: result-mapper vertical slice — failing tests → `mapDoneResponse` single-pass dual-axis regrouping (by type + by pallet), map-primary/`typeKeyOf`-fallback recovery, raw cog + support_ratio pass-through (D-08), multi-pallet + unpacked (SC-1 round-trip, SC-3)
+
+**UI hint**: no (pure library phase — no UI; verified by co-located Vitest + the code-split purity gate)
 
 ### Phase 4: Config Form & Local Persistence
 
@@ -173,7 +186,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | -------------------------------------- | -------------- | ----------- | ---------- |
 | 1. Scaffolding & Version Lock          | 4/4            | Complete    | 2026-06-03 |
 | 2. Coordinate Mapping & Fixture Viewer | 2/2 | Complete    | 2026-06-03 |
-| 3. Pure Transform Core                 | 0/TBD          | Not started | -          |
+| 3. Pure Transform Core                 | 0/3            | Planned     | -          |
 | 4. Config Form & Local Persistence     | 0/TBD          | Not started | -          |
 | 5. API Client & Async Polling          | 0/TBD          | Not started | -          |
 | 6. Result Page & 3D Wiring             | 0/TBD          | Not started | -          |
