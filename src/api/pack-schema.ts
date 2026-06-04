@@ -63,3 +63,6 @@ export type JobState = z.infer<typeof jobStateSchema>;
 
 /** The closed job-status union. */
 export type JobStatus = z.infer<typeof jobStatusSchema>;
+
+/** The validated `failed`/`timeout` error-body shape — the single source of truth for consumers. */
+export type JobError = z.infer<typeof errorBodySchema>;

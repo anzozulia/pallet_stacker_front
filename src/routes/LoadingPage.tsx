@@ -38,13 +38,6 @@ interface LoadingNavState {
   idToType: Map<string, string>;
 }
 
-/** The structured error body the API returns on a `failed`/`timeout` job (zod-parsed, Wave 1). */
-interface JobErrorBody {
-  code?: string;
-  message?: string | null;
-  problems?: string[] | null;
-}
-
 /**
  * Honest status → sub-line map (D-01): the real, validated poll `status` union (zod, Wave 1) drives
  * fixed strings — NO fake %, NO cycling mockup flavor-text array. While the submit is still in flight
@@ -197,7 +190,8 @@ export default function LoadingPage() {
   // An error terminal: render the distinct card instead of the spinner. The `failed` body carries the
   // server's (untrusted, zod-parsed) message/problems; ErrorCard renders them as escaped text (T-5-10).
   if (errorKind) {
-    const body = poll.data?.error as JobErrorBody | undefined;
+    // `poll.data.error` is already the zod-parsed JobError (no cast — that boundary owns the shape).
+    const body = poll.data?.error;
     return (
       <div className="flex min-h-[100dvh] flex-col bg-bg font-sans text-text">
         <Topbar />
