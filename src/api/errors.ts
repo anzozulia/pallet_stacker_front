@@ -26,12 +26,38 @@ export type PackErrorKind = 'unreachable' | 'contract-drift' | 'aborted';
  */
 export class PackError extends Error {
   readonly kind: PackErrorKind;
+  /**
+   * The HTTP status that produced this error, when one was read (WR-02). Present on a non-2xx
+   * response throw; absent for an opaque-CORS/network throw (where no status is readable). Lets a
+   * consumer distinguish a 4xx (the server DID reach us and rejected the request — a re-POST of
+   * the identical body will be re-rejected, so blind Retry has no value) from a 5xx/network blip.
+   */
+  readonly status?: number;
+  /**
+   * The (untrusted) response-body text the server attached to a non-2xx, when readable (WR-02).
+   * Carried so a future failed-style card can surface the server's explanation instead of a
+   * generic "couldn't reach" line. Rendered, if ever shown, as escaped React text.
+   */
+  readonly detail?: string;
 
-  constructor(kind: PackErrorKind, message?: string) {
+  constructor(
+    kind: PackErrorKind,
+    message?: string,
+    options?: { status?: number; detail?: string },
+  ) {
     super(message ?? kind);
     this.name = 'PackError';
     this.kind = kind;
+    this.status = options?.status;
+    this.detail = options?.detail;
   }
+}
+
+/** True for a 4xx status: the server reached us and rejected the request (no blind-Retry value). */
+export function isClientRejection(e: unknown): boolean {
+  return (
+    e instanceof PackError && typeof e.status === 'number' && e.status >= 400 && e.status < 500
+  );
 }
 
 /**

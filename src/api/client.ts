@@ -14,6 +14,22 @@ import { PackError } from '@/api/errors';
 import type { PackRequest } from '@/types/pack-contract';
 
 /**
+ * Build a PackError for a non-2xx response, attaching the status and the (best-effort) response
+ * body so a 4xx (server reached + rejected the request — see `isClientRejection`) is no longer
+ * indistinguishable from an opaque-CORS/network blip (WR-02). The body read is best-effort: a
+ * stream that fails to read just yields no detail rather than masking the real status.
+ */
+async function packErrorFromResponse(res: Response): Promise<PackError> {
+  let detail: string | undefined;
+  try {
+    detail = (await res.text()) || undefined;
+  } catch {
+    detail = undefined;
+  }
+  return new PackError('unreachable', `HTTP ${res.status}`, { status: res.status, detail });
+}
+
+/**
  * The resolved API origin. Empty in dev (relative path → Vite proxy, no CORS); the baked
  * VITE_API_URL origin in a production build. Resolved ONCE at module load.
  *
@@ -51,7 +67,7 @@ export async function submitPackJob(request: PackRequest, signal: AbortSignal) {
     signal,
   });
   if (!res.ok) {
-    throw new PackError('unreachable', `HTTP ${res.status}`);
+    throw await packErrorFromResponse(res);
   }
   return jobAcceptedSchema.parse(await res.json());
 }
@@ -64,7 +80,7 @@ export async function submitPackJob(request: PackRequest, signal: AbortSignal) {
 export async function fetchJobState(jobId: string, signal: AbortSignal): Promise<JobState> {
   const res = await fetch(`${API_BASE}${jobPath(jobId)}`, { signal });
   if (!res.ok) {
-    throw new PackError('unreachable', `HTTP ${res.status}`);
+    throw await packErrorFromResponse(res);
   }
   return jobStateSchema.parse(await res.json());
 }
