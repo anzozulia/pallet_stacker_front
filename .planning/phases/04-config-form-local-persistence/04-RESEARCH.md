@@ -580,21 +580,26 @@ export function checkAllBoxesFit(config: { pallet: PalletConfig; boxTypes: BoxTy
 
 **Note:** No `[ASSUMED]` claims affect compliance/security/retention. The assumptions above are mechanical API-shape details verifiable at implementation time against installed types.
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+All three are resolved for planning purposes — each has a committed recommendation below. None blocks the planner; (1) is a verify-during-implementation detail with an equivalent fallback, (2) and (3) are decided as scope calls.
 
 1. **Exact `form.subscribe` signature in 7.77**
    - What we know: the subscribe API exists in 7.55+ and is re-render-free; returns an unsubscribe.
    - What's unclear: the precise option object shape in 7.77 (`{ formState: { values: true } }` vs `{ name, formState }`).
    - Recommendation: confirm against `node_modules/react-hook-form` types after install; the `watch`-subscription fallback is equivalent if needed.
+   - **RESOLVED:** Non-blocking implementation detail. The autosave plan (04-03/04-07) confirms the exact option shape against the installed `react-hook-form` types at implementation time; the `watch`-subscription fallback is functionally equivalent, so either path satisfies the debounced-autosave requirement.
 
 2. **`Allow overhang` boolean from the mockup**
    - What we know: D-09/specifics say keep `maxOverhang` as the numeric field; a separate boolean is optional (planner's call).
    - What's unclear: whether to render the toggle at all.
    - Recommendation: omit the separate boolean (numeric `maxOverhang` covers it; 0 = no overhang). Keeps the model = `PalletConfig` exactly.
+   - **RESOLVED:** Decided — omit the separate boolean. The numeric `maxOverhang` field (0 = no overhang) is the single control; this keeps the form model equal to `PalletConfig` exactly and avoids a non-`PalletConfig` UI-only field.
 
 3. **Whether to pull EUR preset picker into v1 (CFG-V2-01)**
    - What we know: REQUIREMENTS flags it "low cost; consider during planning"; CONTEXT defers it.
    - Recommendation: stay deferred — D-09 seeds a EUR-shaped default already; a picker is scope expansion.
+   - **RESOLVED:** Decided — stays deferred to v2 (CFG-V2-01). D-09 already seeds a EUR-shaped default config, so a user-facing preset *picker* is out of Phase 4 scope.
 
 ## Environment Availability
 

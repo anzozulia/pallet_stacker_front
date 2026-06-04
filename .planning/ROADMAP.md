@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Scaffolding & Version Lock** - Lock the React 19.2.x / r3f 9 / drei 10 / three 0.184.0 quartet, wire Vite + TS + Tailwind + test tooling, build/serve a skeleton (completed 2026-06-03)
 - [x] **Phase 2: Coordinate Mapping & Fixture Viewer** - Capture a real `done` response, lock the API↔Three.js mapping with golden tests, render a static 3D scene matching the mockup (completed 2026-06-04)
 - [x] **Phase 3: Pure Transform Core** - Build and fully unit-test the request-builder (qty expansion + rotation mapping) and result-mapper (grouping + diagnostics) (completed 2026-06-04)
-- [ ] **Phase 4: Config Form & Local Persistence** - Editable pallet + box catalog form with validation, live unit count, and localStorage that survives refresh
+- [ ] **Phase 4: Config Form & Local Persistence** - Editable pallet + box catalog form with validation, live unit count, and localStorage that survives refresh (7 plans, waves 1→5)
 - [ ] **Phase 5: API Client & Async Polling** - Typed client, submit-then-poll job lifecycle, loading screen, cancel, and all four terminal states handled
 - [ ] **Phase 6: Result Page & 3D Wiring** - Full vertical: real result → mapper → viewer + summary rail, multi-pallet switcher, placement list, unpacked panel, CoG + support diagnostics
 - [ ] **Phase 7: Edge States, Exports & Self-Hosting** - Graceful failure screens, JSON + printable export, single Docker image with SPA fallback, GitHub docs
@@ -125,7 +125,31 @@ Plans:
 4. Invalid pallet or box inputs are flagged with clear messages and block submission
 5. A user can save the current configuration locally and, after a page refresh, the catalog and pallet settings are restored intact
 
-**Plans**: TBD
+**Plans**: 7 plans (foundation → 2 parallel pure-lib waves → primitives → 2 parallel UI slices → integration + persistence + E2E)
+
+Plans:
+
+**Wave 1**
+
+- [ ] 04-01-PLAN.md — Wave 1: install rhf/zod/@hookform/resolvers (supply-chain gate), extend BoxType with label/maxLoad/fragile (D-08), port the light config @theme tokens, author the two zod schemas (strict submit + lenient restore) + DEFAULT_CONFIG/makeDefaultBoxType (D-09)
+
+**Wave 2** _(blocked on Wave 1; the two pure-lib slices run in parallel — no file overlap)_
+
+- [ ] 04-02-PLAN.md — Wave 2: pure libs — box-fit conservative feasibility check (D-01/BOX-06) + config-tally live total & >1000 warning (BOX-05/D-03), TDD with golden tests
+- [ ] 04-03-PLAN.md — Wave 2: pure versioned localStorage (de)serialize/guard (D-07/DATA-02), TDD — never-throw, lenient restore
+
+**Wave 3** _(blocked on Wave 1)_
+
+- [ ] 04-04-PLAN.md — Wave 3: shared UI primitives — NumberField, Switch (role=switch), SegmentedControl (3-mode rotation, C-03), Card, SectionLabel; three-free
+
+**Wave 4** _(blocked on Waves 1-3; the two UI slices run in parallel — no file overlap)_
+
+- [ ] 04-05-PLAN.md — Wave 4: box-catalog slice — BoxRow (dims/weight/qty/maxLoad, fragile↔maxLoad D-08, rotation, swatch) + BoxCatalogCard (useFieldArray CRUD, live badge, empty state) (BOX-01/02/03/04/05)
+- [ ] 04-06-PLAN.md — Wave 4: pallet slice — PalletCard (Dimensions + Limits incl. Max pallets, no CoG C-04) (PALLET-01/02, PACK-03, D-10)
+
+**Wave 5** _(blocked on Waves 1-4)_
+
+- [ ] 04-07-PLAN.md — Wave 5: integration — ConfigForm shell + resolver + Run gate (D-06) + fit-check, FooterBar (total + large-job advisory + Save draft), autosave/restore hook, ConfigurePage, restore-after-reload E2E + human visual sign-off (BOX-06/DATA-02/SC-5)
 **UI hint**: yes
 
 ### Phase 5: API Client & Async Polling
@@ -187,7 +211,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 1. Scaffolding & Version Lock          | 4/4            | Complete    | 2026-06-03 |
 | 2. Coordinate Mapping & Fixture Viewer | 2/2 | Complete    | 2026-06-03 |
 | 3. Pure Transform Core                 | 3/3 | Complete    | 2026-06-04 |
-| 4. Config Form & Local Persistence     | 0/TBD          | Not started | -          |
+| 4. Config Form & Local Persistence     | 0/7            | Not started | -          |
 | 5. API Client & Async Polling          | 0/TBD          | Not started | -          |
 | 6. Result Page & 3D Wiring             | 0/TBD          | Not started | -          |
 | 7. Edge States, Exports & Self-Hosting | 0/TBD          | Not started | -          |
