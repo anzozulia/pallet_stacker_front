@@ -47,12 +47,15 @@ export const jobStateSchema = z.object({
 });
 
 /**
- * The `POST /pack` 202 body: a job_id, a (defaulted) queued status, and a links map.
+ * The `POST /pack` 202 body: a job_id, a (defaulted) queued status, and an OPTIONAL links map.
+ * `links` is `.nullish()` (WR-03): the app never reads it — the poll path is built client-side
+ * from `job_id` — so an accepted job whose 202 omits/renames `links` must not false-positive as
+ * contract-drift. Forward-compat / non-strict, matching the rest of the boundary's design.
  */
 export const jobAcceptedSchema = z.object({
   job_id: z.string(),
   status: z.literal('queued').default('queued'),
-  links: z.record(z.string(), z.string()),
+  links: z.record(z.string(), z.string()).nullish(),
 });
 
 /** The validated poll-state shape consumed by the poll hook / result page. */

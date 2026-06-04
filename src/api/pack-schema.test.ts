@@ -54,6 +54,13 @@ describe('jobAcceptedSchema — POST 202 body', () => {
     });
     expect(parsed.job_id).toBe('j1');
     expect(parsed.status).toBe('queued');
-    expect(parsed.links.self).toBe('/api/v1/jobs/j1');
+    expect(parsed.links?.self).toBe('/api/v1/jobs/j1');
+  });
+
+  it('accepts a 202 body that OMITS links (WR-03: links is unused, must be tolerant)', () => {
+    const parsed = jobAcceptedSchema.parse({ job_id: 'j2', status: 'queued' });
+    expect(parsed.job_id).toBe('j2');
+    expect(parsed.status).toBe('queued');
+    expect(parsed.links).toBeUndefined();
   });
 });
