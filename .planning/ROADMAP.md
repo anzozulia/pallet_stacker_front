@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Scaffolding & Version Lock** - Lock the React 19.2.x / r3f 9 / drei 10 / three 0.184.0 quartet, wire Vite + TS + Tailwind + test tooling, build/serve a skeleton (completed 2026-06-03)
 - [x] **Phase 2: Coordinate Mapping & Fixture Viewer** - Capture a real `done` response, lock the API↔Three.js mapping with golden tests, render a static 3D scene matching the mockup (completed 2026-06-04)
 - [x] **Phase 3: Pure Transform Core** - Build and fully unit-test the request-builder (qty expansion + rotation mapping) and result-mapper (grouping + diagnostics) (completed 2026-06-04)
-- [ ] **Phase 4: Config Form & Local Persistence** - Editable pallet + box catalog form with validation, live unit count, and localStorage that survives refresh (7 plans, waves 1→5)
+- [x] **Phase 4: Config Form & Local Persistence** - Editable pallet + box catalog form with validation, live unit count, and localStorage that survives refresh (7 plans, waves 1→5) (completed 2026-06-04)
 - [ ] **Phase 5: API Client & Async Polling** - Typed client, submit-then-poll job lifecycle, loading screen, cancel, and all four terminal states handled
 - [ ] **Phase 6: Result Page & 3D Wiring** - Full vertical: real result → mapper → viewer + summary rail, multi-pallet switcher, placement list, unpacked panel, CoG + support diagnostics
 - [ ] **Phase 7: Edge States, Exports & Self-Hosting** - Graceful failure screens, JSON + printable export, single Docker image with SPA fallback, GitHub docs
@@ -150,6 +150,7 @@ Plans:
 **Wave 5** _(blocked on Waves 1-4)_
 
 - [x] 04-07-PLAN.md — Wave 5: integration — ConfigForm shell + resolver + Run gate (D-06) + fit-check, FooterBar (total + large-job advisory + Save draft), autosave/restore hook, ConfigurePage, restore-after-reload E2E + human visual sign-off (BOX-06/DATA-02/SC-5)
+
 **UI hint**: yes
 
 ### Phase 5: API Client & Async Polling
@@ -211,7 +212,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 1. Scaffolding & Version Lock          | 4/4            | Complete    | 2026-06-03 |
 | 2. Coordinate Mapping & Fixture Viewer | 2/2 | Complete    | 2026-06-03 |
 | 3. Pure Transform Core                 | 3/3 | Complete    | 2026-06-04 |
-| 4. Config Form & Local Persistence     | 7/7 | In Progress (verification pending) |  |
+| 4. Config Form & Local Persistence     | 7/7 | Complete    | 2026-06-04 |
 | 5. API Client & Async Polling          | 0/TBD          | Not started | -          |
 | 6. Result Page & 3D Wiring             | 0/TBD          | Not started | -          |
 | 7. Edge States, Exports & Self-Hosting | 0/TBD          | Not started | -          |
