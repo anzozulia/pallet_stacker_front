@@ -62,14 +62,14 @@ export function isClientRejection(e: unknown): boolean {
 
 /**
  * Map any thrown value into a transport bucket. Order matters: a PackError already knows
- * its kind; an AbortError is a no-op; a ZodError is contract-drift; ANY other TypeError is
- * opaque-CORS/unreachable (never read a status off it — Pitfall 2); everything else falls
- * back to the safe 'unreachable' default.
+ * its kind; an AbortError is a no-op; a ZodError is contract-drift; everything else (a raw
+ * fetch TypeError from opaque-CORS/failed-to-fetch, or any unknown throw) falls back to the
+ * safe 'unreachable' default — we never read a status off such a throw (Pitfall 2). The
+ * `instanceof TypeError` branch is folded into that default since it returns the same bucket.
  */
 export function classifyFetchError(e: unknown): PackErrorKind {
   if (e instanceof PackError) return e.kind;
   if (e instanceof DOMException && e.name === 'AbortError') return 'aborted';
   if (e instanceof ZodError) return 'contract-drift';
-  if (e instanceof TypeError) return 'unreachable';
   return 'unreachable';
 }
