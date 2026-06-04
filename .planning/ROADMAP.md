@@ -136,7 +136,7 @@ Plans:
 **Wave 2** _(blocked on Wave 1; the two pure-lib slices run in parallel — no file overlap)_
 
 - [x] 04-02-PLAN.md — Wave 2: pure libs — box-fit conservative feasibility check (D-01/BOX-06) + config-tally live total & >1000 warning (BOX-05/D-03), TDD with golden tests
-- [ ] 04-03-PLAN.md — Wave 2: pure versioned localStorage (de)serialize/guard (D-07/DATA-02), TDD — never-throw, lenient restore
+- [x] 04-03-PLAN.md — Wave 2: pure versioned localStorage (de)serialize/guard (D-07/DATA-02), TDD — never-throw, lenient restore
 
 **Wave 3** _(blocked on Wave 1)_
 
