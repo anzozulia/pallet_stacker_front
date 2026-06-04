@@ -14,7 +14,7 @@ Requirements for the initial release. Each maps to a roadmap phase.
 
 ### Box Catalog
 
-- [ ] **BOX-01**: User can add, edit, and remove box types in a catalog
+- [x] **BOX-01**: User can add, edit, and remove box types in a catalog
 - [x] **BOX-02**: User can set each box type's dimensions (L/W/H, mm), unit weight (kg), and quantity
 - [x] **BOX-03**: User can set max-load-on-top per box type and mark a type fragile (fragile = nothing stacked on top)
 - [x] **BOX-04**: User can choose a rotation mode per box type from the API's three modes (any orientation / keep upright / fixed)
@@ -99,7 +99,7 @@ Which phases cover which requirements. Populated during roadmap creation.
 |-------------|-------|--------|
 | PALLET-01 | Phase 4 | Complete |
 | PALLET-02 | Phase 4 | Complete |
-| BOX-01 | Phase 4 | Pending |
+| BOX-01 | Phase 4 | Complete |
 | BOX-02 | Phase 4 | Complete |
 | BOX-03 | Phase 4 | Complete |
 | BOX-04 | Phase 4 | Complete |

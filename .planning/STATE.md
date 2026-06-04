@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-06-04T17:12:12.423Z"
+stopped_at: Completed 04-05-PLAN.md
+last_updated: "2026-06-04T17:19:42.380Z"
 last_activity: 2026-06-04
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 16
-  completed_plans: 13
-  percent: 81
+  completed_plans: 14
+  percent: 88
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 ## Current Position
 
 Phase: 04 (config-form-local-persistence) — EXECUTING
-Plan: 5 of 7
+Plan: 6 of 7
 Status: Ready to execute
 Last activity: 2026-06-04
 
-Progress: [████████░░] 81%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -66,6 +66,7 @@ _Updated after each plan completion_
 | Phase 04 P04-02 | 9 | 2 tasks | 4 files |
 | Phase 04 P04-03 | 7min | 1 tasks | 2 files |
 | Phase 04 P04-04 | 6min | 2 tasks | 7 files |
+| Phase 04 P04-05 | 9min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [03-03]: id->type recovery map-PRIMARY (idToType) / parse-FALLBACK (typeKeyOf), proven by override test (D-07); transform non-mutating via spread (Pitfall 5)
 - [Phase ?]: Phase 4 supply-chain gate (T-4-SC): rhf/zod/@hookform/resolvers human-approved, pinned exact, npm ci clean (04-01).
 - [Phase ?]: [04-03]: localStorage restore guard uses LENIENT packConfigShapeSchema (drafts round-trip) not the strict submit schema (Pitfall 4 / D-04); never-throwing version-guard + safeParse falls back to DEFAULT_CONFIG (D-07 / T-4-PERSIST)
+- [Phase 04]: [04-05]: BoxRow reads RHF via useFormContext (not prop-drilled) and registers numeric fields as strings for schema coercion (Pattern 1); fragile↔maxLoad stashes prior maxLoad in a per-session ref (D-08); rows keyed on field.id; scrollIntoView guarded so jsdom never throws
 
 ### Pending Todos
 
@@ -129,6 +131,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-04T17:12:07.952Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-06-04T17:19:42.374Z
+Stopped at: Completed 04-05-PLAN.md
 Resume file: None

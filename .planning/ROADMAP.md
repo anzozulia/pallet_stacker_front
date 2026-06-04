@@ -144,7 +144,7 @@ Plans:
 
 **Wave 4** _(blocked on Waves 1-3; the two UI slices run in parallel — no file overlap)_
 
-- [ ] 04-05-PLAN.md — Wave 4: box-catalog slice — BoxRow (dims/weight/qty/maxLoad, fragile↔maxLoad D-08, rotation, swatch) + BoxCatalogCard (useFieldArray CRUD, live badge, empty state) (BOX-01/02/03/04/05)
+- [x] 04-05-PLAN.md — Wave 4: box-catalog slice — BoxRow (dims/weight/qty/maxLoad, fragile↔maxLoad D-08, rotation, swatch) + BoxCatalogCard (useFieldArray CRUD, live badge, empty state) (BOX-01/02/03/04/05)
 - [ ] 04-06-PLAN.md — Wave 4: pallet slice — PalletCard (Dimensions + Limits incl. Max pallets, no CoG C-04) (PALLET-01/02, PACK-03, D-10)
 
 **Wave 5** _(blocked on Waves 1-4)_
@@ -211,7 +211,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 1. Scaffolding & Version Lock          | 4/4            | Complete    | 2026-06-03 |
 | 2. Coordinate Mapping & Fixture Viewer | 2/2 | Complete    | 2026-06-03 |
 | 3. Pure Transform Core                 | 3/3 | Complete    | 2026-06-04 |
-| 4. Config Form & Local Persistence     | 0/7            | Not started | -          |
+| 4. Config Form & Local Persistence     | 5/7 | In Progress|  |
 | 5. API Client & Async Polling          | 0/TBD          | Not started | -          |
 | 6. Result Page & 3D Wiring             | 0/TBD          | Not started | -          |
 | 7. Edge States, Exports & Self-Hosting | 0/TBD          | Not started | -          |
