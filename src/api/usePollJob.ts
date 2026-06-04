@@ -51,7 +51,8 @@ export interface UsePollJobOptions {
  *
  * `isCapExceeded` is true once the wall-clock cap elapses while the job is STILL non-terminal —
  * the UI treats this as the timeout/unreachable bucket (do NOT auto-retry). It is false once a
- * terminal status arrives first (the normal path).
+ * terminal status arrives first (the normal path), AND false for any job whose id differs from
+ * the one that tripped the cap (so a Retry's fresh job_id never inherits a stale trip — CR-01).
  */
 export type UsePollJobResult = UseQueryResult<JobState> & {
   isCapExceeded: boolean;
@@ -64,6 +65,16 @@ export type UsePollJobResult = UseQueryResult<JobState> & {
  * disable/unmount react-query aborts the in-flight `queryFn` via its AbortSignal (SC-3) — no
  * leaked interval. The `done` entry survives in cache (`gcTime: Infinity`) for the /result
  * hand-off (D-05). A job that never settles trips `isCapExceeded` at the wall-clock cap (T-5-05).
+ *
+ * The safety cap latches the IDENTITY of the job that tripped it (`trippedJobId`), not a bare
+ * boolean. This kills two bugs at once:
+ *  - CR-01 (Retry broken): after Retry, `jobId` is a NEW job_id, so `capExceeded` (which requires
+ *    `trippedJobId === jobId`) is false — the spinner returns, not a spurious timeout card. No
+ *    synchronous setState-in-effect is needed to clear the latch, so the
+ *    `react-hooks/set-state-in-effect` lint rule stays satisfied.
+ *  - CR-02 (unbounded network loop): the same `capExceeded` predicate gates BOTH `enabled` and
+ *    `refetchInterval`, so once the cap fires react-query disables the query — it aborts the
+ *    in-flight GET and stops the interval (covers the backgrounded-tab case too, WR-06).
  */
 export function usePollJob(
   jobId: string | undefined,
@@ -71,46 +82,62 @@ export function usePollJob(
 ): UsePollJobResult {
   const safetyCapMs = options?.safetyCapMs ?? POLL_SAFETY_CAP_MS;
 
+  // The safety cap, layered ON TOP without a hand-rolled poll: record the wall-clock start the
+  // moment `jobId` first becomes truthy, then arm a SINGLE timer that latches the id of the job
+  // that tripped. We only ever `setState` from the timer callback (never synchronously in the
+  // effect body — react-hooks/set-state-in-effect): the reset case (no job / settled / a new
+  // job_id) is expressed by clearing the start ref and deriving `capExceeded` against the CURRENT
+  // jobId, so a stale trip can never leak into a fresh Retry job (CR-01).
+  const startRef = useRef<number | null>(null);
+  // The job id the wall-clock start in `startRef` belongs to. When `jobId` changes (a Retry mints
+  // a new job_id), the clock must re-arm from zero rather than carry the prior job's elapsed time —
+  // otherwise a fresh job would inherit a long-elapsed start and trip the cap immediately (CR-01).
+  const armedJobIdRef = useRef<string | undefined>(undefined);
+  const [trippedJobId, setTrippedJobId] = useState<string | null>(null);
+
+  // The cap counts as exceeded only when the trip is keyed to the CURRENTLY-polled job (CR-01),
+  // and that job is truthy. Derived BEFORE the query so it can gate `enabled`/`refetchInterval`
+  // and actually stop the poll loop (CR-02 / WR-06) — not just paint a UI overlay.
+  const capExceeded = !!jobId && trippedJobId === jobId;
+
   const query = useQuery({
     queryKey: ['job', jobId],
     queryFn: ({ signal }) => fetchJobState(jobId!, signal),
-    enabled: !!jobId,
-    // v5 single-arg signature: return false on terminal status to STOP the poll (C-01).
-    refetchInterval: (q) => (isTerminal(q.state.data?.status) ? false : POLL_INTERVAL_MS),
+    // Gate on `!capExceeded` so a tripped cap DISABLES the query — react-query aborts the
+    // in-flight GET and stops the interval (CR-02), including a backgrounded tab (WR-06).
+    enabled: !!jobId && !capExceeded,
+    // v5 single-arg signature: return false on terminal status OR a tripped cap to STOP the
+    // poll (C-01 / CR-02).
+    refetchInterval: (q) =>
+      isTerminal(q.state.data?.status) || capExceeded ? false : POLL_INTERVAL_MS,
     refetchIntervalInBackground: true,
     gcTime: Infinity,
     staleTime: 0,
     retry: false,
   });
 
-  // The safety cap, layered ON TOP without a hand-rolled poll: record the wall-clock start the
-  // moment `jobId` first becomes truthy, then arm a SINGLE timer that flips `capTripCount` once
-  // the cap elapses while still non-terminal. We only ever `setState` from the timer callback
-  // (never synchronously in the effect body — react-hooks/set-state-in-effect): the reset case
-  // (no job / settled) is expressed by clearing the start ref and deriving `isCapExceeded` to
-  // `false` whenever the job is terminal or absent, so a stale trip can never leak.
-  const startRef = useRef<number | null>(null);
-  const [capTripped, setCapTripped] = useState(false);
   const terminal = isTerminal(query.data?.status);
 
   useEffect(() => {
     // No active job, or it already settled → there is no cap to enforce. Clear the start ref so
-    // a fresh job re-arms from a fresh wall-clock zero. `isCapExceeded` is derived false below.
+    // a fresh job re-arms from a fresh wall-clock zero. `capExceeded` is derived false above.
     if (!jobId || terminal) {
       startRef.current = null;
+      armedJobIdRef.current = jobId;
       return;
     }
-    if (startRef.current === null) {
+    // Re-arm the wall-clock from zero on a fresh job (first arm OR a new job_id from Retry) so a
+    // new job never inherits the prior job's elapsed time and trips the cap on arrival (CR-01).
+    if (startRef.current === null || armedJobIdRef.current !== jobId) {
       startRef.current = Date.now();
+      armedJobIdRef.current = jobId;
     }
     const remaining = safetyCapMs - (Date.now() - startRef.current);
-    const timer = setTimeout(() => setCapTripped(true), Math.max(0, remaining));
+    // Latch THIS job's id when the cap elapses. A later Retry polls a different id, so
+    // `capExceeded` (trippedJobId === jobId) is false for it — no stale trip leaks (CR-01).
+    const timer = setTimeout(() => setTrippedJobId(jobId), Math.max(0, remaining));
     return () => clearTimeout(timer);
   }, [jobId, terminal, safetyCapMs, query.dataUpdatedAt]);
 
-  // Derived: a trip only counts while there is an active, non-terminal job. A settled/absent job
-  // reports false regardless of a prior timer fire — no synchronous reset-in-effect needed.
-  const isCapExceeded = capTripped && !!jobId && !terminal;
-
-  return { ...query, isCapExceeded };
+  return { ...query, isCapExceeded: capExceeded };
 }
