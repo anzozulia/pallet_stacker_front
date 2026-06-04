@@ -99,6 +99,21 @@ describe('LoadingPage — happy-path submit→poll→summary→navigate (Plan 05
     );
     await waitFor(() => expect(navigateSpy).toHaveBeenCalledWith('/', { replace: true }));
   });
+
+  test('a crafted/malformed nav state redirects home rather than render-crashing (WR-04)', async () => {
+    // `request: {}` (no boxes array, no pallet) + a plain-object idToType would crash on
+    // `request.boxes.map(...)` / `idToType.values()`. The hardened guard must reject it and
+    // redirect home instead, exactly like the no-state deep-link path.
+    renderWithClient(
+      <MemoryRouter
+        initialEntries={[{ pathname: '/loading', state: { request: {}, idToType: {} } }]}
+      >
+        <LoadingPage />
+      </MemoryRouter>,
+    );
+    await waitFor(() => expect(navigateSpy).toHaveBeenCalledWith('/', { replace: true }));
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
 });
 
 describe('LoadingPage — terminal-state distinction + cancel (Plan 05-04)', () => {

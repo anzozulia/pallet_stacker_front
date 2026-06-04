@@ -55,14 +55,22 @@ const STATUS_SUBLINE: Record<string, string> = {
   running: 'Packing…',
 };
 
+/**
+ * Validate the navigation payload BEFORE any consumer reads it (WR-04 / threat T-5-07). The
+ * page later does `request.boxes.map(...)`, destructures `request.pallet`, and calls
+ * `idToType.values()`, so a crafted/malformed `history.state` (e.g. `request: {}`, or `idToType`
+ * present-but-not-a-Map) would otherwise render-crash. Checking the concrete shapes here lets the
+ * caller redirect home on failure — the same graceful degrade as the no-state deep-link guard.
+ */
 function isLoadingNavState(state: unknown): state is LoadingNavState {
-  return (
-    typeof state === 'object' &&
-    state !== null &&
-    'request' in state &&
-    typeof (state as { request: unknown }).request === 'object' &&
-    (state as { request: unknown }).request !== null
-  );
+  if (typeof state !== 'object' || state === null) return false;
+  const { request, idToType } = state as { request?: unknown; idToType?: unknown };
+  if (typeof request !== 'object' || request === null) return false;
+  const { boxes, pallet } = request as { boxes?: unknown; pallet?: unknown };
+  if (!Array.isArray(boxes)) return false;
+  if (typeof pallet !== 'object' || pallet === null) return false;
+  if (!(idToType instanceof Map)) return false;
+  return true;
 }
 
 export default function LoadingPage() {
