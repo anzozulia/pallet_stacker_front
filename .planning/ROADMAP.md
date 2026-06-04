@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Coordinate Mapping & Fixture Viewer** - Capture a real `done` response, lock the API↔Three.js mapping with golden tests, render a static 3D scene matching the mockup (completed 2026-06-04)
 - [x] **Phase 3: Pure Transform Core** - Build and fully unit-test the request-builder (qty expansion + rotation mapping) and result-mapper (grouping + diagnostics) (completed 2026-06-04)
 - [x] **Phase 4: Config Form & Local Persistence** - Editable pallet + box catalog form with validation, live unit count, and localStorage that survives refresh (7 plans, waves 1→5) (completed 2026-06-04)
-- [ ] **Phase 5: API Client & Async Polling** - Typed client, submit-then-poll job lifecycle, loading screen, cancel, and all four terminal states handled
+- [x] **Phase 5: API Client & Async Polling** - Typed client, submit-then-poll job lifecycle, loading screen, cancel, and all four terminal states handled (completed 2026-06-04)
 - [ ] **Phase 6: Result Page & 3D Wiring** - Full vertical: real result → mapper → viewer + summary rail, multi-pallet switcher, placement list, unpacked panel, CoG + support diagnostics
 - [ ] **Phase 7: Edge States, Exports & Self-Hosting** - Graceful failure screens, JSON + printable export, single Docker image with SPA fallback, GitHub docs
 
@@ -184,7 +184,7 @@ Plans:
 
 **Wave 4** _(blocked on Wave 3)_
 
-- [ ] 05-04-PLAN.md — Wave 4: the failure/cancel slice — distinguish failed/timeout/unreachable-CORS + unpacked-is-success (D-07), ErrorCard with Retry/Back, Cancel/Back/unmount clean abort (D-04/D-08/SC-3), Playwright route-intercepted e2e + code-split gate + human sign-off (PACK-05/06)
+- [x] 05-04-PLAN.md — Wave 4: the failure/cancel slice — distinguish failed/timeout/unreachable-CORS + unpacked-is-success (D-07), ErrorCard with Retry/Back, Cancel/Back/unmount clean abort (D-04/D-08/SC-3), Playwright route-intercepted e2e + code-split gate + human sign-off (PACK-05/06)
 
 **UI hint**: yes
 
@@ -232,6 +232,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Coordinate Mapping & Fixture Viewer | 2/2 | Complete    | 2026-06-03 |
 | 3. Pure Transform Core                 | 3/3 | Complete    | 2026-06-04 |
 | 4. Config Form & Local Persistence     | 7/7 | Complete    | 2026-06-04 |
-| 5. API Client & Async Polling          | 3/4 | In Progress|  |
+| 5. API Client & Async Polling          | 4/4 | Complete   | 2026-06-04 |
 | 6. Result Page & 3D Wiring             | 0/TBD          | Not started | -          |
 | 7. Edge States, Exports & Self-Hosting | 0/TBD          | Not started | -          |

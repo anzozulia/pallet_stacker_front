@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
+status: verifying
 stopped_at: Phase 5 context gathered
-last_updated: "2026-06-04T20:53:07.220Z"
+last_updated: "2026-06-04T21:06:45.903Z"
 last_activity: 2026-06-04
 progress:
   total_phases: 7
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 20
-  completed_plans: 19
-  percent: 57
+  completed_plans: 20
+  percent: 71
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 
 Phase: 05 (api-client-async-polling) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-06-04
 
 Progress: [█████████░] 90%
@@ -73,6 +73,7 @@ _Updated after each plan completion_
 | Phase 05 P01 | 10 | 3 tasks | 11 files |
 | Phase 05 P02 | 4min | 2 tasks | 6 files |
 | Phase 05 P03 | 2min | 2 tasks | 4 files |
+| Phase 05 P05-04 | 3min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -122,6 +123,10 @@ Recent decisions affecting current work:
 - [Phase 05-03]: First end-to-end slice: a valid Run navigates to the eager three-free /loading route carrying { request, idToType } state, which fires useSubmitJob then chains job_id into usePollJob and on done navigate('/result', { replace }) so Back skips the spinner (D-03/D-05)
 - [Phase 05-03]: Loading summary card reuses tallyCatalog (no recompute, D-01); distinct box TYPES recovered from new Set(idToType.values()).size since request.boxes is already quantity-expanded one-per-unit (C-05)
 - [Phase 05-03]: /loading is a STATIC eager router import (no lazy/Suspense) keeping three out of the entry chunk (C-06/D-03); honest status sub-line via {queued,running} map (no fake %/flavor text); T-5-07 no-nav-state deep-link redirects home
+- [Phase ?]: [05-04]: Four terminal states each map to a handled outcome — done (incl. unpacked_items>0) → /result SUCCESS; failed → ErrorCard with server message; timeout OR isCapExceeded → timeout card; any thrown POST/poll → classifyFetchError → unreachable card; aborted throw is a no-op (Pitfall 3) — none crash (PACK-06/T-5-11)
+- [Phase ?]: [05-04]: ErrorCard renders untrusted server message/problems as React text only — NEVER dangerouslySetInnerHTML (T-5-10/ASVS V5); body also zod-parsed upstream (05-01)
+- [Phase ?]: [05-04]: Cancel aborts the in-flight POST (per-attempt AbortController) + disables the poll query (react-query auto-cancels) + navigate('/'), no confirmation (D-04/D-08); Retry re-POSTs the SAME built request from nav state (D-07); Back returns to / draft-intact — no leaked interval/request (PACK-05)
+- [Phase ?]: [05-04]: Deterministic Playwright e2e (api-poll.spec.ts) route-intercepts the POST + GET poll sequence across calls — six cases (happy/failed/timeout/unreachable/unpacked-is-success/cancel), never the live API; code-split gate confirms /loading + src/features/loading/* + src/api stay three-free (C-06)
 
 ### Pending Todos
 
@@ -147,6 +152,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-04T20:52:40.746Z
+Last session: 2026-06-04T21:06:15.712Z
 Stopped at: Phase 5 context gathered
 Resume file: None
