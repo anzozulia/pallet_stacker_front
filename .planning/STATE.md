@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 3 context gathered
-last_updated: "2026-06-04T10:27:31.311Z"
+last_updated: "2026-06-04T10:32:42.851Z"
 last_activity: 2026-06-04
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 9
-  completed_plans: 7
-  percent: 78
+  completed_plans: 8
+  percent: 89
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 ## Current Position
 
 Phase: 03 (pure-transform-core) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-06-04
 
-Progress: [████████░░] 78%
+Progress: [█████████░] 89%
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ _Updated after each plan completion_
 | Phase 02 P01 | 3 | 3 tasks | 7 files |
 | Phase 02 P02 | ~18min | 4 tasks | 9 files |
 | Phase 03 P01 | 3 | 2 tasks | 3 files |
+| Phase 03 P02 | 3min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [03-01]: RotationMode app union 'free'|'uprightOnly'|'fixed' (D-05/D-06) is distinct from API 'all'|'this_side_up'|'none' (on BoxRequest); mapping deferred to Plan 02
 - [Phase ?]: [03-01]: PackConfig carries only maxPallets; baked options (time_budget_s/seed/support_ratio) live in builder (D-03)
 - [Phase ?]: [03-01]: Done-response interfaces consolidated to src/types/pack-contract.ts (D-02); fixture-types.ts now a re-export shim — 5 importers unchanged
+- [Phase ?]: 03-02: idToType Map is the PRIMARY type-recovery channel; typeKeyOf is fallback only (returns 'Da-' for 'Da-0')
+- [Phase ?]: 03-02: rotation table typed Record<RotationMode, ApiRotation> so tsc enforces totality (BOX-04/SC-2)
 
 ### Pending Todos
 
@@ -116,6 +119,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-04T10:27:12.954Z
+Last session: 2026-06-04T10:32:38.548Z
 Stopped at: Phase 3 context gathered
 Resume file: None
