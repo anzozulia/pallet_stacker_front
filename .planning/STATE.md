@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
+status: verifying
 stopped_at: Phase 3 context gathered
-last_updated: "2026-06-04T10:32:42.851Z"
+last_updated: "2026-06-04T10:36:49.294Z"
 last_activity: 2026-06-04
 progress:
   total_phases: 7
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 9
-  completed_plans: 8
-  percent: 89
+  completed_plans: 9
+  percent: 100
 ---
 
 # Project State
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 
 Phase: 03 (pure-transform-core) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-06-04
 
-Progress: [█████████░] 89%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ _Updated after each plan completion_
 | Phase 02 P02 | ~18min | 4 tasks | 9 files |
 | Phase 03 P01 | 3 | 2 tasks | 3 files |
 | Phase 03 P02 | 3min | 2 tasks | 2 files |
+| Phase 03 P03 | 6min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [03-01]: Done-response interfaces consolidated to src/types/pack-contract.ts (D-02); fixture-types.ts now a re-export shim — 5 importers unchanged
 - [Phase ?]: 03-02: idToType Map is the PRIMARY type-recovery channel; typeKeyOf is fallback only (returns 'Da-' for 'Da-0')
 - [Phase ?]: 03-02: rotation table typed Record<RotationMode, ApiRotation> so tsc enforces totality (BOX-04/SC-2)
+- [Phase ?]: [03-03]: mapDoneResponse surfaces cog + support_ratio RAW; Three.js remap/support bucketing deferred to Phase 6 (D-08)
+- [Phase ?]: [03-03]: id->type recovery map-PRIMARY (idToType) / parse-FALLBACK (typeKeyOf), proven by override test (D-07); transform non-mutating via spread (Pitfall 5)
 
 ### Pending Todos
 
@@ -119,6 +122,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-04T10:32:38.548Z
+Last session: 2026-06-04T10:36:33.465Z
 Stopped at: Phase 3 context gathered
 Resume file: None

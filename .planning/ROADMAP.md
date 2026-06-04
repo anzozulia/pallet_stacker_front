@@ -107,7 +107,7 @@ Plans:
 **Wave 2** _(blocked on Wave 1 completion; the two slices run in parallel — no file overlap)_
 
 - [x] 03-02-PLAN.md — Wave 2: request-builder vertical slice — failing tests → `buildPackRequest` (qty expansion, stable unique `{typeId}-{index}` ids + O(1) `idToType` map, D-07) + `rotationToApi` total table (free/uprightOnly/fixed → all/this_side_up/none) + baked options (25/7/0.8, D-03) (PACK-02 / SC-1, BOX-04 / SC-2)
-- [ ] 03-03-PLAN.md — Wave 2: result-mapper vertical slice — failing tests → `mapDoneResponse` single-pass dual-axis regrouping (by type + by pallet), map-primary/`typeKeyOf`-fallback recovery, raw cog + support_ratio pass-through (D-08), multi-pallet + unpacked (SC-1 round-trip, SC-3)
+- [x] 03-03-PLAN.md — Wave 2: result-mapper vertical slice — failing tests → `mapDoneResponse` single-pass dual-axis regrouping (by type + by pallet), map-primary/`typeKeyOf`-fallback recovery, raw cog + support_ratio pass-through (D-08), multi-pallet + unpacked (SC-1 round-trip, SC-3)
 
 **UI hint**: no (pure library phase — no UI; verified by co-located Vitest + the code-split purity gate)
 
