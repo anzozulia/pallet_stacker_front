@@ -40,7 +40,17 @@ type BoxRowProps = {
 };
 
 export default function BoxRow({ index, allIds, onRemove }: BoxRowProps) {
-  const { control, register, getValues, setValue } = useFormContext<PackConfig>();
+  const {
+    control,
+    register,
+    getValues,
+    setValue,
+    formState: { errors },
+  } = useFormContext<PackConfig>();
+
+  // The fit-check (Plan 07 Run gate) maps an unfittable box to an inline error on this
+  // row's `length` (the "Dimensions" field), so surface it there (D-01 / BOX-06).
+  const lengthError = errors.boxTypes?.[index]?.length?.message;
 
   // Stable identity + swatch colour. colorForType is order-independent (it sorts/dedupes),
   // so a given id always maps to the same colour regardless of row order.
@@ -112,6 +122,7 @@ export default function BoxRow({ index, allIds, onRemove }: BoxRowProps) {
           label="Dimensions"
           hint="length · width · height"
           unit="mm"
+          error={lengthError}
           {...register(`boxTypes.${index}.length`)}
         />
         <div className="grid grid-cols-3 gap-7 max-[720px]:grid-cols-1">
