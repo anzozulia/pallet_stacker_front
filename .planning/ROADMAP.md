@@ -102,7 +102,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Wave 1: pure type foundation — `src/types/config.ts` (PackConfig/BoxType/PalletConfig/RotationMode, D-01/D-05/D-06) + `src/types/pack-contract.ts` (PackRequest/BoxRequest/PackOptions + consolidated done-response interfaces, D-02) + `fixture-types.ts` re-export shim (PACK-02, BOX-04 contract seam)
+- [x] 03-01-PLAN.md — Wave 1: pure type foundation — `src/types/config.ts` (PackConfig/BoxType/PalletConfig/RotationMode, D-01/D-05/D-06) + `src/types/pack-contract.ts` (PackRequest/BoxRequest/PackOptions + consolidated done-response interfaces, D-02) + `fixture-types.ts` re-export shim (PACK-02, BOX-04 contract seam)
 
 **Wave 2** _(blocked on Wave 1 completion; the two slices run in parallel — no file overlap)_
 

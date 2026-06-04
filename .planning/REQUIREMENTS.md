@@ -17,14 +17,14 @@ Requirements for the initial release. Each maps to a roadmap phase.
 - [ ] **BOX-01**: User can add, edit, and remove box types in a catalog
 - [ ] **BOX-02**: User can set each box type's dimensions (L/W/H, mm), unit weight (kg), and quantity
 - [ ] **BOX-03**: User can set max-load-on-top per box type and mark a type fragile (fragile = nothing stacked on top)
-- [ ] **BOX-04**: User can choose a rotation mode per box type from the API's three modes (any orientation / keep upright / fixed)
+- [x] **BOX-04**: User can choose a rotation mode per box type from the API's three modes (any orientation / keep upright / fixed)
 - [ ] **BOX-05**: App shows a live running total of box types and units and warns when the unit count is large
 - [ ] **BOX-06**: App validates pallet and box inputs and blocks submitting an invalid configuration with clear messages
 
 ### Packing Job
 
 - [ ] **PACK-01**: User can submit the configuration to run a packing calculation
-- [ ] **PACK-02**: App expands each box type's quantity into individual, uniquely-identified boxes before calling the API
+- [x] **PACK-02**: App expands each box type's quantity into individual, uniquely-identified boxes before calling the API
 - [ ] **PACK-03**: User can set how many pallets the solver may use (max_pallets)
 - [ ] **PACK-04**: App shows a loading state and polls the asynchronous job until it reaches a terminal state
 - [ ] **PACK-05**: User can cancel an in-progress packing job, and polling stops cleanly
@@ -102,11 +102,11 @@ Which phases cover which requirements. Populated during roadmap creation.
 | BOX-01 | Phase 4 | Pending |
 | BOX-02 | Phase 4 | Pending |
 | BOX-03 | Phase 4 | Pending |
-| BOX-04 | Phase 4 | Pending |
+| BOX-04 | Phase 4 | Complete |
 | BOX-05 | Phase 4 | Pending |
 | BOX-06 | Phase 4 | Pending |
 | PACK-01 | Phase 5 | Pending |
-| PACK-02 | Phase 3 | Pending |
+| PACK-02 | Phase 3 | Complete |
 | PACK-03 | Phase 4 | Pending |
 | PACK-04 | Phase 5 | Pending |
 | PACK-05 | Phase 5 | Pending |
