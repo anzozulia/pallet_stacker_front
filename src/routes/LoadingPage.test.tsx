@@ -6,6 +6,7 @@
 // navigation INTENT is asserted without a real route change; `useLocation` + MemoryRouter carry the
 // nav state. The `@/` alias resolves via Vitest.
 import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { server } from '@/test/msw/server';
@@ -97,5 +98,78 @@ describe('LoadingPage — happy-path submit→poll→summary→navigate (Plan 05
       </MemoryRouter>,
     );
     await waitFor(() => expect(navigateSpy).toHaveBeenCalledWith('/', { replace: true }));
+  });
+});
+
+describe('LoadingPage — terminal-state distinction + cancel (Plan 05-04)', () => {
+  test("a failed job shows the distinct 'failed' card with the server's error message (no crash)", async () => {
+    server.use(
+      makePollSequence([
+        { status: 'running' },
+        { status: 'failed', error: { code: 'SOLVER_ERROR', message: 'overhang exceeded' } },
+      ]),
+    );
+    renderLoading();
+
+    // running→failed spans ~1 poll interval (POLL_INTERVAL_MS=1000); allow ample time.
+    expect(await screen.findByText('overhang exceeded', {}, { timeout: 5000 })).toBeInTheDocument();
+    // It is rendered inside the alert error card, NOT a navigation to /result.
+    expect(screen.getByRole('alert')).toHaveTextContent('Packing failed');
+    expect(navigateSpy).not.toHaveBeenCalledWith('/result', { replace: true });
+  });
+
+  test("a timeout job shows the distinct 'ran out of time' card (no crash)", async () => {
+    server.use(makePollSequence([{ status: 'running' }, { status: 'timeout' }]));
+    renderLoading();
+
+    expect(await screen.findByText(/ran out of time/i, {}, { timeout: 5000 })).toBeInTheDocument();
+    expect(navigateSpy).not.toHaveBeenCalledWith('/result', { replace: true });
+  });
+
+  test("a network throw shows the distinct 'unreachable' card and the app does not crash", async () => {
+    server.use(makePollSequence([{ status: 'running' }, 'throw']));
+    renderLoading();
+
+    expect(
+      await screen.findByText(/couldn't reach the packing service/i, {}, { timeout: 5000 }),
+    ).toBeInTheDocument();
+    expect(navigateSpy).not.toHaveBeenCalledWith('/result', { replace: true });
+  });
+
+  test('a done body with unpacked_items > 0 is SUCCESS → navigates to /result (not an error)', async () => {
+    // The committed fixture has 7 unpacked_items; a `done` with that body must still route to /result.
+    server.use(makePollSequence([{ status: 'running' }, { status: 'done' }]));
+    renderLoading();
+
+    await waitFor(() => expect(navigateSpy).toHaveBeenCalledWith('/result', { replace: true }), {
+      timeout: 5000,
+    });
+    // Not treated as an error: no error card rendered on the way.
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  test('Cancel returns to / and leaves no pending poll (no post-unmount state update)', async () => {
+    const user = userEvent.setup();
+    // A long non-terminal sequence so the job is still polling when we cancel.
+    server.use(
+      makePollSequence([
+        { status: 'queued' },
+        { status: 'running' },
+        { status: 'running' },
+        { status: 'running' },
+      ]),
+    );
+    const { unmount } = renderLoading();
+
+    const cancel = await screen.findByRole('button', { name: 'Cancel' });
+    await user.click(cancel);
+
+    // Cancel navigates home (NOT a replace — Cancel is a normal back-to-configure).
+    expect(navigateSpy).toHaveBeenCalledWith('/');
+    // Unmount mid-flight: react-query auto-cancels the poll; assert no late act() warning / hang.
+    unmount();
+    // Give any (incorrectly) still-armed interval a chance to fire and complain.
+    await new Promise((r) => setTimeout(r, 50));
+    expect(navigateSpy).not.toHaveBeenCalledWith('/result', { replace: true });
   });
 });

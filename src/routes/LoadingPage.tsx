@@ -1,29 +1,48 @@
-// The /loading route (D-01/D-03): the three-free, EAGER `/loading` chunk (C-06). This page is
-// the happy-path spine of the submit→poll lifecycle: it reads the `{ request, idToType }` handed
-// over via react-router navigation state, fires `useSubmitJob` on mount, chains the returned
-// `job_id` into `usePollJob`, renders the comet spinner + a tally-derived job-summary card with an
-// HONEST status sub-line (NO fake %, NO cycling mockup flavor text), and on `done` navigates to
-// /result with `replace` so Back skips the spinner.
+// The /loading route (D-01/D-03/D-07/D-08): the three-free, EAGER `/loading` chunk (C-06). This
+// page is the full submit→poll lifecycle: it reads the `{ request, idToType }` handed over via
+// react-router navigation state, fires `useSubmitJob` on mount, chains the returned `job_id` into
+// `usePollJob`, renders the comet spinner + a tally-derived job-summary card with an HONEST status
+// sub-line (NO fake %, NO cycling mockup flavor text), and on `done` navigates to /result with
+// `replace` so Back skips the spinner.
 //
-// Code-split gate (C-06): imports ONLY React, react-router, the three-free Wave-2 hooks, the pure
-// `tallyCatalog`, and the `Card`-free local chrome — NEVER three/r3f/drei, NEVER @/components/viewer,
-// NEVER @/routes/ResultPage. This keeps `/loading` on the eager Configure→loading chunk and out of
-// the lazy /result chunk (the Wave-4 `scripts/check-code-split.mjs` gate enforces the machine half).
+// Terminal-state distinction (D-07 / PACK-06): the four non-queued/running outcomes are each handled
+// without crashing —
+//   - done   (incl. `unpacked_items > 0`, which is SUCCESS) → navigate('/result', { replace }).
+//   - failed (server terminal)                              → ErrorCard kind 'failed' (server message).
+//   - timeout (server terminal) OR the client safety cap    → ErrorCard kind 'timeout'.
+//   - a thrown POST/poll (network/opaque-CORS)              → classifyFetchError → ErrorCard 'unreachable'
+//                                                             (an 'aborted' throw is a no-op, Pitfall 3).
 //
-// The failed / timeout / cap-exceeded / cancel-abort distinctions are Plan 04 — this slice handles
-// ONLY the happy path plus the defensive no-nav-state guard (threat T-5-07: a deep-link to /loading
-// with no state has nothing to submit → redirect to '/', never crash on `undefined`).
-import { useEffect, useMemo, useRef } from 'react';
+// Cancel/Back/unmount (D-04/D-08/SC-3 / PACK-05): Cancel aborts the in-flight POST (the per-attempt
+// AbortController) AND stops the poll (the query is disabled by dropping the jobId) then navigate('/');
+// leaving via browser-Back or a route change unmounts the page so react-query auto-cancels the poll —
+// no leaked interval/request. No confirmation dialog (D-08). Retry re-fires the SAME already-built
+// request from nav state (no bounce through the form), resetting the lifecycle.
+//
+// Code-split gate (C-06 / threat T-5-13): imports ONLY React, react-router, the three-free Wave-2
+// hooks, the Wave-1 error classifier, the pure `tallyCatalog`, and the three-free local `ErrorCard` —
+// NEVER three/r3f/drei, NEVER @/components/viewer, NEVER @/routes/ResultPage. The Wave-4
+// `scripts/check-code-split.mjs` gate enforces the machine half.
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useSubmitJob } from '@/api/useSubmitJob';
 import { usePollJob } from '@/api/usePollJob';
+import { classifyFetchError } from '@/api/errors';
 import { tallyCatalog } from '@/lib/config-tally';
+import ErrorCard, { type ErrorCardKind } from '@/features/loading/ErrorCard';
 import type { PackRequest } from '@/types/pack-contract';
 
 /** The navigation payload ConfigForm hands over (C-05): the built request + the id→type recovery map. */
 interface LoadingNavState {
   request: PackRequest;
   idToType: Map<string, string>;
+}
+
+/** The structured error body the API returns on a `failed`/`timeout` job (zod-parsed, Wave 1). */
+interface JobErrorBody {
+  code?: string;
+  message?: string | null;
+  problems?: string[] | null;
 }
 
 /**
@@ -51,41 +70,101 @@ export default function LoadingPage() {
   const location = useLocation();
   const navState = location.state;
 
-  const submit = useSubmitJob();
-  // Fire the POST exactly once on mount, forwarding the AbortSignal (SC-3). The submit hook resolves
-  // the 202 { job_id }; we chain that into the poll below. Guarded by a ref so StrictMode's
-  // double-invoke (dev) does not double-submit.
-  const firedRef = useRef(false);
   const valid = isLoadingNavState(navState);
   const request = valid ? navState.request : undefined;
   const idToType = valid ? navState.idToType : undefined;
 
+  const submit = useSubmitJob();
+
+  // The AbortController for the CURRENT submit attempt. Held in a ref so Cancel can abort the
+  // in-flight POST imperatively (SC-3); re-created on each (re)fire so a Retry gets a fresh signal.
+  const controllerRef = useRef<AbortController | null>(null);
+  // Fire the POST once on mount (guarded against StrictMode dev double-invoke); Retry re-arms it.
+  const firedRef = useRef(false);
+  // Cancelled: drop the jobId so the poll query disables (no leaked interval), and suppress any
+  // in-flight error from flashing an error card while we navigate home.
+  const [cancelled, setCancelled] = useState(false);
+
+  // The single submit-firing primitive, reused by mount and Retry: abort any prior attempt, mint a
+  // fresh AbortController, and POST the SAME already-built request from nav state (D-07).
+  const fireSubmit = useCallback(() => {
+    if (!request) return;
+    controllerRef.current?.abort();
+    const controller = new AbortController();
+    controllerRef.current = controller;
+    submit.mutate({ request, signal: controller.signal });
+    // submit.mutate is stable; request is captured once from nav state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [request]);
+
   useEffect(() => {
     if (!valid || firedRef.current || !request) return;
     firedRef.current = true;
-    const controller = new AbortController();
-    submit.mutate({ request, signal: controller.signal });
-    return () => controller.abort();
-    // submit.mutate is stable; request is captured once on mount. We intentionally run this once.
+    fireSubmit();
+    // Abort the in-flight POST when the page unmounts (browser-Back / route change) — SC-3.
+    return () => controllerRef.current?.abort();
+    // Run once on mount; `valid`/`request` are captured from the initial nav state.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [valid]);
 
   const jobId = submit.data?.job_id;
-  const poll = usePollJob(jobId);
+  // Stop polling the instant we are cancelled (drop the jobId → the query disables, react-query
+  // clears its interval) — no zombie poll after Cancel (PACK-05 / T-5-12).
+  const poll = usePollJob(cancelled ? undefined : jobId);
   const status = poll.data?.status;
 
   // Defensive no-nav-state guard (threat T-5-07): a direct deep-link to /loading carries no state →
-  // nothing to submit. Degrade to a redirect home rather than crashing on `undefined`. Done in an
-  // effect (navigate-during-render is disallowed); render a neutral null in the meantime.
+  // nothing to submit. Degrade to a redirect home rather than crashing on `undefined`.
   useEffect(() => {
     if (!valid) navigate('/', { replace: true });
   }, [valid, navigate]);
 
-  // Reaching `done` hands off to /result with `replace` so Back skips the spinner (D-03/D-05). The
+  // Reaching `done` — INCLUDING when `unpacked_items.length > 0` (that is SUCCESS, never an error,
+  // Anti-Pattern) — hands off to /result with `replace` so Back skips the spinner (D-03/D-05). The
   // done payload remains in the react-query cache (gcTime:Infinity, Wave 2) for /result to read.
   useEffect(() => {
-    if (status === 'done') navigate('/result', { replace: true });
-  }, [status, navigate]);
+    if (!cancelled && status === 'done') navigate('/result', { replace: true });
+  }, [cancelled, status, navigate]);
+
+  // Classify any transport throw (POST or poll) into a bucket WITHOUT reading a status (Pattern 3).
+  // An 'aborted' throw is a user-leaving no-op (no error card, Pitfall 3); 'unreachable'/'contract-
+  // drift' surface the unreachable card.
+  const transportError = submit.error ?? poll.error;
+  const transportKind = transportError ? classifyFetchError(transportError) : undefined;
+
+  // Derive the single terminal error-card kind to show, or undefined (still in flight / success /
+  // cancelled / aborted). Order: a thrown transport beats a job-state read only when it is a real
+  // (non-aborted) failure.
+  const errorKind: ErrorCardKind | undefined = (() => {
+    if (cancelled) return undefined;
+    if (transportKind === 'unreachable' || transportKind === 'contract-drift') return 'unreachable';
+    if (status === 'failed') return 'failed';
+    if (status === 'timeout' || poll.isCapExceeded) return 'timeout';
+    return undefined;
+  })();
+
+  // Cancel (D-08): abort the in-flight POST, stop the poll (via `cancelled`), and return home. No
+  // confirmation. The form was never destructively unmounted so the draft persists (D-08) — Back
+  // re-seeds Configure from it.
+  const handleCancel = useCallback(() => {
+    controllerRef.current?.abort();
+    setCancelled(true);
+    navigate('/');
+  }, [navigate]);
+
+  // Retry (D-07): re-fire the SAME built request from nav state, resetting the mutation + poll, and
+  // clear any prior error so the spinner returns.
+  const handleRetry = useCallback(() => {
+    setCancelled(false);
+    submit.reset();
+    fireSubmit();
+    // submit.reset is stable.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fireSubmit]);
+
+  // Back (D-07): return to Configure with the draft intact. Same target as Cancel but semantically
+  // the error-card "go back" action.
+  const handleBack = useCallback(() => navigate('/'), [navigate]);
 
   // Job-summary card from the EXISTING tally (D-01) — do NOT recompute the unit/weight logic. The
   // request's boxes are already quantity-expanded (one entry per unit), so each maps to a
@@ -102,22 +181,31 @@ export default function LoadingPage() {
 
   if (!valid || !summary) return null;
 
+  // An error terminal: render the distinct card instead of the spinner. The `failed` body carries the
+  // server's (untrusted, zod-parsed) message/problems; ErrorCard renders them as escaped text (T-5-10).
+  if (errorKind) {
+    const body = poll.data?.error as JobErrorBody | undefined;
+    return (
+      <div className="flex min-h-[100dvh] flex-col bg-bg font-sans text-text">
+        <Topbar />
+        <main className="flex flex-1 flex-col items-center justify-center px-6 pb-24 pt-8">
+          <ErrorCard
+            kind={errorKind}
+            message={errorKind === 'failed' ? body?.message : undefined}
+            problems={errorKind === 'failed' ? body?.problems : undefined}
+            onRetry={handleRetry}
+            onBack={handleBack}
+          />
+        </main>
+      </div>
+    );
+  }
+
   const subline = status ? (STATUS_SUBLINE[status] ?? 'Packing…') : 'Submitting…';
 
   return (
     <div className="flex min-h-[100dvh] flex-col bg-bg font-sans text-text">
-      <header className="flex h-[var(--topbar-height)] flex-none items-center px-6">
-        <div className="flex items-center gap-2 font-semibold tracking-[-0.02em] text-text">
-          <span
-            aria-hidden="true"
-            className="relative h-[22px] w-[22px] flex-none rounded-[6px] bg-[linear-gradient(150deg,#6d63f5,#4f46e5)] after:absolute after:inset-[5px] after:rounded-[2px] after:border-[1.5px] after:border-white/90 after:content-['']"
-          />
-          Palletize
-          <small className="ml-0.5 font-mono text-[10px] font-normal uppercase text-text-3">
-            pack&nbsp;studio
-          </small>
-        </div>
-      </header>
+      <Topbar />
 
       <main className="flex flex-1 flex-col items-center justify-center gap-0 px-6 pb-24 pt-8">
         <div className="flex flex-col items-center">
@@ -172,12 +260,11 @@ export default function LoadingPage() {
             </div>
           </dl>
 
-          {/* Secondary-action slot (design/loading.html "Skip to result"). For this happy-path slice
-              this is a Cancel placeholder that simply returns home; its abort+navigate behavior is
-              wired in Plan 04. The draft persists (D-08) so returning re-seeds the form. */}
+          {/* Cancel (D-08): aborts the in-flight POST + stops the poll, then returns home. The draft
+              persists (D-08) so returning re-seeds the form. No confirmation dialog. */}
           <button
             type="button"
-            onClick={() => navigate('/')}
+            onClick={handleCancel}
             className="mt-[30px] inline-flex cursor-pointer items-center gap-[7px] rounded-[6px] px-[10px] py-[6px] text-[12.5px] font-medium text-text-3 transition-colors duration-150 hover:text-text"
           >
             Cancel
@@ -185,5 +272,23 @@ export default function LoadingPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+/** The shared brand topbar (spinner + error views render the same chrome). */
+function Topbar() {
+  return (
+    <header className="flex h-[var(--topbar-height)] flex-none items-center px-6">
+      <div className="flex items-center gap-2 font-semibold tracking-[-0.02em] text-text">
+        <span
+          aria-hidden="true"
+          className="relative h-[22px] w-[22px] flex-none rounded-[6px] bg-[linear-gradient(150deg,#6d63f5,#4f46e5)] after:absolute after:inset-[5px] after:rounded-[2px] after:border-[1.5px] after:border-white/90 after:content-['']"
+        />
+        Palletize
+        <small className="ml-0.5 font-mono text-[10px] font-normal uppercase text-text-3">
+          pack&nbsp;studio
+        </small>
+      </div>
+    </header>
   );
 }
