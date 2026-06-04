@@ -149,7 +149,7 @@ Plans:
 
 **Wave 5** _(blocked on Waves 1-4)_
 
-- [ ] 04-07-PLAN.md — Wave 5: integration — ConfigForm shell + resolver + Run gate (D-06) + fit-check, FooterBar (total + large-job advisory + Save draft), autosave/restore hook, ConfigurePage, restore-after-reload E2E + human visual sign-off (BOX-06/DATA-02/SC-5)
+- [x] 04-07-PLAN.md — Wave 5: integration — ConfigForm shell + resolver + Run gate (D-06) + fit-check, FooterBar (total + large-job advisory + Save draft), autosave/restore hook, ConfigurePage, restore-after-reload E2E + human visual sign-off (BOX-06/DATA-02/SC-5)
 **UI hint**: yes
 
 ### Phase 5: API Client & Async Polling
@@ -211,7 +211,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 1. Scaffolding & Version Lock          | 4/4            | Complete    | 2026-06-03 |
 | 2. Coordinate Mapping & Fixture Viewer | 2/2 | Complete    | 2026-06-03 |
 | 3. Pure Transform Core                 | 3/3 | Complete    | 2026-06-04 |
-| 4. Config Form & Local Persistence     | 6/7 | In Progress|  |
+| 4. Config Form & Local Persistence     | 7/7 | In Progress (verification pending) |  |
 | 5. API Client & Async Polling          | 0/TBD          | Not started | -          |
 | 6. Result Page & 3D Wiring             | 0/TBD          | Not started | -          |
 | 7. Edge States, Exports & Self-Hosting | 0/TBD          | Not started | -          |
