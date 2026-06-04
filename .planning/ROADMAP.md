@@ -172,7 +172,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 05-01-PLAN.md — Wave 1: supply-chain checkpoint (react-query 5.101.0 + msw 2.14.6, T-5-SC) + the three-free contract layer — zod network-boundary schema (C-02), PackError taxonomy + CORS/abort bucketing (D-07), AbortSignal fetch client (D-11/C-04), MSW transport + isolated QueryClient render helper (Wave-0 infra) (PACK-01/04/06)
+- [x] 05-01-PLAN.md — Wave 1: supply-chain checkpoint (react-query 5.101.0 + msw 2.14.6, T-5-SC) + the three-free contract layer — zod network-boundary schema (C-02), PackError taxonomy + CORS/abort bucketing (D-07), AbortSignal fetch client (D-11/C-04), MSW transport + isolated QueryClient render helper (Wave-0 infra) (PACK-01/04/06)
 
 **Wave 2** _(blocked on Wave 1)_
 

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
+status: executing
 stopped_at: Phase 5 context gathered
-last_updated: "2026-06-04T20:16:57.140Z"
-last_activity: 2026-06-04 -- Phase 05 planning complete
+last_updated: "2026-06-04T20:34:21.462Z"
+last_activity: 2026-06-04
 progress:
   total_phases: 7
   completed_phases: 4
-  total_plans: 16
-  completed_plans: 16
-  percent: 57
+  total_plans: 20
+  completed_plans: 17
+  percent: 85
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-03)
 
 **Core value:** A user can describe their pallet and boxes and get back a correct, explorable 3D packing plan in seconds — zero signup, single self-hostable Docker container.
-**Current focus:** Phase 04 — config-form-local-persistence
+**Current focus:** Phase 05 — api-client-async-polling
 
 ## Current Position
 
-Phase: 5
-Plan: Not started
-Status: All plans executed — awaiting phase verification
-Last activity: 2026-06-04 -- Phase 05 planning complete
+Phase: 05 (api-client-async-polling) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-06-04
 
-Progress: [██████████] 100%
+Progress: [█████████░] 85%
 
 ## Performance Metrics
 
@@ -70,6 +70,7 @@ _Updated after each plan completion_
 | Phase 04 P04-05 | 9min | 2 tasks | 4 files |
 | Phase 04 P04-06 | ~6min | 1 tasks | 2 files |
 | Phase 04 P04-07 | ~22min | 4 tasks | 7 files |
+| Phase 05 P01 | 10 | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,8 @@ Recent decisions affecting current work:
 - [Phase 04]: [04-07]: ConfigForm = useForm<PackConfig> + zodResolver (mode onSubmit / reValidate onChange, D-04) seeded from useLocalStorageAutosave; Run gate disabled-while-invalid → checkAllBoxesFit → setError on rows → buildPackRequest → console.log (D-06, no network this phase); useLocalStorageAutosave is the SOLE IO module (debounced ~400ms UNCONDITIONAL save even of invalid drafts + flushSave); FooterBar useWatch→tallyCatalog live NaN-safe total + strict >1000 non-blocking advisory
 - [Phase 04]: [04-07]: Lenient restore guard coerces string|number→number (structure-only) — RHF stores numeric inputs as strings so the bare z.number() shape check was discarding valid drafts on reload (Rule-1 bugfix)
 - [Phase 04]: [04-07]: Human visual + auto-save-feel checkpoint (blocking) APPROVED — Configure screen matches design/config.html / UI-SPEC; auto-save/restore/Save-draft/Run/large-job-advisory all confirmed
+- [Phase ?]: 05-01: zod-at-boundary parses untrusted API JSON (jobStateSchema) so contract drift is a handled ZodError, never a render crash (C-02/T-5-01)
+- [Phase ?]: 05-01: classifyFetchError buckets transport failures (opaque-CORS TypeError->unreachable, AbortError->aborted, ZodError->contract-drift); never read a status off a thrown fetch (D-07)
 
 ### Pending Todos
 
@@ -138,6 +141,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-04T19:47:01.034Z
+Last session: 2026-06-04T20:34:16.285Z
 Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-api-client-async-polling/05-CONTEXT.md
+Resume file: None

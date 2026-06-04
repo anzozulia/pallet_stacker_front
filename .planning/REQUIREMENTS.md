@@ -23,12 +23,12 @@ Requirements for the initial release. Each maps to a roadmap phase.
 
 ### Packing Job
 
-- [ ] **PACK-01**: User can submit the configuration to run a packing calculation
+- [x] **PACK-01**: User can submit the configuration to run a packing calculation
 - [x] **PACK-02**: App expands each box type's quantity into individual, uniquely-identified boxes before calling the API
 - [x] **PACK-03**: User can set how many pallets the solver may use (max_pallets)
-- [ ] **PACK-04**: App shows a loading state and polls the asynchronous job until it reaches a terminal state
+- [x] **PACK-04**: App shows a loading state and polls the asynchronous job until it reaches a terminal state
 - [ ] **PACK-05**: User can cancel an in-progress packing job, and polling stops cleanly
-- [ ] **PACK-06**: App distinguishes job failure, timeout, unreachable/CORS errors, and "some items unpacked" — none crash the app
+- [x] **PACK-06**: App distinguishes job failure, timeout, unreachable/CORS errors, and "some items unpacked" — none crash the app
 
 ### Result & Visualization
 
@@ -105,12 +105,12 @@ Which phases cover which requirements. Populated during roadmap creation.
 | BOX-04 | Phase 4 | Complete |
 | BOX-05 | Phase 4 | Complete |
 | BOX-06 | Phase 4 | Complete |
-| PACK-01 | Phase 5 | Pending |
+| PACK-01 | Phase 5 | Complete |
 | PACK-02 | Phase 3 | Complete |
 | PACK-03 | Phase 4 | Complete |
-| PACK-04 | Phase 5 | Pending |
+| PACK-04 | Phase 5 | Complete |
 | PACK-05 | Phase 5 | Pending |
-| PACK-06 | Phase 5 | Pending |
+| PACK-06 | Phase 5 | Complete |
 | RESULT-01 | Phase 2 | Complete |
 | RESULT-02 | Phase 2 | Complete |
 | RESULT-03 | Phase 6 | Pending |
