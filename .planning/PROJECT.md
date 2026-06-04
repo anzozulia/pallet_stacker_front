@@ -20,14 +20,14 @@ A user can describe their pallet and boxes and get back a correct, explorable 3D
 
 <!-- Current scope. Building toward these. All are hypotheses until shipped. -->
 
-- [ ] User can configure a pallet: length, width, max stack height, max weight, max overhang (mm / kg)
-- [ ] User can build a box catalog: per type — dimensions, unit weight, quantity, max load on top, fragile flag, rotation mode
+- [x] User can configure a pallet: length, width, max stack height, max weight, max overhang (mm / kg) — built in Phase 4
+- [x] User can build a box catalog: per type — dimensions, unit weight, quantity, max load on top, fragile flag, rotation mode — built in Phase 4 (max load + fragile are persisted/displayed but NOT sent to the API per D-08)
 - [ ] App expands per-type quantities into individual boxes with unique IDs for the API
 - [ ] User can submit a packing job and see a loading state while the app polls the async API to completion
 - [ ] User can view the result: 3D pallet viewer + summary (pallets used, utilisation, unpacked, total weight) + per-box placement list
 - [ ] User can pack across multiple pallets (`options.max_pallets`) and switch between generated pallets
 - [ ] User can export the packing result (JSON / printable report)
-- [ ] User can save and reload their configuration locally (localStorage) so a refresh doesn't lose work
+- [x] User can save and reload their configuration locally (localStorage) so a refresh doesn't lose work — built in Phase 4
 - [ ] User can see stability diagnostics: centre-of-gravity and support ratios returned by the API
 - [ ] App handles API failure / timeout / unpacked-items states gracefully with clear messaging
 - [ ] App ships as a single Docker image, self-hostable, with the API base URL configurable at build time
@@ -97,4 +97,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-_Last updated: 2026-06-04 — Phase 3 (Pure Transform Core) complete: the IO-free transform layer is built and fully unit-tested — `buildPackRequest` expands per-type quantities into stable unique `{typeId}-{index}` boxes with an O(1) `idToType` map and maps the three rotation modes to the API's `all`/`this_side_up`/`none`, and `mapDoneResponse` regroups results by type and per pallet while surfacing raw CoG + support-ratio diagnostics; both lib modules grep-clean of React/three/IO (36/36 tests green). Known follow-up (REVIEW CR-01): the `typeKeyOf` fallback returns `Da-` for builder-format `Da-0` ids, so the Phase 5/6 pipeline must thread `idToType` from builder to mapper (or fix the fallback regex to `/^([^\d-]+)/`) for correct type grouping when a result is restored without the in-memory map._
+_Last updated: 2026-06-04 — Phase 4 (Config Form & Local Persistence) complete: the full Configure screen ships on `/` — a validated `useForm<PackConfig>` (zod resolver) composing the Pallet card (dimensions + limits incl. Max pallets, no CoG input per C-04) and the `useFieldArray` Box catalog (per-type dims/weight/qty/max-load, fragile↔max-load interaction, 3-mode rotation, live types/units badge, empty state), a sticky footer with the live NaN-safe total + non-blocking >1000 large-job advisory, a Run gate that blocks invalid/unfittable input (zod + conservative D-01 box-fit) before `buildPackRequest` → console.log, and debounced auto-save/restore via a versioned, never-throwing localStorage guard (DATA-02) proven by a Playwright reload spec. `maxLoad`/`fragile` are collected/persisted/displayed but never sent (D-08). 112 unit/component + 4 E2E tests green; eager `/` chunk stays three-free. Verification 5/5 must-haves (status human_needed — `04-HUMAN-UAT.md` tracks UI-fidelity checks, substantially covered by the approved visual checkpoint; full tab-close persistence still open). Code review: 0 critical / 7 warning / 6 info — notably WR-01 (a blank *required* numeric field decays to 0 across two reload cycles) is an open robustness refinement. Next: Phase 5 (API client & async submit-then-poll) wires this config to the real packing API._
