@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 5 context gathered
-last_updated: "2026-06-04T20:41:51.097Z"
+last_updated: "2026-06-04T20:53:07.220Z"
 last_activity: 2026-06-04
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 20
-  completed_plans: 18
-  percent: 90
+  completed_plans: 19
+  percent: 57
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 ## Current Position
 
 Phase: 05 (api-client-async-polling) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-06-04
 
@@ -72,6 +72,7 @@ _Updated after each plan completion_
 | Phase 04 P04-07 | ~22min | 4 tasks | 7 files |
 | Phase 05 P01 | 10 | 3 tasks | 11 files |
 | Phase 05 P02 | 4min | 2 tasks | 6 files |
+| Phase 05 P03 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -118,6 +119,9 @@ Recent decisions affecting current work:
 - [Phase ?]: 05-01: zod-at-boundary parses untrusted API JSON (jobStateSchema) so contract drift is a handled ZodError, never a render crash (C-02/T-5-01)
 - [Phase ?]: 05-01: classifyFetchError buckets transport failures (opaque-CORS TypeError->unreachable, AbortError->aborted, ZodError->contract-drift); never read a status off a thrown fetch (D-07)
 - [Phase ?]: 05-02: terminal-aware refetchInterval self-stops the poll on done/failed/timeout (C-01, no hand-rolled setInterval); POLL_SAFETY_CAP_MS=120000 client cap bounds a never-terminal job
+- [Phase 05-03]: First end-to-end slice: a valid Run navigates to the eager three-free /loading route carrying { request, idToType } state, which fires useSubmitJob then chains job_id into usePollJob and on done navigate('/result', { replace }) so Back skips the spinner (D-03/D-05)
+- [Phase 05-03]: Loading summary card reuses tallyCatalog (no recompute, D-01); distinct box TYPES recovered from new Set(idToType.values()).size since request.boxes is already quantity-expanded one-per-unit (C-05)
+- [Phase 05-03]: /loading is a STATIC eager router import (no lazy/Suspense) keeping three out of the entry chunk (C-06/D-03); honest status sub-line via {queued,running} map (no fake %/flavor text); T-5-07 no-nav-state deep-link redirects home
 
 ### Pending Todos
 
@@ -143,6 +147,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-04T20:41:31.083Z
+Last session: 2026-06-04T20:52:40.746Z
 Stopped at: Phase 5 context gathered
 Resume file: None

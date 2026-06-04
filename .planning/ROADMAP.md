@@ -180,7 +180,7 @@ Plans:
 
 **Wave 3** _(blocked on Wave 2)_
 
-- [ ] 05-03-PLAN.md — Wave 3: the happy-path vertical slice — LoadingPage (comet spinner + tally-derived summary + honest real-status sub-line, D-01) on the eager three-free /loading route (D-03) + the ConfigForm Run seam swap (console.log → navigate('/loading'), C-03/C-05) + done→navigate('/result',replace) (PACK-01/04)
+- [x] 05-03-PLAN.md — Wave 3: the happy-path vertical slice — LoadingPage (comet spinner + tally-derived summary + honest real-status sub-line, D-01) on the eager three-free /loading route (D-03) + the ConfigForm Run seam swap (console.log → navigate('/loading'), C-03/C-05) + done→navigate('/result',replace) (PACK-01/04)
 
 **Wave 4** _(blocked on Wave 3)_
 
@@ -232,6 +232,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Coordinate Mapping & Fixture Viewer | 2/2 | Complete    | 2026-06-03 |
 | 3. Pure Transform Core                 | 3/3 | Complete    | 2026-06-04 |
 | 4. Config Form & Local Persistence     | 7/7 | Complete    | 2026-06-04 |
-| 5. API Client & Async Polling          | 0/4            | Planned     | -          |
+| 5. API Client & Async Polling          | 3/4 | In Progress|  |
 | 6. Result Page & 3D Wiring             | 0/TBD          | Not started | -          |
 | 7. Edge States, Exports & Self-Hosting | 0/TBD          | Not started | -          |
