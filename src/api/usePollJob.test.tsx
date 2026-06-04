@@ -6,9 +6,24 @@ import { type ReactNode } from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
 import { server } from '@/test/msw/server';
 import { makePollSequence } from '@/test/msw/handlers';
 import { usePollJob, isTerminal, POLL_INTERVAL_MS, POLL_SAFETY_CAP_MS } from '@/api/usePollJob';
+
+/**
+ * A never-terminal GET /jobs/:id handler that counts how many times it is hit, so a test can
+ * assert the poll loop actually STOPS firing GETs once the cap trips (CR-02). Always returns
+ * `running`, so without the cap-gate the loop would run forever.
+ */
+function makeCountingRunningHandler() {
+  const counter = { calls: 0 };
+  const handler = http.get('*/api/v1/jobs/:id', ({ params }) => {
+    counter.calls += 1;
+    return HttpResponse.json({ job_id: String(params.id), status: 'running' }, { status: 200 });
+  });
+  return { counter, handler };
+}
 
 /** A fresh isolated QueryClient per render (retry:false, gcTime:0) — the RTL+react-query gotcha. */
 function makeWrapper() {
@@ -99,6 +114,62 @@ describe('usePollJob', () => {
       wrapper,
     });
 
+    await waitFor(() => expect(result.current.data?.status).toBe('done'), { timeout: 5000 });
+    expect(result.current.isCapExceeded).toBe(false);
+  });
+
+  it('STOPS firing GET /jobs/{id} once the cap trips on a never-terminal job (CR-02 regression)', async () => {
+    // Drive a job that stays 'running' forever past a tiny injected cap, then assert the GET
+    // call count stops increasing — the cap must disable the query (abort the in-flight GET +
+    // clear the interval), not merely paint a UI overlay. On the OLD code this count kept
+    // climbing at 1 Hz indefinitely.
+    const { counter, handler } = makeCountingRunningHandler();
+    server.use(handler);
+
+    const { wrapper } = makeWrapper();
+    const { result } = renderHook(() => usePollJob('stuck-loop-job', { safetyCapMs: 50 }), {
+      wrapper,
+    });
+
+    await waitFor(() => expect(result.current.isCapExceeded).toBe(true), { timeout: 5000 });
+
+    // Capture the count the moment the cap trips, then wait well past several poll intervals.
+    const callsAtTrip = counter.calls;
+    await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS * 3));
+
+    // The loop is stopped: at most one more in-flight GET may have been already dispatched at
+    // the trip instant, but no further polling occurs.
+    expect(counter.calls).toBeLessThanOrEqual(callsAtTrip + 1);
+    expect(result.current.isCapExceeded).toBe(true);
+  });
+
+  it('does NOT inherit a stale cap trip when re-armed with a NEW jobId — Retry recovers (CR-01 regression)', async () => {
+    // Trip the cap on a stuck job, then re-arm the SAME hook instance with a new job_id (the
+    // Retry path: LoadingPage keeps one usePollJob instance and feeds it a fresh job_id). On the
+    // OLD boolean-latch code isCapExceeded stayed true and the timeout card showed instantly on
+    // the new job; with the tripped-job-identity latch it must be false for the new job.
+    server.use(makePollSequence([{ status: 'running' }]));
+
+    const { wrapper } = makeWrapper();
+    const { result, rerender } = renderHook(
+      ({ jobId }: { jobId: string }) => usePollJob(jobId, { safetyCapMs: 50 }),
+      { wrapper, initialProps: { jobId: 'stuck-job-1' } },
+    );
+
+    // First job trips the cap.
+    await waitFor(() => expect(result.current.isCapExceeded).toBe(true), { timeout: 5000 });
+
+    // Retry: the same hook instance now polls a BRAND NEW job that settles to done on its first
+    // poll (so it never reaches the tiny 50ms cap on its own).
+    server.use(makePollSequence([{ status: 'done' }]));
+    rerender({ jobId: 'fresh-retry-job-2' });
+
+    // CR-01 core proof: the instant the hook is re-armed with the new job_id, the stale trip is
+    // NOT inherited — isCapExceeded is false (the spinner returns, not the timeout card). On the
+    // old boolean-latch code this was true because capTripped was never reset.
+    expect(result.current.isCapExceeded).toBe(false);
+
+    // And the fresh job polls through to a real terminal state, never re-tripping the cap.
     await waitFor(() => expect(result.current.data?.status).toBe('done'), { timeout: 5000 });
     expect(result.current.isCapExceeded).toBe(false);
   });
