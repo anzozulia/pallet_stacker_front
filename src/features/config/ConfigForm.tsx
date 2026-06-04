@@ -16,6 +16,7 @@
 // `@/features/config/*`, `@/hooks/*`, `@/lib/{request-builder,box-fit}`, and `@/types/config`
 // — never three/r3f/drei or any viewer module, so it stays in the eager `/` chunk.
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router';
 import { FormProvider, useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import PalletCard from '@/features/config/PalletCard';
@@ -42,6 +43,8 @@ function RunIcon() {
 }
 
 export default function ConfigForm() {
+  const navigate = useNavigate();
+
   // Restore-on-mount once, before the form exists, so RHF seeds from the persisted draft
   // (or DEFAULT_CONFIG). Memoised so re-renders never re-read storage / reset defaultValues.
   const defaultValues = useMemo<PackConfig>(() => readPersistedConfig(), []);
@@ -73,7 +76,7 @@ export default function ConfigForm() {
   // Wire the debounced auto-save + flush to this form instance.
   const { flushSave } = useLocalStorageAutosave(form);
 
-  // The valid-parse path: feasibility gate, then build + log (D-06 / D-01 / BOX-06).
+  // The valid-parse path: feasibility gate, then build + hand off to /loading (D-06 / C-03 / C-05).
   function onValid(config: PackConfig) {
     const fit = checkAllBoxesFit(config);
     if (!fit.ok) {
@@ -81,10 +84,13 @@ export default function ConfigForm() {
       fit.failures.forEach((f) => {
         setError(`boxTypes.${f.index}.length`, { type: 'fit', message: f.message });
       });
-      return; // stay blocked — do NOT build/log
+      return; // stay blocked — do NOT build/navigate
     }
-    const { request } = buildPackRequest(config);
-    console.log('[Phase 4 Run] PackRequest:', JSON.stringify(request, null, 2));
+    // Build the request AND retain idToType (C-05): both ride the navigation state into the
+    // eager /loading route, which runs the submit→poll lifecycle. The form is NOT unmounted
+    // destructively and the persisted draft survives (D-08) for a later Cancel/Back return.
+    const { request, idToType } = buildPackRequest(config);
+    navigate('/loading', { state: { request, idToType } });
   }
 
   const onRun = handleSubmit(onValid);

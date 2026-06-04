@@ -1,19 +1,40 @@
 import { render, screen, within } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 // jsdom-WebGL-free component test (Pitfall 2): no Canvas/three import. Pins the assembled
 // Configure screen's Run gate + error timing + D-08 unsent fields. `@/` resolves via Vitest.
 // localStorage is cleared before each test so restore-on-mount always seeds DEFAULT_CONFIG
 // (the EUR-pallet seed is business-valid and its default box fits the pallet).
+//
+// Plan 05-03 seam swap (C-05): onValid now `navigate('/loading', { state: { request, idToType } })`
+// instead of console.log. `useNavigate` is spied so the Run gate is asserted via the navigation
+// INTENT — a blocked Run must NOT navigate, a valid Run navigates carrying the built PackRequest.
+import type { PackRequest } from '@/types/pack-contract';
 import ConfigForm from '@/features/config/ConfigForm';
+
+const navigateSpy = vi.fn();
+vi.mock('react-router', async () => {
+  const actual = await vi.importActual<typeof import('react-router')>('react-router');
+  return { ...actual, useNavigate: () => navigateSpy };
+});
 
 beforeEach(() => {
   localStorage.clear();
+  navigateSpy.mockClear();
 });
 
 afterEach(() => {
   vi.restoreAllMocks();
 });
+
+function renderForm() {
+  return render(
+    <MemoryRouter>
+      <ConfigForm />
+    </MemoryRouter>,
+  );
+}
 
 // Both Run CTAs (topbar + footer) submit the same handler; the footer one is unambiguous.
 function footerRunButton() {
@@ -22,10 +43,9 @@ function footerRunButton() {
 }
 
 describe('ConfigForm — Run gate (D-06)', () => {
-  test('a cleared required pallet field blocks Run and logs nothing (D-02/D-04)', async () => {
+  test('a cleared required pallet field blocks Run and navigates nowhere (D-02/D-04)', async () => {
     const user = userEvent.setup();
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    render(<ConfigForm />);
+    renderForm();
 
     // Clear the pallet Length input (a required mm field).
     const length = screen.getByLabelText('Length');
@@ -34,13 +54,12 @@ describe('ConfigForm — Run gate (D-06)', () => {
     await user.click(footerRunButton());
 
     expect(await screen.findByText('Required')).toBeInTheDocument();
-    expect(logSpy).not.toHaveBeenCalled();
+    expect(navigateSpy).not.toHaveBeenCalled();
   });
 
   test('an empty catalog blocks Run with "Add at least one box type" (D-02)', async () => {
     const user = userEvent.setup();
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    render(<ConfigForm />);
+    renderForm();
 
     // Remove the single default box type → empty catalog.
     await user.click(screen.getByRole('button', { name: /^Remove / }));
@@ -48,13 +67,12 @@ describe('ConfigForm — Run gate (D-06)', () => {
     await user.click(footerRunButton());
 
     expect(await screen.findByText('Add at least one box type')).toBeInTheDocument();
-    expect(logSpy).not.toHaveBeenCalled();
+    expect(navigateSpy).not.toHaveBeenCalled();
   });
 
   test('a box too big for the pallet blocks Run with an inline fit message (D-01/BOX-06)', async () => {
     const user = userEvent.setup();
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    render(<ConfigForm />);
+    renderForm();
 
     // Make the box's length 5000mm — too big for the 1200×800×1800 deck in EVERY allowed
     // orientation (any footprint placement leaves the 5000mm extent exceeding a deck/height
@@ -68,31 +86,36 @@ describe('ConfigForm — Run gate (D-06)', () => {
     expect(
       await screen.findByText(/cannot fit the pallet in any allowed orientation/),
     ).toBeInTheDocument();
-    expect(logSpy).not.toHaveBeenCalled();
+    expect(navigateSpy).not.toHaveBeenCalled();
   });
 
-  test('a valid config logs a PackRequest with NO maxLoad/fragile box keys (D-06/D-08)', async () => {
+  test('a valid config navigates to /loading with a PackRequest carrying NO maxLoad/fragile box keys (D-06/D-08)', async () => {
     const user = userEvent.setup();
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    render(<ConfigForm />);
+    renderForm();
 
     // DEFAULT_CONFIG is business-valid and its default box fits the EUR pallet — Run as-is.
     await user.click(footerRunButton());
 
-    expect(logSpy).toHaveBeenCalledTimes(1);
-    const [, payload] = logSpy.mock.calls[0] as [string, string];
-    const request = JSON.parse(payload) as { boxes: Record<string, unknown>[] };
+    expect(navigateSpy).toHaveBeenCalledTimes(1);
+    const [path, opts] = navigateSpy.mock.calls[0] as [
+      string,
+      { state: { request: PackRequest; idToType: Map<string, string> } },
+    ];
+    expect(path).toBe('/loading');
+    const { request, idToType } = opts.state;
     expect(request.boxes.length).toBeGreaterThan(0);
     expect(request.boxes[0]).not.toHaveProperty('maxLoad');
     expect(request.boxes[0]).not.toHaveProperty('fragile');
+    // idToType rides along for the /result type recovery (C-05).
+    expect(idToType).toBeInstanceOf(Map);
+    expect(idToType.size).toBe(request.boxes.length);
   });
 });
 
 describe('ConfigForm — Run disabled while invalid (D-06)', () => {
   test('Run becomes disabled after a failed submit', async () => {
     const user = userEvent.setup();
-    vi.spyOn(console, 'log').mockImplementation(() => {});
-    render(<ConfigForm />);
+    renderForm();
 
     const length = screen.getByLabelText('Length');
     await user.clear(length);
@@ -106,8 +129,7 @@ describe('ConfigForm — Run disabled while invalid (D-06)', () => {
 // Guard: the rendered shell is the real assembled screen, not the placeholder.
 describe('ConfigForm — shell (D-05)', () => {
   test('renders the page H1 and both cards', () => {
-    vi.spyOn(console, 'log').mockImplementation(() => {});
-    render(<ConfigForm />);
+    renderForm();
     expect(screen.getByRole('heading', { name: 'Packing task' })).toBeInTheDocument();
     const headings = screen.getAllByRole('heading');
     const titles = headings.map((h) => h.textContent);
