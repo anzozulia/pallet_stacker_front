@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 5 context gathered
-last_updated: "2026-06-04T21:06:45.903Z"
-last_activity: 2026-06-04
+status: gaps_found
+stopped_at: Phase 5 verification — 2 blockers found (CR-01/CR-02, poll safety-cap)
+last_updated: "2026-06-05T00:45:00.000Z"
+last_activity: 2026-06-05
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 4
   total_plans: 20
   completed_plans: 20
-  percent: 71
+  percent: 57
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 
 ## Current Position
 
-Phase: 05 (api-client-async-polling) — EXECUTING
-Plan: 4 of 4
-Status: Phase complete — ready for verification
-Last activity: 2026-06-04
+Phase: 05 (api-client-async-polling) — VERIFICATION GAPS
+Plan: 4 of 4 executed
+Status: All 4 plans executed; phase verification found 2 blockers (CR-01/CR-02, poll safety-cap) — gap closure needed
+Last activity: 2026-06-05
 
 Progress: [█████████░] 90%
 
