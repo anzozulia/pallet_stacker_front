@@ -2,7 +2,8 @@
 // the request-builder (Plan 02) reads. These are hand-written, pure contract types:
 // this module imports NOTHING (no `three`, no React, no IO) so it is safe to import
 // from anywhere, preserving the code-split discipline (the lazy /result chunk gate).
-// No zod this phase (D-04) — runtime validation lives at Phase 5's network boundary.
+// The runtime zod mirror of these types lives in src/features/config/schema.ts (the
+// form/restore boundary); this module stays type-only.
 //
 // Field convention: camelCase app-model fields in mm (dimensions, integers) / kg
 // (weight). The request-builder (Plan 02) maps these to the API's snake_case
@@ -42,11 +43,27 @@ export interface BoxType {
    * prefix, see mapping.ts) stays correct (Pitfall 3).
    */
   id: string;
+  /**
+   * User-facing display name for this box type (D-08), distinct from the builder slug
+   * `id`. Shown in the catalog UI and persisted; collected from the user, NOT sent to
+   * the API in v1.
+   */
+  label: string;
   length: number;
   width: number;
   height: number;
   weight: number;
   quantity: number;
+  /**
+   * Maximum load that may rest on top of this box, in kg (D-08). `0` when the box is
+   * `fragile`. Collected, persisted, and displayed, but NOT sent to the API in v1.
+   */
+  maxLoad: number;
+  /**
+   * Fragile flag (D-08): when true, nothing may be stacked on top (and `maxLoad` is 0).
+   * Collected, persisted, and displayed, but NOT sent to the API in v1.
+   */
+  fragile: boolean;
   rotation: RotationMode;
 }
 
