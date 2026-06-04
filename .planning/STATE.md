@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 5 context gathered
-last_updated: "2026-06-04T20:34:21.462Z"
+last_updated: "2026-06-04T20:41:51.097Z"
 last_activity: 2026-06-04
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 20
-  completed_plans: 17
-  percent: 85
+  completed_plans: 18
+  percent: 90
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 ## Current Position
 
 Phase: 05 (api-client-async-polling) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-06-04
 
-Progress: [█████████░] 85%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
@@ -71,6 +71,7 @@ _Updated after each plan completion_
 | Phase 04 P04-06 | ~6min | 1 tasks | 2 files |
 | Phase 04 P04-07 | ~22min | 4 tasks | 7 files |
 | Phase 05 P01 | 10 | 3 tasks | 11 files |
+| Phase 05 P02 | 4min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -116,6 +117,7 @@ Recent decisions affecting current work:
 - [Phase 04]: [04-07]: Human visual + auto-save-feel checkpoint (blocking) APPROVED — Configure screen matches design/config.html / UI-SPEC; auto-save/restore/Save-draft/Run/large-job-advisory all confirmed
 - [Phase ?]: 05-01: zod-at-boundary parses untrusted API JSON (jobStateSchema) so contract drift is a handled ZodError, never a render crash (C-02/T-5-01)
 - [Phase ?]: 05-01: classifyFetchError buckets transport failures (opaque-CORS TypeError->unreachable, AbortError->aborted, ZodError->contract-drift); never read a status off a thrown fetch (D-07)
+- [Phase ?]: 05-02: terminal-aware refetchInterval self-stops the poll on done/failed/timeout (C-01, no hand-rolled setInterval); POLL_SAFETY_CAP_MS=120000 client cap bounds a never-terminal job
 
 ### Pending Todos
 
@@ -141,6 +143,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-04T20:34:16.285Z
+Last session: 2026-06-04T20:41:31.083Z
 Stopped at: Phase 5 context gathered
 Resume file: None

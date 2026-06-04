@@ -176,7 +176,7 @@ Plans:
 
 **Wave 2** _(blocked on Wave 1)_
 
-- [ ] 05-02-PLAN.md — Wave 2: the submit-then-poll engine — useSubmitJob (useMutation) + usePollJob (useQuery + terminal-aware refetchInterval + ~120-140s safety cap, C-01/D-09) + the app-wide QueryClientProvider (PACK-01/04/05)
+- [x] 05-02-PLAN.md — Wave 2: the submit-then-poll engine — useSubmitJob (useMutation) + usePollJob (useQuery + terminal-aware refetchInterval + ~120-140s safety cap, C-01/D-09) + the app-wide QueryClientProvider (PACK-01/04/05)
 
 **Wave 3** _(blocked on Wave 2)_
 
