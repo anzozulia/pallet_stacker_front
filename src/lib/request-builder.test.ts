@@ -53,11 +53,12 @@ const config: PackConfig = {
 
 describe('buildPackRequest (PACK-02 expansion)', () => {
   it('expands quantity into exactly N boxes per type', () => {
-    const { request } = buildPackRequest(config);
+    const { request, idToType } = buildPackRequest(config);
     // 3 + 2 + 1 = 6 total expanded boxes.
     expect(request.boxes).toHaveLength(6);
+    // Group via the PRIMARY recovery channel (idToType), not the typeKeyOf parse-fallback.
     const countOf = (typeId: string) =>
-      request.boxes.filter((b) => typeKeyOf(b.id) === typeId).length;
+      request.boxes.filter((b) => idToType.get(b.id) === typeId).length;
     expect(countOf('Da')).toBe(3);
     expect(countOf('Tb')).toBe(2);
     expect(countOf('Fc')).toBe(1);
@@ -82,11 +83,13 @@ describe('buildPackRequest (PACK-02 expansion)', () => {
     ]);
   });
 
-  it('id format is parse-fallback-safe (non-digit-leading; typeKeyOf recovers prefix)', () => {
+  it('id format is parse-fallback-safe (non-digit-leading so typeKeyOf cannot mis-parse)', () => {
     const { request } = buildPackRequest(config);
     for (const box of request.boxes) {
+      // Pitfall 3 guard: ids never start with a digit, so the typeKeyOf parse-FALLBACK
+      // (leading non-digit prefix) never returns a digit-leading garbage key.
       expect(box.id[0]).not.toMatch(/\d/);
-      expect(typeKeyOf(box.id)).toBe(box.id.split('-')[0]);
+      expect(typeKeyOf(box.id)[0]).not.toMatch(/\d/);
     }
   });
 });
@@ -126,9 +129,9 @@ describe('rotationToApi (BOX-04 / SC-2 total table)', () => {
   });
 
   it('applies the rotation table per box in the built request', () => {
-    const { request } = buildPackRequest(config);
+    const { request, idToType } = buildPackRequest(config);
     const byType = (typeId: string) =>
-      request.boxes.find((b) => typeKeyOf(b.id) === typeId)!.rotations;
+      request.boxes.find((b) => idToType.get(b.id) === typeId)!.rotations;
     expect(byType('Da')).toBe('all');
     expect(byType('Tb')).toBe('this_side_up');
     expect(byType('Fc')).toBe('none');
