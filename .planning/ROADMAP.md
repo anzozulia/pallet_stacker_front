@@ -212,7 +212,7 @@ Plans:
 
 **Wave 2** _(blocked on Wave 1)_
 
-- [ ] 06-02-PLAN.md — Wave 2: the carrier + live-data slice — `LoadingPage` carries `{ jobId, idToType }` on done-nav, `ResultPage` reads the real `done` from the react-query cache + no-result redirect (C-02) + `mapDoneResponse(done, idToType)` (C-03) + selected-pallet state + topbar/grid shell (D-07/D-08/D-09); makes /result REAL (RESULT-04, SC-1)
+- [x] 06-02-PLAN.md — Wave 2: the carrier + live-data slice — `LoadingPage` carries `{ jobId, idToType }` on done-nav, `ResultPage` reads the real `done` from the react-query cache + no-result redirect (C-02) + `mapDoneResponse(done, idToType)` (C-03) + selected-pallet state + topbar/grid shell (D-07/D-08/D-09); makes /result REAL (RESULT-04, SC-1)
 
 **Wave 3** _(blocked on Wave 2)_
 

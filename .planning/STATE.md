@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 6 UI-SPEC approved
-last_updated: "2026-06-05T09:44:46.391Z"
+last_updated: "2026-06-05T09:56:17.407Z"
 last_activity: 2026-06-05
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 25
-  completed_plans: 21
-  percent: 84
+  completed_plans: 22
+  percent: 88
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 ## Current Position
 
 Phase: 06 (result-page-3d-wiring) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-06-05
 
-Progress: [████████░░] 84%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -76,6 +76,7 @@ _Updated after each plan completion_
 | Phase 05 P03 | 2min | 2 tasks | 4 files |
 | Phase 05 P05-04 | 3min | 3 tasks | 4 files |
 | Phase 06 P01 | 3min | 3 tasks | 8 files |
+| Phase 06 P02 | 6min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -132,6 +133,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [06-01]: summarise preserves the RAW utilisation product (72.81) and sums totalWeightKg across ALL pallets (whole-job scope, D-03); rounding is the component's job
 - [Phase ?]: [06-01]: mapCog maps the CoG on the empirically-confirmed cog.z up-axis with NO half-dim term and never routes through mapPlacement; DECK_TOP_Y exported from mapping.ts so marker+boxes share one deck height
 - [Phase ?]: [06-01]: supportColor is a colour-blind-considerate ordered scale (blue→teal→amber→magenta→brown), proven on SYNTHETIC ratios (fixture support_ratio uniformly 1.0, Pitfall 4); --color-warn ported but unused on rows (D-04); all three new lib modules three-free (code-split gate green)
+- [Phase ?]: [06-02]: Carrier seam — LoadingPage done-nav carries { jobId, idToType } only; the done body stays the single source of truth in the react-query cache (gcTime:Infinity), never history.state
+- [Phase ?]: [06-02]: ResultPage reads the live cache (getQueryData ['job',jobId]) — fixture import removed; cast only done.result; isResultNavState validates jobId+idToType instanceof Map; absent/non-done → redirect / (C-02/T-06-03/04)
+- [Phase ?]: [06-02]: selectedPalletIndex swaps the pallet on ONE persistent Canvas (D-01/SC-1); palette from the WHOLE result keeps the legend stable across switches; setSel/setHoveredId seam awaits Plans 03-05
 
 ### Pending Todos
 
@@ -157,6 +161,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-05T09:44:25.429Z
+Last session: 2026-06-05T09:55:55.847Z
 Stopped at: Phase 6 UI-SPEC approved
 Resume file: None
