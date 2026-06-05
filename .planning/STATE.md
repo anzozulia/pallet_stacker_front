@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 6 UI-SPEC approved
-last_updated: "2026-06-05T09:56:17.407Z"
+last_updated: "2026-06-05T10:07:17.537Z"
 last_activity: 2026-06-05
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 25
-  completed_plans: 22
-  percent: 88
+  completed_plans: 23
+  percent: 92
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 ## Current Position
 
 Phase: 06 (result-page-3d-wiring) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-06-05
 
-Progress: [█████████░] 88%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
@@ -77,6 +77,7 @@ _Updated after each plan completion_
 | Phase 05 P05-04 | 3min | 3 tasks | 4 files |
 | Phase 06 P01 | 3min | 3 tasks | 8 files |
 | Phase 06 P02 | 6min | 3 tasks | 6 files |
+| Phase 06 P03 | 6min | 4 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -136,6 +137,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [06-02]: Carrier seam — LoadingPage done-nav carries { jobId, idToType } only; the done body stays the single source of truth in the react-query cache (gcTime:Infinity), never history.state
 - [Phase ?]: [06-02]: ResultPage reads the live cache (getQueryData ['job',jobId]) — fixture import removed; cast only done.result; isResultNavState validates jobId+idToType instanceof Map; absent/non-done → redirect / (C-02/T-06-03/04)
 - [Phase ?]: [06-02]: selectedPalletIndex swaps the pallet on ONE persistent Canvas (D-01/SC-1); palette from the WHOLE result keeps the legend stable across switches; setSel/setHoveredId seam awaits Plans 03-05
+- [Phase ?]: [06-03]: SummaryBlock + PalletSwitcher are three-free rail blocks (Card-token surface + SectionLabel head); fill% strictly NEUTRAL (D-04, no amber); pallet label is pallet_id with 'Pallet N' fallback (D-05)
+- [Phase ?]: [06-03]: Pitfall-3 fix — CameraPresets preset-animation effect drops bbox from deps (reads bboxRef.current); measureNonce prop (=selIndex) re-measures bbox on pallet swap WITHOUT re-framing, preserving the camera across switches (D-02), proven by e2e
 
 ### Pending Todos
 
@@ -161,6 +164,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-05T09:55:55.847Z
+Last session: 2026-06-05T10:07:11.958Z
 Stopped at: Phase 6 UI-SPEC approved
 Resume file: None

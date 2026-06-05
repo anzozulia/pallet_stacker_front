@@ -136,7 +136,7 @@ None — no new security surface beyond the plan's `<threat_model>`. T-06-05 (AP
 
 ## Self-Check: PASSED
 
-(populated below after file/commit verification)
+All 4 created files present on disk (SummaryBlock + PalletSwitcher + their tests); all 4 task commits (590cbbd, a261e1d, 72eb78c, 081a9a3) found in git log.
 
 ## Next Phase Readiness
 

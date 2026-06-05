@@ -216,7 +216,7 @@ Plans:
 
 **Wave 3** _(blocked on Wave 2)_
 
-- [ ] 06-03-PLAN.md — Wave 3: summary + switcher slice — `SummaryBlock` (whole-job 2×2, RESULT-03), `PalletSwitcher` (neutral fill single-select, RESULT-04/D-04/D-05), overlay sub-line (D-03), camera-preserved-on-switch guard (D-02/Pitfall 3) + e2e
+- [x] 06-03-PLAN.md — Wave 3: summary + switcher slice — `SummaryBlock` (whole-job 2×2, RESULT-03), `PalletSwitcher` (neutral fill single-select, RESULT-04/D-04/D-05), overlay sub-line (D-03), camera-preserved-on-switch guard (D-02/Pitfall 3) + e2e
 
 **Wave 4** _(blocked on Wave 3)_
 
