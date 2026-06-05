@@ -45,6 +45,8 @@
   --color-accent-weak: #ecebfd; /* accent focus ring / soft fill */
   --color-accent-text: #4338ca; /* accent text on weak fill */
   --color-danger: #dc2626; /* validation error / destructive */
+  --color-pos: #16a34a; /* positive / good result-rail metric (UI-SPEC Token Porting Checklist) */
+  --color-warn: #d97706; /* warning result-rail metric — ported for parity, UNUSED on pallet rows (D-04) */
 
   --radius: 10px; /* default control radius */
   --radius-sm: 7px; /* small inputs / affixes */
