@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 6 UI-SPEC approved
-last_updated: "2026-06-05T09:35:25.452Z"
-last_activity: 2026-06-05 -- Phase 6 planning complete
+last_updated: "2026-06-05T09:44:46.391Z"
+last_activity: 2026-06-05
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 20
-  completed_plans: 20
-  percent: 71
+  total_plans: 25
+  completed_plans: 21
+  percent: 84
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-03)
 
 **Core value:** A user can describe their pallet and boxes and get back a correct, explorable 3D packing plan in seconds — zero signup, single self-hostable Docker container.
-**Current focus:** Phase 6 — result-page-&-3d-wiring (next)
+**Current focus:** Phase 06 — result-page-3d-wiring
 
 ## Current Position
 
-Phase: 6
-Plan: Not started
+Phase: 06 (result-page-3d-wiring) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-06-05 -- Phase 6 planning complete
+Last activity: 2026-06-05
 
-Progress: [███████░░░] 71%
+Progress: [████████░░] 84%
 
 ## Performance Metrics
 
@@ -75,6 +75,7 @@ _Updated after each plan completion_
 | Phase 05 P02 | 4min | 2 tasks | 6 files |
 | Phase 05 P03 | 2min | 2 tasks | 4 files |
 | Phase 05 P05-04 | 3min | 3 tasks | 4 files |
+| Phase 06 P01 | 3min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -128,6 +129,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [05-04]: ErrorCard renders untrusted server message/problems as React text only — NEVER dangerouslySetInnerHTML (T-5-10/ASVS V5); body also zod-parsed upstream (05-01)
 - [Phase ?]: [05-04]: Cancel aborts the in-flight POST (per-attempt AbortController) + disables the poll query (react-query auto-cancels) + navigate('/'), no confirmation (D-04/D-08); Retry re-POSTs the SAME built request from nav state (D-07); Back returns to / draft-intact — no leaked interval/request (PACK-05)
 - [Phase ?]: [05-04]: Deterministic Playwright e2e (api-poll.spec.ts) route-intercepts the POST + GET poll sequence across calls — six cases (happy/failed/timeout/unreachable/unpacked-is-success/cancel), never the live API; code-split gate confirms /loading + src/features/loading/* + src/api stay three-free (C-06)
+- [Phase ?]: [06-01]: summarise preserves the RAW utilisation product (72.81) and sums totalWeightKg across ALL pallets (whole-job scope, D-03); rounding is the component's job
+- [Phase ?]: [06-01]: mapCog maps the CoG on the empirically-confirmed cog.z up-axis with NO half-dim term and never routes through mapPlacement; DECK_TOP_Y exported from mapping.ts so marker+boxes share one deck height
+- [Phase ?]: [06-01]: supportColor is a colour-blind-considerate ordered scale (blue→teal→amber→magenta→brown), proven on SYNTHETIC ratios (fixture support_ratio uniformly 1.0, Pitfall 4); --color-warn ported but unused on rows (D-04); all three new lib modules three-free (code-split gate green)
 
 ### Pending Todos
 
@@ -153,6 +157,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-05T09:04:05.601Z
+Last session: 2026-06-05T09:44:25.429Z
 Stopped at: Phase 6 UI-SPEC approved
-Resume file: .planning/phases/06-result-page-3d-wiring/06-UI-SPEC.md
+Resume file: None

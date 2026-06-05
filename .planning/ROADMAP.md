@@ -208,7 +208,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 06-01-PLAN.md — Wave 1: pure src/lib foundation — `result-summary` (whole-job aggregation, RESULT-03), `cog-map` (cog.z up-axis point-map + exported `DECK_TOP_Y`, DIAG-01), `support-scale` (synthetic-ratio heatmap scale, DIAG-02), `--color-pos`/`--color-warn` tokens; golden/synthetic tests, three-free (Nyquist Wave 0)
+- [x] 06-01-PLAN.md — Wave 1: pure src/lib foundation — `result-summary` (whole-job aggregation, RESULT-03), `cog-map` (cog.z up-axis point-map + exported `DECK_TOP_Y`, DIAG-01), `support-scale` (synthetic-ratio heatmap scale, DIAG-02), `--color-pos`/`--color-warn` tokens; golden/synthetic tests, three-free (Nyquist Wave 0)
 
 **Wave 2** _(blocked on Wave 1)_
 
