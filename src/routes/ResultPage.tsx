@@ -29,6 +29,8 @@ import { Pallet } from '@/components/viewer/Pallet';
 import { ViewerOverlay } from '@/components/viewer/ViewerOverlay';
 import SummaryBlock from '@/components/result/SummaryBlock';
 import PalletSwitcher from '@/components/result/PalletSwitcher';
+import PlacementList from '@/components/result/PlacementList';
+import UnpackedPanel from '@/components/result/UnpackedPanel';
 import { queryClient } from '@/api/queryClient';
 import { mapDoneResponse } from '@/lib/result-mapper';
 import type { PresetKind } from '@/lib/camera-presets';
@@ -74,13 +76,11 @@ export default function ResultPage() {
     if (!hasResult) navigate('/', { replace: true });
   }, [hasResult, navigate]);
 
-  // Selected-pallet + hover state (D-01/D-05). `sel` swaps which pallet feeds the ONE persistent
-  // Canvas AND drives the PalletSwitcher selected highlight + the overlay sub-line (this slice).
-  // `setHoveredId` is the PlacementList hover link landing in Plan 04 — declared now, not yet read.
+  // Selected-pallet + hover state (D-01/D-05/D-11). `sel` swaps which pallet feeds the ONE persistent
+  // Canvas AND drives the PalletSwitcher selected highlight + the overlay sub-line. `hoveredId` is the
+  // PlacementList → Boxes hover link (Plan 04): the hovered card's item_id lights the matching mesh.
   const [sel, setSel] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  void hoveredId;
-  void setHoveredId; // wired by PlacementList (Plan 04)
 
   // Camera-preset state (PRESERVED from the fixture version — the scene subtree is unchanged, C-01).
   const boxesRef = useRef<Group>(null);
@@ -230,7 +230,7 @@ export default function ResultPage() {
               and drives the camera/target to presetFromBbox(...). A drei <Bounds observe> wrapper
               here would re-fit every frame and fight the preset animation, so it is intentionally
               absent. */}
-          <Boxes ref={boxesRef} pallet={selPallet} palette={palette} />
+          <Boxes ref={boxesRef} pallet={selPallet} palette={palette} hoveredId={hoveredId} />
 
           {/* measureNonce = selIndex: a pallet swap RE-MEASURES the bbox (new boxes) but must NOT
               re-frame the camera (D-02). CameraPresets reads the latest bbox via a ref and animates
@@ -265,6 +265,17 @@ export default function ResultPage() {
       >
         <SummaryBlock view={view} />
         <PalletSwitcher pallets={view.pallets} selected={selIndex} onSelect={setSel} />
+        {/* Per-selected-pallet placement cards (RESULT-05): the items array is the MappedPallet's
+            `PlacementOut & { typeId }`. onHover drives `hoveredId` → the matching mesh glows (D-11). */}
+        <PlacementList
+          items={selMapped.items}
+          palette={palette}
+          palletLabel={palletLabel}
+          onHover={setHoveredId}
+        />
+        {/* Whole-job unpacked panel (RESULT-06): does NOT change on pallet switch. idToType gives
+            map-PRIMARY type recovery (C-03). */}
+        <UnpackedPanel unpacked={view.unpacked} idToType={idToType} />
       </aside>
     </div>
   );

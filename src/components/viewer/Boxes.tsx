@@ -32,6 +32,10 @@ export interface BoxesProps {
   pallet: PalletResult;
   // Palette keyed by the whole-fixture type set (from buildPalette).
   palette: Map<string, string>;
+  // The hovered placement's id (= item_id) from the PlacementList rail (D-11). The matching mesh
+  // glows via a DECLARATIVE emissiveIntensity — r3f diffs the prop and patches the live material in
+  // place (NO imperative material.emissive.set, NO ref, NO remount).
+  hoveredId?: string | null;
 }
 
 // Edge tint: from the box colour via offsetHSL(0, -0.04, +0.18) (mockup tint()).
@@ -39,7 +43,10 @@ function edgeTint(hex: string): Color {
   return new Color(hex).offsetHSL(0, -0.04, 0.18);
 }
 
-export const Boxes = forwardRef<Group, BoxesProps>(function Boxes({ pallet, palette }, ref) {
+export const Boxes = forwardRef<Group, BoxesProps>(function Boxes(
+  { pallet, palette, hoveredId },
+  ref,
+) {
   const mapped = useMemo(
     () =>
       pallet.items.map((item) => {
@@ -58,7 +65,16 @@ export const Boxes = forwardRef<Group, BoxesProps>(function Boxes({ pallet, pale
       {mapped.map((b) => (
         <mesh key={b.id} position={b.center} castShadow receiveShadow>
           <boxGeometry args={b.size} />
-          <meshStandardMaterial color={b.color} roughness={0.62} metalness={0.04} />
+          {/* Declarative hover glow (D-11): r3f diffs emissiveIntensity and patches the live
+              material in place — no imperative material.emissive.set, no remount. Keyed by the box
+              id (= item_id). Individual meshes (D-12) make per-box emissive trivial (≤19 boxes). */}
+          <meshStandardMaterial
+            color={b.color}
+            emissive={b.color}
+            emissiveIntensity={hoveredId === b.id ? 0.45 : 0}
+            roughness={0.62}
+            metalness={0.04}
+          />
           <Edges>
             <lineBasicMaterial color={edgeTint(b.color)} transparent opacity={0.55} />
           </Edges>
