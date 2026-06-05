@@ -318,6 +318,73 @@ test.describe('async submit→poll lifecycle (deterministic, stubbed API)', () =
     expect(errors).toHaveLength(0);
   });
 
+  test('DIAGNOSTICS: CoG toggle (default ON) + Support heatmap toggle recolour the scene (DIAG-01/02)', async ({
+    page,
+  }) => {
+    // Drive the stubbed Configure→Run→Result flow to a POPULATED /result, then exercise the two
+    // diagnostics overlay toggles and prove each one changes what's drawn in the WebGL canvas:
+    //   (a) `Centre of gravity` is present, ON by default (aria-checked=true); toggling it OFF
+    //       removes the CoG marker + drop-line → the canvas pixels change.
+    //   (b) `Support heatmap` is OFF by default; toggling it ON recolours the boxes by support
+    //       ratio → the canvas pixels change AND the legend swaps to the support-scale key.
+    //   (c) a placement card shows a `%` support value (DIAG-02, always shown).
+    // All API routes stubbed; never the live API.
+    const errors = collectConsoleErrors(page);
+    await page.route('**/api/v1/pack', (route) => stubAccept(route));
+    await stubPollSequence(page, [
+      { status: 'running' },
+      { status: 'done', result: packDoneResponse.result },
+    ]);
+
+    await runFromConfigure(page);
+    await expect(page).toHaveURL(/\/result$/, { timeout: 15000 });
+
+    const canvas = page.locator('[data-testid="r3f-canvas"]');
+    await expect(canvas).toBeVisible();
+
+    // Let the initial ISO framing settle so the camera is at rest before any toggle.
+    await page.waitForFunction(() => {
+      const s = (window as Window & { __cameraState?: { settled?: boolean } }).__cameraState;
+      return s?.settled === true;
+    });
+    await page.waitForTimeout(250);
+
+    const cogToggle = page.getByRole('switch', { name: 'Centre of gravity' });
+    const heatToggle = page.getByRole('switch', { name: 'Support heatmap' });
+
+    // (a) CoG is ON by default (the differentiator). Toggling it OFF must change the canvas pixels
+    // (the marker sphere + drop-line disappeared from the scene).
+    await expect(cogToggle).toBeVisible();
+    await expect(cogToggle).toHaveAttribute('aria-checked', 'true');
+    const pngCogOn = await canvas.screenshot();
+    await cogToggle.click();
+    await expect(cogToggle).toHaveAttribute('aria-checked', 'false');
+    await expect
+      .poll(async () => (await canvas.screenshot()).equals(pngCogOn), { timeout: 5000 })
+      .toBe(false);
+
+    // (b) Support heatmap is OFF by default. Toggling it ON recolours the boxes (canvas pixels
+    // change) and swaps the legend to the support-scale key (e.g. `well supported`).
+    const legend = page.locator('[data-viewer-legend]');
+    await expect(legend.getByText('D', { exact: true })).toBeVisible();
+    await expect(heatToggle).toHaveAttribute('aria-checked', 'false');
+    const pngHeatOff = await canvas.screenshot();
+    await heatToggle.click();
+    await expect(heatToggle).toHaveAttribute('aria-checked', 'true');
+    // Legend swapped: the by-type `D` key is gone, the support-scale key is shown.
+    await expect(legend.getByText('well supported')).toBeVisible();
+    await expect(legend.getByText('D', { exact: true })).toHaveCount(0);
+    await expect
+      .poll(async () => (await canvas.screenshot()).equals(pngHeatOff), { timeout: 5000 })
+      .toBe(false);
+
+    // (c) A placement card always shows a `%` support value (DIAG-02), independent of the toggle.
+    const rail = page.locator('[data-result-rail]');
+    await expect(rail.getByText(/\d+%/).first()).toBeVisible();
+
+    expect(errors).toHaveLength(0);
+  });
+
   test('CANCEL: Cancel on /loading returns to / with the draft intact; no hang', async ({
     page,
   }) => {

@@ -54,6 +54,12 @@ vi.mock('@/components/viewer/Pallet', () => ({ Pallet: () => <div data-testid="p
 vi.mock('@/components/viewer/CameraPresets', () => ({
   CameraPresets: () => <div data-testid="camera-presets" />,
 }));
+// CogMarker uses drei <Line>, which calls useThree() and throws outside a real <Canvas> (jsdom has
+// no WebGL). Mock it like the rest of the viewer subtree — the real CoG marker + drop-line are
+// proven in Playwright (Plan 06-05 diagnostics e2e), never jsdom.
+vi.mock('@/components/viewer/CogMarker', () => ({
+  CogMarker: () => <div data-testid="cog-marker" />,
+}));
 
 import ResultPage from '@/routes/ResultPage';
 
