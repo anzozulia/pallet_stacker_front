@@ -220,7 +220,7 @@ Plans:
 
 **Wave 4** _(blocked on Wave 3)_
 
-- [ ] 06-04-PLAN.md — Wave 4: placement + unpacked slice — `PlacementList` (per-pallet cards + always-shown support%, RESULT-05) with one-way row→mesh emissive hover (D-11), `UnpackedPanel` (conditional whole-job + reasons, RESULT-06/D-06), `Boxes` hoveredId emissive prop + hover e2e
+- [x] 06-04-PLAN.md — Wave 4: placement + unpacked slice — `PlacementList` (per-pallet cards + always-shown support%, RESULT-05) with one-way row→mesh emissive hover (D-11), `UnpackedPanel` (conditional whole-job + reasons, RESULT-06/D-06), `Boxes` hoveredId emissive prop + hover e2e
 
 **Wave 5** _(blocked on Wave 4)_
 

@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 6 UI-SPEC approved
-last_updated: "2026-06-05T10:07:17.537Z"
+last_updated: "2026-06-05T10:21:40.361Z"
 last_activity: 2026-06-05
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 25
-  completed_plans: 23
-  percent: 92
+  completed_plans: 24
+  percent: 96
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 ## Current Position
 
 Phase: 06 (result-page-3d-wiring) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-06-05
 
-Progress: [█████████░] 92%
+Progress: [██████████] 96%
 
 ## Performance Metrics
 
@@ -78,6 +78,7 @@ _Updated after each plan completion_
 | Phase 06 P01 | 3min | 3 tasks | 8 files |
 | Phase 06 P02 | 6min | 3 tasks | 6 files |
 | Phase 06 P03 | 6min | 4 tasks | 8 files |
+| Phase 06 P04 | 11min | 4 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -139,6 +140,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [06-02]: selectedPalletIndex swaps the pallet on ONE persistent Canvas (D-01/SC-1); palette from the WHOLE result keeps the legend stable across switches; setSel/setHoveredId seam awaits Plans 03-05
 - [Phase ?]: [06-03]: SummaryBlock + PalletSwitcher are three-free rail blocks (Card-token surface + SectionLabel head); fill% strictly NEUTRAL (D-04, no amber); pallet label is pallet_id with 'Pallet N' fallback (D-05)
 - [Phase ?]: [06-03]: Pitfall-3 fix — CameraPresets preset-animation effect drops bbox from deps (reads bboxRef.current); measureNonce prop (=selIndex) re-measures bbox on pallet swap WITHOUT re-framing, preserving the camera across switches (D-02), proven by e2e
+- [Phase ?]: [06-04]: Placement→mesh hover is DECLARATIVE (emissiveIntensity prop on the per-mesh material; r3f patches it in place) — no imperative material.emissive.set, no ref, no remount, no InstancedMesh (D-11/D-12)
+- [Phase ?]: [06-04]: Support% ALWAYS shown on every placement card (DIAG-02); unpacked reason rendered as PLAIN text (T-06-07); UnpackedPanel omitted when none, replaced by an 'All items packed ✓' --color-pos affordance (D-06)
+- [Phase ?]: [06-04]: Added data-viewer-legend hook so e2e D/F/T assertions scope to the legend (rail type-id rows collide); e2e hover test iterates cards to skip ISO-occluded boxes
 
 ### Pending Todos
 
@@ -164,6 +168,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-05T10:07:11.958Z
+Last session: 2026-06-05T10:21:18.343Z
 Stopped at: Phase 6 UI-SPEC approved
 Resume file: None
