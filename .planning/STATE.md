@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 Phase: 7
 Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-06-05
+Last activity: 2026-06-06 - Completed quick task 260606-01h: 12 UI/UX fixes + box-state desync bug
 
 Progress: [██████████] 100%
 
@@ -162,6 +162,12 @@ None yet.
 - [Phase 2]: `orientation.perm` semantics (gather vs scatter) and whether `position.z` / `dimensions` are pre- or post-orientation are unresolved. Hard blocker for the viewer — must capture a real `done` response and write golden tests before implementing the mapper. Flagged for deeper research during Phase 2 planning.
 - [Phase 7]: `packerapi.anzozulia.xyz` CORS allowlist must include the production serving origin before self-hosting ships (API is author-controlled).
 - [Phase 6]: InstancedMesh ~100–200 box threshold is an estimate; verify empirically.
+
+### Quick Tasks Completed
+
+| #         | Description                                                                 | Date       | Commit  | Status              | Directory                                                                                              |
+| --------- | --------------------------------------------------------------------------- | ---------- | ------- | ------------------- | ----------------------------------------------------------------------------------------------------- |
+| 260606-01h | 12 UI/UX fixes (config form, footer, results, 3D viewer) + box-state desync bug (#5/#8 root-caused: config-tally string-coercion) | 2026-06-06 | 8e4e014 | Needs visual review | [260606-01h](./quick/260606-01h-config-ui-results-3d-viewer-fixes-and-bo/) |
 
 ## Deferred Items
 
