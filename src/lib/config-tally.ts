@@ -4,8 +4,27 @@
 //
 // NaN-safety: a half-typed quantity/weight field is mid-edit `NaN`/non-finite — coerce it to
 // 0 so the footer never renders `NaN` (the correct soft behaviour during editing, D-04).
+//
+// SINGLE-SOURCE-OF-TRUTH (#8 desync): RHF stores EDITED numeric `<input>` values as STRINGS on
+// the form (e.g. `"25"`) — only the seeded defaults are real `number`s. The submit path coerces
+// those strings to numbers (the zod schema / request-builder), so the BUILT request counts `"25"`
+// as 25 units. This tally must coerce IDENTICALLY: a bare `Number.isFinite("25")` is `false`, which
+// would silently drop every edited field to 0 and make the displayed counters disagree with what
+// actually gets packed (the #5 stale-counter + #8 displayed-vs-submitted divergence). `toFiniteNumber`
+// runs the SAME string→number coercion as the request builder so rows, badge, footer, and the built
+// PackRequest are provably one source of truth.
 
 import type { BoxType } from '@/types/config';
+
+/**
+ * Coerce a possibly-string form value (RHF leaves edited `<input>`s as strings) to a finite
+ * number, matching the submit-path coercion (`Number(v)`); non-finite / blank → 0 so the tally
+ * never renders `NaN` mid-edit. The lone coercion seam shared by units AND estKg.
+ */
+function toFiniteNumber(v: unknown): number {
+  const n = typeof v === 'number' ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
 
 /**
  * The large-job advisory threshold (D-03): jobs whose expanded unit count is STRICTLY greater
@@ -32,8 +51,10 @@ export function tallyCatalog(boxTypes: Pick<BoxType, 'quantity' | 'weight'>[]): 
   let units = 0;
   let estKg = 0;
   for (const b of boxTypes) {
-    const q = Number.isFinite(b.quantity) ? b.quantity : 0;
-    const w = Number.isFinite(b.weight) ? b.weight : 0;
+    // Coerce string-or-number form values the SAME way the request builder does (#8): an edited
+    // `"25"` counts as 25 units here AND in the built PackRequest — one source of truth.
+    const q = toFiniteNumber(b.quantity);
+    const w = toFiniteNumber(b.weight);
     units += q;
     estKg += q * w;
   }
