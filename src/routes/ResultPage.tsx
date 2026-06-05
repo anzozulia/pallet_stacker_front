@@ -158,7 +158,7 @@ export default function ResultPage() {
   const subline = `${selMapped.items.length} boxes placed · ${(selMapped.utilisation * 100).toFixed(1)}% fill · ${selMapped.totalWeight.toFixed(1)} kg`;
 
   return (
-    <div className="grid h-[100dvh] grid-cols-[1fr_384px] grid-rows-[var(--topbar-height)_1fr] max-[900px]:grid-cols-1 max-[900px]:grid-rows-[var(--topbar-height)_1fr_auto]">
+    <div className="grid h-[100dvh] grid-cols-[1fr_440px] grid-rows-[var(--topbar-height)_1fr] max-[900px]:grid-cols-1 max-[900px]:grid-rows-[var(--topbar-height)_1fr_auto]">
       {/* Result TOPBAR (D-09): mirrors the Configure topbar — brand glyph + step-nav (Configure ✓ →
           Result active) + an "Edit configuration" ghost button that returns to / with the draft
           intact. NO Export, NO "Solved in" pill (D-07). Spans both columns. */}

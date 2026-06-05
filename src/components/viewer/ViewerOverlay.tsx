@@ -124,7 +124,7 @@ export function ViewerOverlay({
             aria-pressed={on}
             onClick={onToggle}
             className={clsx(
-              'rounded-md border px-[10px] py-[6px] font-mono text-xs leading-tight transition-colors',
+              'cursor-pointer rounded-md border px-[10px] py-[6px] font-mono text-xs leading-tight transition-colors',
               on
                 ? 'border-[rgba(124,116,255,0.6)] bg-[rgba(99,90,245,0.32)] text-white'
                 : 'border-[var(--color-d-border)] bg-white/5 text-[var(--color-d-text-2)] hover:bg-white/10 hover:text-[var(--color-d-text)]',
@@ -145,7 +145,7 @@ export function ViewerOverlay({
               type="button"
               onClick={() => onSelect(p)}
               className={clsx(
-                'rounded-md border px-[10px] py-[6px] font-mono text-xs leading-tight transition-colors',
+                'cursor-pointer rounded-md border px-[10px] py-[6px] font-mono text-xs leading-tight transition-colors',
                 isActive
                   ? 'border-[rgba(124,116,255,0.6)] bg-[rgba(99,90,245,0.32)] text-white'
                   : 'border-[var(--color-d-border)] bg-white/5 text-[var(--color-d-text-2)] hover:bg-white/10 hover:text-[var(--color-d-text)]',

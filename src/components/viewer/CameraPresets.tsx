@@ -10,13 +10,16 @@
 import { type RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { OrbitControls } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Box3, type Group, Vector3 } from 'three';
+import { Box3, type Group, Quaternion, Vector3 } from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import {
   type Bbox,
   type PresetKind,
+  type Vec4Tuple,
   distanceLimitsFromBbox,
+  lookQuaternion,
   presetFromBbox,
+  slerpQuat,
 } from '@/lib/camera-presets';
 
 export interface CameraPresetsProps {
@@ -90,14 +93,22 @@ export function CameraPresets({
   // with a differently-sized pallet) — but this only adjusts clamps, it does NOT animate.
   const limits = useMemo(() => distanceLimitsFromBbox(bbox), [bbox]);
 
-  // Animation state for the active transition.
+  // Animation state for the active transition. `fromQuat`/`toQuat` carry the camera ORIENTATION
+  // endpoints so it can be slerped alongside the position/target lerp (#11): a pure position lerp
+  // leaves the look-direction to resolve nonlinearly (tilt-then-snap); slerping the orientation
+  // sweeps it uniformly so ISO→TOP (and every preset) rotates smoothly.
   const anim = useRef<{
     fromPos: Vector3;
     toPos: Vector3;
     fromTarget: Vector3;
     toTarget: Vector3;
+    fromQuat: Vec4Tuple;
+    toQuat: Vec4Tuple;
     start: number;
   } | null>(null);
+
+  // Reused scratch quaternion so the per-frame slerp allocates nothing.
+  const scratchQuat = useRef(new Quaternion());
 
   useEffect(() => {
     const controls = controlsRef.current;
@@ -106,11 +117,24 @@ export function CameraPresets({
     // target a correct frame without depending on `bbox` — a pallet swap re-measures the bbox
     // but must not re-trigger this animation (D-02 / Pitfall 3).
     const { position, target } = presetFromBbox(bboxRef.current, preset);
+    const fromPos: [number, number, number] = [
+      camera.position.x,
+      camera.position.y,
+      camera.position.z,
+    ];
+    const fromTarget: [number, number, number] = [
+      controls.target.x,
+      controls.target.y,
+      controls.target.z,
+    ];
     anim.current = {
       fromPos: camera.position.clone(),
       toPos: new Vector3(...position),
       fromTarget: controls.target.clone(),
       toTarget: new Vector3(...target),
+      // Orientation endpoints: the look-rotation at the CURRENT pose and at the target pose.
+      fromQuat: lookQuaternion(fromPos, fromTarget),
+      toQuat: lookQuaternion(position, target),
       start: performance.now(),
     };
     // Re-run ONLY on an explicit preset press (preset change OR nonce bump). `bbox` is
@@ -126,6 +150,17 @@ export function CameraPresets({
     camera.position.lerpVectors(a.fromPos, a.toPos, e);
     controls.target.lerpVectors(a.fromTarget, a.toTarget, e);
     controls.update();
+
+    // Sweep the camera ORIENTATION smoothly via quaternion slerp (#11). Applied AFTER
+    // controls.update() so it overrides OrbitControls' linearly-derived look-at for the duration
+    // of the transition — eliminating the tilt-then-snap. On the final frame (k>=1) we let the
+    // settled controls.update() above own the orientation so OrbitControls' internal spherical
+    // state stays consistent for subsequent user drags.
+    if (k < 1) {
+      const q = slerpQuat(a.fromQuat, a.toQuat, e);
+      scratchQuat.current.set(q[0], q[1], q[2], q[3]);
+      camera.quaternion.copy(scratchQuat.current);
+    }
 
     // Test-only camera-state hook: the strengthened preset-reframe e2e reads this
     // to assert ISO/TOP/FRONT produce DISTINCT camera positions (a non-reframing

@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest';
 // Wiring copied from mapping.test.ts: @/ alias proves resolution under Vitest,
 // stays jsdom-WebGL-free (no Canvas / three import) — pure vector math only.
-import { type Bbox, distanceLimitsFromBbox, presetFromBbox } from '@/lib/camera-presets';
+import {
+  type Bbox,
+  type Vec4Tuple,
+  distanceLimitsFromBbox,
+  lookQuaternion,
+  presetFromBbox,
+  presetQuaternion,
+  quatAngle,
+  slerpQuat,
+} from '@/lib/camera-presets';
 
 // Synthetic, off-origin bbox so "target === centre" and per-axis offsets are
 // unambiguous (centre is not [0,0,0]).
@@ -51,6 +60,51 @@ describe('presetFromBbox', () => {
       // target always equals the bbox centre
       expect(presetFromBbox(large, which).target).toEqual(large.center);
     }
+  });
+});
+
+describe('preset orientation interpolation (#11 smooth-sweep math)', () => {
+  function isUnit(q: Vec4Tuple): boolean {
+    return Math.abs(Math.hypot(q[0], q[1], q[2], q[3]) - 1) < 1e-6;
+  }
+
+  it('lookQuaternion returns a unit quaternion', () => {
+    const q = lookQuaternion([100, 100, 100], [0, 0, 0]);
+    expect(isUnit(q)).toBe(true);
+  });
+
+  it('ISO and TOP look-orientations differ (distinct framings rotate, not just translate)', () => {
+    const iso = presetQuaternion(bbox, 'ISO');
+    const top = presetQuaternion(bbox, 'TOP');
+    expect(isUnit(iso)).toBe(true);
+    expect(isUnit(top)).toBe(true);
+    // The two presets look in clearly different directions — a real rotational gap to sweep.
+    expect(quatAngle(iso, top)).toBeGreaterThan(0.3);
+  });
+
+  it('a slerped mid-point lies BETWEEN the two preset orientations (uniform sweep)', () => {
+    const iso = presetQuaternion(bbox, 'ISO');
+    const top = presetQuaternion(bbox, 'TOP');
+    const total = quatAngle(iso, top);
+    const mid = slerpQuat(iso, top, 0.5);
+    expect(isUnit(mid)).toBe(true);
+    const toMid = quatAngle(iso, mid);
+    const fromMid = quatAngle(mid, top);
+    // The midpoint is strictly between the endpoints …
+    expect(toMid).toBeGreaterThan(1e-3);
+    expect(fromMid).toBeGreaterThan(1e-3);
+    expect(toMid).toBeLessThan(total);
+    // … and a t=0.5 slerp bisects the arc evenly (the no-snap guarantee: the rotation is
+    // distributed uniformly across the transition, not back-loaded).
+    expect(toMid).toBeCloseTo(fromMid, 4);
+    expect(toMid + fromMid).toBeCloseTo(total, 4);
+  });
+
+  it('slerp endpoints are exact (t=0 → from, t=1 → to)', () => {
+    const iso = presetQuaternion(bbox, 'ISO');
+    const front = presetQuaternion(bbox, 'FRONT');
+    expect(quatAngle(slerpQuat(iso, front, 0), iso)).toBeLessThan(1e-6);
+    expect(quatAngle(slerpQuat(iso, front, 1), front)).toBeLessThan(1e-6);
   });
 });
 

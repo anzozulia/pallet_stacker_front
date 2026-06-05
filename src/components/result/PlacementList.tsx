@@ -38,11 +38,11 @@ interface PlacementListProps {
 /** One field cell: a small uppercase mono label over a mono tabular-nums value. */
 function Field({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1.5">
       <span className="font-mono text-[9.5px] uppercase tracking-[0.08em] text-text-3">
         {label}
       </span>
-      <span className="font-mono text-[12px] tabular-nums text-text-2">{value}</span>
+      <span className="font-mono text-[13px] tabular-nums text-text">{value}</span>
     </div>
   );
 }
@@ -71,7 +71,7 @@ export default function PlacementList({
         positions are box min-corner · mm · origin = pallet corner
       </p>
 
-      <div className="mt-4 flex flex-col gap-2">
+      <div className="mt-4 flex flex-col gap-3">
         {items.map((item) => {
           const swatch = palette.get(item.typeId) ?? '#6d63f5';
           const isHovered = hovered === item.item_id;
@@ -91,7 +91,7 @@ export default function PlacementList({
                 onHover(null);
               }}
               className={clsx(
-                'rounded-[12px] border px-4 py-3 transition-colors duration-150',
+                'rounded-[12px] border px-5 py-4 transition-colors duration-150',
                 isHovered ? 'border-accent bg-accent-weak' : 'border-border bg-surface',
               )}
             >
@@ -115,10 +115,12 @@ export default function PlacementList({
               </div>
 
               {/* Sub-line: recovered type id */}
-              <div className="mt-1 font-mono text-[10.5px] text-text-3">{item.typeId}</div>
+              <div className="mt-2 font-mono text-[10.5px] uppercase tracking-[0.06em] text-text-3">
+                {item.typeId}
+              </div>
 
               {/* Field grid: Size · Position · Support (Support always shown — DIAG-02) */}
-              <div className="mt-3 grid grid-cols-3 gap-3">
+              <div className="mt-4 grid grid-cols-3 gap-4 border-t border-border pt-4">
                 <Field label="Size L·W·H" value={`${L}·${W}·${H}`} />
                 <Field label="Position x,y,z" value={`${x}, ${y}, ${z}`} />
                 <Field label="Support" value={`${(item.support_ratio * 100).toFixed(0)}%`} />

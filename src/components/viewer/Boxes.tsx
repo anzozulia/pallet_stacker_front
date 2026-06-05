@@ -81,7 +81,7 @@ export const Boxes = forwardRef<Group, BoxesProps>(function Boxes(
             roughness={0.62}
             metalness={0.04}
           />
-          <Edges>
+          <Edges lineWidth={1.75}>
             <lineBasicMaterial color={edgeTint(b.color)} transparent opacity={0.55} />
           </Edges>
         </mesh>
