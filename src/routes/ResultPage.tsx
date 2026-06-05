@@ -27,6 +27,8 @@ import { Boxes, buildPalette } from '@/components/viewer/Boxes';
 import { CameraPresets } from '@/components/viewer/CameraPresets';
 import { Pallet } from '@/components/viewer/Pallet';
 import { ViewerOverlay } from '@/components/viewer/ViewerOverlay';
+import SummaryBlock from '@/components/result/SummaryBlock';
+import PalletSwitcher from '@/components/result/PalletSwitcher';
 import { queryClient } from '@/api/queryClient';
 import { mapDoneResponse } from '@/lib/result-mapper';
 import type { PresetKind } from '@/lib/camera-presets';
@@ -73,11 +75,10 @@ export default function ResultPage() {
   }, [hasResult, navigate]);
 
   // Selected-pallet + hover state (D-01/D-05). `sel` swaps which pallet feeds the ONE persistent
-  // Canvas; `setSel` is driven by the PalletSwitcher and `setHoveredId` by the PlacementList — both
-  // land in Plans 03–05, so the setters are declared now (the carrier seam) but not yet consumed.
+  // Canvas AND drives the PalletSwitcher selected highlight + the overlay sub-line (this slice).
+  // `setHoveredId` is the PlacementList hover link landing in Plan 04 — declared now, not yet read.
   const [sel, setSel] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  void setSel; // wired by PalletSwitcher (Plan 03–05)
   void hoveredId;
   void setHoveredId; // wired by PlacementList (Plan 04)
 
@@ -96,7 +97,8 @@ export default function ResultPage() {
   // Run map-PRIMARY type recovery with the carrier idToType (C-03). Cast ONLY `done.result`: the
   // JobState envelope matches DoneResponse, `result` is typed `unknown` at the poll boundary
   // (pack-schema.ts) but IS the DoneResult body (confirmed by the e2e `{ status:'done', result }`).
-  useMemo(
+  // The mapped `view` feeds the rail (SummaryBlock whole-job stats + PalletSwitcher per-pallet rows).
+  const view = useMemo(
     () => (result ? mapDoneResponse({ ...done!, result } as DoneResponse, idToType) : null),
     [done, result, idToType],
   );
@@ -109,14 +111,18 @@ export default function ResultPage() {
   );
   const legend = useMemo<[string, string][]>(() => [...palette.entries()], [palette]);
 
-  if (!hasResult || !result) return null;
+  if (!hasResult || !result || !view) return null;
 
   // Read the selected pallet's footprint from the cached PalletResult (A2/A3 — MappedPallet drops
   // `dimensions`). Clamp `sel` defensively so a stale index never reads past the array.
   const selIndex = Math.min(sel, result.pallets.length - 1);
   const selPallet = result.pallets[selIndex];
+  const selMapped = view.pallets[selIndex]; // MappedPallet: items / utilisation / totalWeight
   const d = selPallet.dimensions;
   const palletLabel = selPallet.pallet_id || `Pallet ${selIndex + 1}`;
+
+  // Computed per-selected-pallet overlay sub-line (D-03): item count + 1-decimal fill% + 1-decimal kg.
+  const subline = `${selMapped.items.length} boxes placed · ${(selMapped.utilisation * 100).toFixed(1)}% fill · ${selMapped.totalWeight.toFixed(1)} kg`;
 
   return (
     <div className="grid h-[100dvh] grid-cols-[1fr_384px] grid-rows-[var(--topbar-height)_1fr] max-[900px]:grid-cols-1 max-[900px]:grid-rows-[var(--topbar-height)_1fr_auto]">
@@ -226,27 +232,40 @@ export default function ResultPage() {
               absent. */}
           <Boxes ref={boxesRef} pallet={selPallet} palette={palette} />
 
-          <CameraPresets boxesRef={boxesRef} preset={active} presetNonce={presetNonce} />
+          {/* measureNonce = selIndex: a pallet swap RE-MEASURES the bbox (new boxes) but must NOT
+              re-frame the camera (D-02). CameraPresets reads the latest bbox via a ref and animates
+              only on an explicit preset press. */}
+          <CameraPresets
+            boxesRef={boxesRef}
+            preset={active}
+            presetNonce={presetNonce}
+            measureNonce={selIndex}
+          />
         </Canvas>
 
         <ViewerOverlay
           title={palletLabel}
           dims={{ L: d.L, W: d.W, H: d.H }}
+          subline={subline}
           legend={legend}
           active={active}
           onSelect={select}
         />
       </div>
 
-      {/* Result rail (D-08): the persistent reading surface. Empty placeholder this slice — the
-          Summary / Pallets / Placement / Unpacked blocks are added in Plans 03–05. Stacks beneath the
-          viewer below 900px. The pallet switcher (Plans 03–05) calls setSel to drive the canvas. */}
+      {/* Result rail (D-08): the persistent reading surface. This slice mounts the whole-job Summary
+          block + the per-pallet Switcher (Plan 06-03); Placement / Unpacked land in Plans 04–05.
+          Selecting a switcher row calls setSel → swaps the canvas pallet + the overlay sub-line.
+          Stacks beneath the viewer below 900px. */}
       <aside
         aria-label="Result details"
         data-result-rail
-        className="overflow-y-auto border-l border-border bg-surface max-[900px]:border-l-0 max-[900px]:border-t"
+        className="flex flex-col gap-6 overflow-y-auto border-l border-border bg-bg p-6 max-[900px]:border-l-0 max-[900px]:border-t"
         data-pallet-count={result.pallets.length}
-      />
+      >
+        <SummaryBlock view={view} />
+        <PalletSwitcher pallets={view.pallets} selected={selIndex} onSelect={setSel} />
+      </aside>
     </div>
   );
 }

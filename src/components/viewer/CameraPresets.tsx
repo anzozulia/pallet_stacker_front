@@ -25,6 +25,10 @@ export interface CameraPresetsProps {
   // Bumped each time a preset button is pressed so re-selecting the same preset
   // still re-triggers the animation.
   presetNonce: number;
+  // Bumped by the parent when the selected pallet changes, so the bbox is RE-MEASURED on a
+  // swap (the new pallet's boxes feed the group). Distinct from presetNonce: a swap re-measures
+  // but MUST NOT re-frame the camera (D-02) — see the ref decoupling below.
+  measureNonce?: number;
   // Reports the computed bbox up to the parent (for any chrome that needs it).
   onBbox?: (bbox: Bbox) => void;
 }
@@ -32,14 +36,28 @@ export interface CameraPresetsProps {
 const ANIM_MS = 520;
 const easeOutCubic = (k: number) => 1 - Math.pow(1 - k, 3);
 
-export function CameraPresets({ boxesRef, preset, presetNonce, onBbox }: CameraPresetsProps) {
+export function CameraPresets({
+  boxesRef,
+  preset,
+  presetNonce,
+  measureNonce,
+  onBbox,
+}: CameraPresetsProps) {
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const camera = useThree((s) => s.camera);
 
   // Measure the scene bbox from the boxes group post-mount (refs are only valid in
-  // effects, not during render). The boxes are static (committed fixture), so a
-  // single measurement is correct; default keeps the first frame composed.
+  // effects, not during render). A pallet SWAP (Plan 06-03) changes which boxes feed the
+  // group, so this is no longer a one-shot measurement — it re-measures each time the
+  // selected pallet changes via the `measureNonce` the parent bumps on switch.
   const [bbox, setBbox] = useState<Bbox>({ center: [0, 0, 0], size: [1000, 1000, 1000] });
+
+  // Pitfall 3 (D-02): hold the latest measured bbox in a ref so the preset-animation effect
+  // can read a correct frame WHEN a preset is pressed WITHOUT listing `bbox` in its deps. If
+  // `bbox` were a dep, a pallet swap (which re-measures the bbox) would re-fire the animation
+  // and snap the camera toward the active preset — exactly the no-snap-on-switch violation we
+  // are guarding against. The ref decouples "the bbox changed" from "re-frame the camera".
+  const bboxRef = useRef<Bbox>(bbox);
 
   useEffect(() => {
     const group = boxesRef.current;
@@ -48,10 +66,14 @@ export function CameraPresets({ boxesRef, preset, presetNonce, onBbox }: CameraP
     const c = box.getCenter(new Vector3());
     const s = box.getSize(new Vector3());
     const measured: Bbox = { center: [c.x, c.y, c.z], size: [s.x, s.y, s.z] };
+    bboxRef.current = measured;
     setBbox(measured);
     onBbox?.(measured);
-  }, [boxesRef, onBbox]);
+    // Re-measure on mount AND on each pallet switch (measureNonce), never animating off it.
+  }, [boxesRef, onBbox, measureNonce]);
 
+  // Distance limits stay reactive to the measured bbox (the min/max orbit distance may shift
+  // with a differently-sized pallet) — but this only adjusts clamps, it does NOT animate.
   const limits = useMemo(() => distanceLimitsFromBbox(bbox), [bbox]);
 
   // Animation state for the active transition.
@@ -66,7 +88,10 @@ export function CameraPresets({ boxesRef, preset, presetNonce, onBbox }: CameraP
   useEffect(() => {
     const controls = controlsRef.current;
     if (!controls) return;
-    const { position, target } = presetFromBbox(bbox, preset);
+    // Read the LATEST measured bbox from the ref (NOT the `bbox` state) so this effect can
+    // target a correct frame without depending on `bbox` — a pallet swap re-measures the bbox
+    // but must not re-trigger this animation (D-02 / Pitfall 3).
+    const { position, target } = presetFromBbox(bboxRef.current, preset);
     anim.current = {
       fromPos: camera.position.clone(),
       toPos: new Vector3(...position),
@@ -74,8 +99,9 @@ export function CameraPresets({ boxesRef, preset, presetNonce, onBbox }: CameraP
       toTarget: new Vector3(...target),
       start: performance.now(),
     };
-    // Re-run on preset OR nonce change (re-clicking the same preset).
-  }, [preset, presetNonce, bbox, camera]);
+    // Re-run ONLY on an explicit preset press (preset change OR nonce bump). `bbox` is
+    // intentionally NOT a dep: re-measuring on a swap must not snap the camera.
+  }, [preset, presetNonce, camera]);
 
   useFrame(() => {
     const a = anim.current;

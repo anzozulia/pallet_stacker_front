@@ -2,9 +2,10 @@
 // drei <Html>, per RESEARCH Open Question 2 — screen-anchored chrome is cleaner as
 // plain DOM). pointer-events:none everywhere except the interactive preset buttons.
 //
-// STATIC labels only (D-13): pallet name + dimensions tag from fixture pallet 0,
-// a legend row per whole-fixture type, control hints, and the ISO/TOP/FRONT
-// buttons. NO computed stats, NO right rail (Phase 6 — D-14/D-15).
+// Per-selected-pallet chrome: pallet name + dimensions tag + the computed sub-line
+// (`{N} boxes placed · {fill}% fill · {kg} kg`, D-03), a legend row per whole-result
+// type, control hints, and the ISO/TOP/FRONT buttons. The right rail (Summary /
+// Switcher / Placement) is sibling DOM in ResultPage, not part of this overlay.
 
 import clsx from 'clsx';
 import type { PresetKind } from '@/lib/camera-presets';
@@ -13,6 +14,9 @@ export interface ViewerOverlayProps {
   title: string;
   // Pallet 0 footprint dims (integer mm) for the dimensions tag.
   dims: { L: number; W: number; H: number };
+  // Computed per-selected-pallet sub-line (D-03): `{N} boxes placed · {fill}% fill · {kg} kg`.
+  // Optional so the overlay stays usable without it; rendered under the dims tag when present.
+  subline?: string;
   // Legend rows: [typeKey, hexColor] in stable sorted order.
   legend: [string, string][];
   active: PresetKind;
@@ -21,17 +25,31 @@ export interface ViewerOverlayProps {
 
 const PRESETS: PresetKind[] = ['ISO', 'TOP', 'FRONT'];
 
-export function ViewerOverlay({ title, dims, legend, active, onSelect }: ViewerOverlayProps) {
+export function ViewerOverlay({
+  title,
+  dims,
+  subline,
+  legend,
+  active,
+  onSelect,
+}: ViewerOverlayProps) {
   return (
     <div className="pointer-events-none absolute inset-0 select-none">
-      {/* Header — top-left */}
-      <div className="absolute left-6 top-6 flex items-center gap-4">
-        <span className="font-sans text-base font-semibold leading-tight text-[var(--color-d-text)]">
-          {title}
-        </span>
-        <span className="rounded-[5px] border border-[var(--color-d-border)] bg-white/5 px-2 py-1 font-mono text-xs font-normal leading-tight text-[var(--color-d-text-2)]">
-          {dims.L} {'×'} {dims.W} {'×'} {dims.H} mm
-        </span>
+      {/* Header — top-left: title + dims tag, with the computed per-pallet sub-line beneath (D-03). */}
+      <div className="absolute left-6 top-6 flex flex-col gap-1.5">
+        <div className="flex items-center gap-4">
+          <span className="font-sans text-base font-semibold leading-tight text-[var(--color-d-text)]">
+            {title}
+          </span>
+          <span className="rounded-[5px] border border-[var(--color-d-border)] bg-white/5 px-2 py-1 font-mono text-xs font-normal leading-tight text-[var(--color-d-text-2)]">
+            {dims.L} {'×'} {dims.W} {'×'} {dims.H} mm
+          </span>
+        </div>
+        {subline ? (
+          <span className="font-mono text-xs font-normal leading-tight text-[var(--color-d-text-2)]">
+            {subline}
+          </span>
+        ) : null}
       </div>
 
       {/* Legend — top-right */}
