@@ -16,6 +16,7 @@ import { Color, type Group } from 'three';
 import type { DoneResponse, PalletResult } from '@/lib/fixture-types';
 import { assertWithinEnvelope, mapPlacement, typeKeyOf } from '@/lib/mapping';
 import { colorForType } from '@/lib/palette';
+import { supportColor } from '@/lib/support-scale';
 
 /**
  * Build the deterministic type->colour map from the WHOLE fixture (all pallets +
@@ -36,6 +37,10 @@ export interface BoxesProps {
   // glows via a DECLARATIVE emissiveIntensity — r3f diffs the prop and patches the live material in
   // place (NO imperative material.emissive.set, NO ref, NO remount).
   hoveredId?: string | null;
+  // Support-heatmap colour mode (DIAG-02 / D-10). When true, each box is tinted by its
+  // `support_ratio` via the pure `supportColor` scale instead of its by-type palette colour.
+  // Default (false/undefined) keeps the by-type colouring — the default per D-10.
+  heatmap?: boolean;
 }
 
 // Edge tint: from the box colour via offsetHSL(0, -0.04, +0.18) (mockup tint()).
@@ -44,7 +49,7 @@ function edgeTint(hex: string): Color {
 }
 
 export const Boxes = forwardRef<Group, BoxesProps>(function Boxes(
-  { pallet, palette, hoveredId },
+  { pallet, palette, hoveredId, heatmap },
   ref,
 ) {
   const mapped = useMemo(
@@ -52,12 +57,16 @@ export const Boxes = forwardRef<Group, BoxesProps>(function Boxes(
       pallet.items.map((item) => {
         const typeKey = typeKeyOf(item.item_id);
         assertWithinEnvelope(item, pallet.dimensions); // dev-only, tree-shaken
+        // Colour by MODE (D-10): heatmap ON → the pure support-ratio scale; OFF → by-type palette.
+        const color = heatmap
+          ? supportColor(item.support_ratio)
+          : (palette.get(typeKey) ?? '#888888');
         return {
           ...mapPlacement(item, pallet.dimensions, typeKey),
-          color: palette.get(typeKey) ?? '#888888',
+          color,
         };
       }),
-    [pallet, palette],
+    [pallet, palette, heatmap],
   );
 
   return (
