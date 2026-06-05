@@ -177,6 +177,67 @@ test.describe('async submit→poll lifecycle (deterministic, stubbed API)', () =
     expect(errors).toHaveLength(0);
   });
 
+  test('PALLET SWITCH: selecting another pallet swaps the boxes but PRESERVES the camera (D-02)', async ({
+    page,
+  }) => {
+    // Drive the stubbed Configure→Run→Result flow to a POPULATED /result (fixture has 2 pallets
+    // P001/P002). Then click the second switcher row and prove (1) the camera position is UNCHANGED
+    // across the switch (no auto-re-frame on swap, D-02) and (2) the rendered canvas pixels DIFFER
+    // (the boxes actually swapped — the scene updated). All API routes stubbed; never the live API.
+    type CamState = { position: [number, number, number] };
+    const l2 = (a: readonly number[], b: readonly number[]) =>
+      Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+    const readCam = () =>
+      page.evaluate(
+        () => (window as Window & { __cameraState?: unknown }).__cameraState,
+      ) as Promise<CamState>;
+
+    const errors = collectConsoleErrors(page);
+    await page.route('**/api/v1/pack', (route) => stubAccept(route));
+    await stubPollSequence(page, [
+      { status: 'running' },
+      { status: 'done', result: packDoneResponse.result },
+    ]);
+
+    await runFromConfigure(page);
+    await expect(page).toHaveURL(/\/result$/, { timeout: 15000 });
+
+    const canvas = page.locator('[data-testid="r3f-canvas"]');
+    await expect(canvas).toBeVisible();
+
+    // Let the initial ISO framing settle so the camera is at rest before the switch.
+    await page.waitForFunction(() => {
+      const s = (window as Window & { __cameraState?: { settled?: boolean } }).__cameraState;
+      return s?.settled === true;
+    });
+    await page.waitForTimeout(250);
+
+    const before = await readCam();
+    const pngBefore = await canvas.screenshot();
+
+    // Switch to the second pallet (P002) via its switcher row inside the result rail.
+    const rail = page.locator('[data-result-rail]');
+    await rail.getByRole('button', { name: /P002/ }).click();
+
+    // The switcher highlight reflects the selection (aria-pressed flips to the P002 row).
+    await expect(rail.getByRole('button', { name: /P002/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    // Let the scene settle after the swap (re-measure happens, but the camera must NOT animate).
+    await page.waitForTimeout(500);
+
+    const after = await readCam();
+    const pngAfter = await canvas.screenshot();
+
+    // (1) Camera UNCHANGED across the switch (within a tiny epsilon — no snap, D-02).
+    expect(l2(before.position, after.position)).toBeLessThan(1);
+    // (2) Canvas pixels DIFFER — the boxes swapped (P001's 19 boxes → P002's 12 boxes).
+    expect(pngBefore.equals(pngAfter)).toBe(false);
+
+    expect(errors).toHaveLength(0);
+  });
+
   test('CANCEL: Cancel on /loading returns to / with the draft intact; no hang', async ({
     page,
   }) => {
