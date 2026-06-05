@@ -81,12 +81,17 @@ export default function LoadingPage() {
   // The AbortController for the CURRENT submit attempt. Held in a ref so Cancel can abort the
   // in-flight POST imperatively (SC-3); re-created on each (re)fire so a Retry gets a fresh signal.
   const controllerRef = useRef<AbortController | null>(null);
-  // Fire the POST once on mount (guarded against StrictMode dev double-invoke); Retry re-arms it.
-  // INVARIANT (WR-05): this page is mounted fresh per navigation to /loading — the router never
-  // reuses a single LoadingPage instance across two different nav states (each Run navigates anew,
-  // and Cancel/Back unmount it). So `firedRef` need not reset on a nav-state change; it is reset
-  // implicitly by remount. If the route config ever changes to reuse this component across nav
-  // states, this guard must be re-keyed on the request identity or the new POST would never fire.
+  // Fire the POST once per mounted lifecycle (Retry re-arms it). The guard suppresses a duplicate
+  // fire from a same-instance re-render, but it is RESET in the effect cleanup so that a remount —
+  // including React StrictMode's dev-only mount→cleanup→mount double-invoke — re-fires the POST.
+  //
+  // BUGFIX (loading-post-strictmode-abort): the cleanup aborts the per-attempt AbortController
+  // (SC-3 / Cancel / Back). Under StrictMode the first mount fired the POST and the immediate
+  // cleanup aborted it BEFORE it left the browser; without resetting this guard the second mount
+  // saw `firedRef.current === true`, early-returned, and the sole POST was never retried — leaving
+  // the page hung forever on "Submitting…". Resetting the guard in cleanup makes the remount fire a
+  // fresh, un-aborted POST. (Masked from e2e because Playwright runs a production build, where
+  // StrictMode does not double-invoke effects.)
   const firedRef = useRef(false);
   // Cancelled: drop the jobId so the poll query disables (no leaked interval), and suppress any
   // in-flight error from flashing an error card while we navigate home.
@@ -108,9 +113,15 @@ export default function LoadingPage() {
     if (!valid || firedRef.current || !request) return;
     firedRef.current = true;
     fireSubmit();
-    // Abort the in-flight POST when the page unmounts (browser-Back / route change) — SC-3.
-    return () => controllerRef.current?.abort();
-    // Run once on mount; `valid`/`request` are captured from the initial nav state.
+    // Abort the in-flight POST when the page unmounts (browser-Back / route change) — SC-3 — AND
+    // reset the once-per-lifecycle guard so a remount re-fires. On a REAL unmount the reset is moot
+    // (the instance is gone); on a StrictMode dev remount it is what lets the second mount re-fire
+    // the POST the first cleanup just aborted (loading-post-strictmode-abort).
+    return () => {
+      controllerRef.current?.abort();
+      firedRef.current = false;
+    };
+    // Run once per mounted lifecycle; `valid`/`request` are captured from the initial nav state.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [valid]);
 
