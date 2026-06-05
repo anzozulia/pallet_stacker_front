@@ -23,7 +23,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { type Group } from 'three';
 import { Canvas } from '@react-three/fiber';
-import { Boxes, buildPalette } from '@/components/viewer/Boxes';
+import { Boxes } from '@/components/viewer/Boxes';
 import { CameraPresets } from '@/components/viewer/CameraPresets';
 import { CogMarker } from '@/components/viewer/CogMarker';
 import { Pallet } from '@/components/viewer/Pallet';
@@ -34,6 +34,7 @@ import PlacementList from '@/components/result/PlacementList';
 import UnpackedPanel from '@/components/result/UnpackedPanel';
 import { queryClient } from '@/api/queryClient';
 import { mapDoneResponse } from '@/lib/result-mapper';
+import { colorForType } from '@/lib/palette';
 import type { PresetKind } from '@/lib/camera-presets';
 import type { JobState } from '@/api/pack-schema';
 import type { DoneResponse, DoneResult } from '@/types/pack-contract';
@@ -110,11 +111,16 @@ export default function ResultPage() {
     [done, result, idToType],
   );
 
-  // Build the palette ONCE from the WHOLE result (all pallets + unpacked) so the legend is stable
-  // across pallet switches (Pitfall 5) — not from the selected pallet alone.
+  // Build the palette ONCE from the recovered typeIds the mapped `view` already carries (CR-01):
+  // `view.byType` keys are the map-PRIMARY/parse-FALLBACK `typeId`s — the SAME key the box tint,
+  // the PlacementList swatch, and the legend label all look up. Keying off `view.byType.keys()`
+  // (not a re-parsed `typeKeyOf(item_id)`) keeps all four in lockstep for the real
+  // `${typeId}-${index}` id format, where `typeKeyOf` would otherwise diverge (e.g. "Da-" vs "Da").
+  // Built from the WHOLE result (every pallet's items, folded into byType) so the legend stays
+  // stable across pallet switches (Pitfall 5) — not from the selected pallet alone.
   const palette = useMemo(
-    () => (result ? buildPalette({ result } as DoneResponse) : new Map<string, string>()),
-    [result],
+    () => (view ? colorForType([...view.byType.keys()]) : new Map<string, string>()),
+    [view],
   );
   const legend = useMemo<[string, string][]>(() => [...palette.entries()], [palette]);
 
@@ -239,7 +245,8 @@ export default function ResultPage() {
               absent. */}
           <Boxes
             ref={boxesRef}
-            pallet={selPallet}
+            items={selMapped.items}
+            dimensions={selPallet.dimensions}
             palette={palette}
             hoveredId={hoveredId}
             heatmap={heatmap}

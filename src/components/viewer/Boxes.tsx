@@ -1,37 +1,33 @@
-// Per-box meshes for fixture pallet 0: each API placement is mapped to a Three.js
-// box-centre transform (mapPlacement) and tinted by its box type (colorForType),
-// with drei <Edges> for the mockup's edge-lines. Individual meshes (no InstancedMesh)
+// Per-box meshes for the selected pallet: each API placement is mapped to a Three.js
+// box-centre transform (mapPlacement) and tinted by its RECOVERED `typeId` via the shared
+// palette, with drei <Edges> for the mockup's edge-lines. Individual meshes (no InstancedMesh)
 // per D-10 — the single-pallet count (~19) is far below the instancing threshold.
 //
-// The palette is built from the WHOLE-fixture type set ({D,F,T}) so the legend is
-// stable across pallets (Pitfall 5); buildPalette is exported so ResultPage's
-// legend and these meshes share one deterministic colour map. dev-only
-// assertWithinEnvelope mirrors the golden AABB invariant at runtime (tree-shaken).
+// CR-01: tinting keys off the mapped `item.typeId` (the same map-PRIMARY/parse-FALLBACK key the
+// rest of the page uses), NOT a re-parsed `typeKeyOf(item_id)`. ResultPage builds the palette from
+// `view.byType.keys()` (the recovered typeIds) so the box tint, the PlacementList swatch, and the
+// legend label all resolve to the SAME colour. dev-only assertWithinEnvelope mirrors the golden
+// AABB invariant at runtime (tree-shaken).
 //
 // All three/r3f/drei imports stay inside this lazy /result subtree (Pitfall 3).
 
 import { forwardRef, useMemo } from 'react';
 import { Edges } from '@react-three/drei';
 import { Color, type Group } from 'three';
-import type { DoneResponse, PalletResult } from '@/lib/fixture-types';
-import { assertWithinEnvelope, mapPlacement, typeKeyOf } from '@/lib/mapping';
-import { colorForType } from '@/lib/palette';
+import type { PalletDims, PlacementOut } from '@/lib/fixture-types';
+import { assertWithinEnvelope, mapPlacement } from '@/lib/mapping';
 import { supportColor } from '@/lib/support-scale';
 
-/**
- * Build the deterministic type->colour map from the WHOLE fixture (all pallets +
- * unpacked), so every legend swatch appears regardless of which pallet renders.
- */
-export function buildPalette(data: DoneResponse): Map<string, string> {
-  const keys = new Set<string>();
-  for (const p of data.result.pallets) for (const it of p.items) keys.add(typeKeyOf(it.item_id));
-  for (const u of data.result.unpacked_items) keys.add(typeKeyOf(u.item_id));
-  return colorForType([...keys]);
-}
-
 export interface BoxesProps {
-  pallet: PalletResult;
-  // Palette keyed by the whole-fixture type set (from buildPalette).
+  // The SELECTED pallet's placements, each tagged with its recovered `typeId` (from the mapped
+  // `view` — map-PRIMARY/parse-FALLBACK, CR-01). Tinting keys off this `typeId`, NOT a re-parsed
+  // `typeKeyOf(item_id)`, so the box colour matches the PlacementList swatch + legend exactly.
+  items: Array<PlacementOut & { typeId: string }>;
+  // The selected pallet's footprint, needed by mapPlacement (recentre) + the dev AABB assertion.
+  dimensions: PalletDims;
+  // Palette keyed by the recovered `typeId` (built in ResultPage from `view.byType.keys()`), so
+  // the palette key, the box tint key, the PlacementList lookup key, and the legend label are ALL
+  // the same recovered `typeId` (CR-01 invariant).
   palette: Map<string, string>;
   // The hovered placement's id (= item_id) from the PlacementList rail (D-11). The matching mesh
   // glows via a DECLARATIVE emissiveIntensity — r3f diffs the prop and patches the live material in
@@ -49,24 +45,25 @@ function edgeTint(hex: string): Color {
 }
 
 export const Boxes = forwardRef<Group, BoxesProps>(function Boxes(
-  { pallet, palette, hoveredId, heatmap },
+  { items, dimensions, palette, hoveredId, heatmap },
   ref,
 ) {
   const mapped = useMemo(
     () =>
-      pallet.items.map((item) => {
-        const typeKey = typeKeyOf(item.item_id);
-        assertWithinEnvelope(item, pallet.dimensions); // dev-only, tree-shaken
+      items.map((item) => {
+        // Tint by the recovered `typeId` (CR-01): the SAME key the palette/legend/PlacementList use.
+        const typeKey = item.typeId;
+        assertWithinEnvelope(item, dimensions); // dev-only, tree-shaken
         // Colour by MODE (D-10): heatmap ON → the pure support-ratio scale; OFF → by-type palette.
         const color = heatmap
           ? supportColor(item.support_ratio)
           : (palette.get(typeKey) ?? '#888888');
         return {
-          ...mapPlacement(item, pallet.dimensions, typeKey),
+          ...mapPlacement(item, dimensions, typeKey),
           color,
         };
       }),
-    [pallet, palette, heatmap],
+    [items, dimensions, palette, heatmap],
   );
 
   return (
