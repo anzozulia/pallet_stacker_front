@@ -4,7 +4,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { FormProvider, useForm } from 'react-hook-form';
 // jsdom-WebGL-free component test (Pitfall 2): no Canvas/three import. Pins the box-row
 // per-type contract (BOX-03/04 / D-08): fragile ON disables + zeroes max-load, OFF
-// restores the prior value, the rotation segmented control sets one of the 3 modes, and
+// restores the prior value, the rotation segmented control sets one of the 2 UI modes, and
 // the remove button carries the interpolated `aria-label`. `@/` resolves via Vitest.
 import type { BoxType, PackConfig } from '@/types/config';
 import { makeDefaultBoxType } from '@/features/config/defaults';

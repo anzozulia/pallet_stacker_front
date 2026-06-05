@@ -1,7 +1,7 @@
 // The capstone host for the Configure screen (D-04/D-05/D-06/D-08). Owns the single
 // `useForm<PackConfig>` instance, seeds it from the restored localStorage draft, wires the
-// debounced auto-save, and assembles the page shell: topbar (brand + step nav + Run) →
-// page-head → PalletCard → BoxCatalogCard → sticky FooterBar.
+// debounced auto-save, and assembles the page shell: topbar (brand + step nav) →
+// page-head → PalletCard → BoxCatalogCard → sticky FooterBar (which owns the sole Run CTA).
 //
 // Error timing (D-04): `mode:'onSubmit'` + `reValidateMode:'onChange'` — least noisy while
 // typing; errors first surface on a Run attempt, then live-update per field. Persistence
