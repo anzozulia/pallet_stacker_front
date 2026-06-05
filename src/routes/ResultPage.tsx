@@ -25,6 +25,7 @@ import { type Group } from 'three';
 import { Canvas } from '@react-three/fiber';
 import { Boxes, buildPalette } from '@/components/viewer/Boxes';
 import { CameraPresets } from '@/components/viewer/CameraPresets';
+import { CogMarker } from '@/components/viewer/CogMarker';
 import { Pallet } from '@/components/viewer/Pallet';
 import { ViewerOverlay } from '@/components/viewer/ViewerOverlay';
 import SummaryBlock from '@/components/result/SummaryBlock';
@@ -81,6 +82,12 @@ export default function ResultPage() {
   // PlacementList → Boxes hover link (Plan 04): the hovered card's item_id lights the matching mesh.
   const [sel, setSel] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  // Diagnostics overlay toggles (DIAG-01/02 / D-10). `cogOn` shows the per-pallet CoG marker —
+  // default ON (the differentiator, RESEARCH Open Q2). `heatmap` recolours boxes by support ratio
+  // — default OFF (by-type colouring is the default, D-10); the per-card support% is always shown.
+  const [cogOn, setCogOn] = useState(true);
+  const [heatmap, setHeatmap] = useState(false);
 
   // Camera-preset state (PRESERVED from the fixture version — the scene subtree is unchanged, C-01).
   const boxesRef = useRef<Group>(null);
@@ -230,7 +237,23 @@ export default function ResultPage() {
               and drives the camera/target to presetFromBbox(...). A drei <Bounds observe> wrapper
               here would re-fit every frame and fight the preset animation, so it is intentionally
               absent. */}
-          <Boxes ref={boxesRef} pallet={selPallet} palette={palette} hoveredId={hoveredId} />
+          <Boxes
+            ref={boxesRef}
+            pallet={selPallet}
+            palette={palette}
+            hoveredId={hoveredId}
+            heatmap={heatmap}
+          />
+
+          {/* CoG marker (DIAG-01): rendered INSIDE the Canvas, toggle-able (default ON). Fed the
+              SELECTED pallet's cog + footprint so it moves on a pallet switch. */}
+          {cogOn && (
+            <CogMarker
+              cog={selPallet.cog}
+              palletL={selPallet.dimensions.L}
+              palletW={selPallet.dimensions.W}
+            />
+          )}
 
           {/* measureNonce = selIndex: a pallet swap RE-MEASURES the bbox (new boxes) but must NOT
               re-frame the camera (D-02). CameraPresets reads the latest bbox via a ref and animates
@@ -250,6 +273,10 @@ export default function ResultPage() {
           legend={legend}
           active={active}
           onSelect={select}
+          cogOn={cogOn}
+          onToggleCog={() => setCogOn((v) => !v)}
+          heatmapOn={heatmap}
+          onToggleHeatmap={() => setHeatmap((v) => !v)}
         />
       </div>
 
