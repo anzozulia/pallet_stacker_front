@@ -16,7 +16,7 @@
 
 import type { PalletDims, PlacementOut } from './fixture-types';
 
-const DECK_TOP_Y = 100; // blockH 78 + deckH 22 (mockup pallet model); tunable
+export const DECK_TOP_Y = 100; // blockH 78 + deckH 22 (mockup pallet model); tunable
 
 export interface MappedBox {
   id: string;
