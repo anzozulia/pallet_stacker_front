@@ -53,7 +53,7 @@ export function ViewerOverlay({
       </div>
 
       {/* Legend — top-right */}
-      <div className="absolute right-6 top-6 flex flex-col items-end gap-2">
+      <div data-viewer-legend className="absolute right-6 top-6 flex flex-col items-end gap-2">
         {legend.map(([key, color]) => (
           <div key={key} className="flex items-center gap-1">
             <span

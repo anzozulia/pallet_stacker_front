@@ -102,11 +102,13 @@ test.describe('async submit→poll lifecycle (deterministic, stubbed API)', () =
 
     // The REAL scene mounted from the live cached payload (Plan 06-02): the r3f Canvas is visible and
     // the overlay legend shows the whole-result type keys — proving live data, not the removed fixture
-    // import, drives /result.
+    // import, drives /result. Scope the type-key assertions to the legend container so they do not
+    // collide with the rail's placement/unpacked rows, which also render type ids (Plan 06-04).
     await expect(page.locator('[data-testid="r3f-canvas"]')).toBeVisible();
-    await expect(page.getByText('D', { exact: true })).toBeVisible();
-    await expect(page.getByText('F', { exact: true })).toBeVisible();
-    await expect(page.getByText('T', { exact: true })).toBeVisible();
+    const legend = page.locator('[data-viewer-legend]');
+    await expect(legend.getByText('D', { exact: true })).toBeVisible();
+    await expect(legend.getByText('F', { exact: true })).toBeVisible();
+    await expect(legend.getByText('T', { exact: true })).toBeVisible();
 
     expect(errors).toHaveLength(0);
   });
@@ -234,6 +236,84 @@ test.describe('async submit→poll lifecycle (deterministic, stubbed API)', () =
     expect(l2(before.position, after.position)).toBeLessThan(1);
     // (2) Canvas pixels DIFFER — the boxes swapped (P001's 19 boxes → P002's 12 boxes).
     expect(pngBefore.equals(pngAfter)).toBe(false);
+
+    expect(errors).toHaveLength(0);
+  });
+
+  test('PLACEMENT HOVER: hovering a placement row glows the matching mesh (RESULT-05 / D-11)', async ({
+    page,
+  }) => {
+    // Drive the stubbed Configure→Run→Result flow to a POPULATED /result, then hover the first
+    // placement card in the rail and prove (1) the canvas pixels CHANGE (the matching mesh's
+    // declarative emissiveIntensity lit it up — the glow rendered) and (2) moving off the card
+    // clears the glow (the off-hover capture differs from the hovered one — pixels return toward
+    // the baseline). All API routes stubbed; never the live API.
+    const errors = collectConsoleErrors(page);
+    await page.route('**/api/v1/pack', (route) => stubAccept(route));
+    await stubPollSequence(page, [
+      { status: 'running' },
+      { status: 'done', result: packDoneResponse.result },
+    ]);
+
+    await runFromConfigure(page);
+    await expect(page).toHaveURL(/\/result$/, { timeout: 15000 });
+
+    const canvas = page.locator('[data-testid="r3f-canvas"]');
+    await expect(canvas).toBeVisible();
+
+    // Let the initial ISO framing settle so the camera is at rest before any hover.
+    await page.waitForFunction(() => {
+      const s = (window as Window & { __cameraState?: { settled?: boolean } }).__cameraState;
+      return s?.settled === true;
+    });
+    await page.waitForTimeout(250);
+
+    const pngBaseline = await canvas.screenshot();
+
+    // Hover a placement card in the result rail. The card's onMouseEnter sets hoveredId → the
+    // matching mesh's declarative emissiveIntensity (0.45) → the glow renders. Some boxes sit at
+    // the back/bottom of the ISO frame and are occluded, so iterate the cards until one produces a
+    // visible canvas-pixel change (proving the hover→emissive→render path end-to-end). The card's
+    // own accent cue (border-accent) confirms onMouseEnter fired before we look at the WebGL glow.
+    const rail = page.locator('[data-result-rail]');
+    const cards = rail.locator('[data-placement-card]');
+    const count = await cards.count();
+    expect(count).toBeGreaterThan(0);
+
+    let glowedCard = -1;
+    let pngHovered = pngBaseline;
+    for (let i = 0; i < count; i++) {
+      const card = cards.nth(i);
+      await card.scrollIntoViewIfNeeded();
+      await card.hover();
+      await expect(card).toHaveClass(/border-accent/);
+      await page.waitForTimeout(250); // let the emissive material repaint
+      pngHovered = await canvas.screenshot();
+      if (!pngHovered.equals(pngBaseline)) {
+        glowedCard = i;
+        break;
+      }
+      // No visible change (occluded box) — move off so its accent clears, then try the next card.
+      await rail.getByText('Placement', { exact: true }).hover();
+      await expect(card).not.toHaveClass(/border-accent/);
+    }
+
+    // (1) The glow rendered: at least one hovered card changed the canvas pixels.
+    expect(glowedCard).toBeGreaterThanOrEqual(0);
+
+    // (2) The glow clears on mouse-leave: move off the glowing card and assert the canvas returns
+    // toward the baseline (the cleared capture differs from the hovered one — emissive removed).
+    await rail.getByText('Placement', { exact: true }).hover();
+    await expect(cards.nth(glowedCard)).not.toHaveClass(/border-accent/);
+    await expect
+      .poll(
+        async () => {
+          const pngCleared = await canvas.screenshot();
+          return pngCleared.equals(pngHovered);
+        },
+        { timeout: 5000 },
+      )
+      .toBe(false);
 
     expect(errors).toHaveLength(0);
   });

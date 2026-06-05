@@ -92,10 +92,12 @@ test('result viewer mounts a populated Canvas without WebGL errors (via the stub
   await expect(page.locator('[data-testid="r3f-canvas"]')).toBeVisible();
 
   // The overlay legend renders one row per whole-result type (D/F/T) — evidence the populated scene
-  // (≥1 box mesh + chrome) mounted from the live data, not an empty scene.
-  await expect(page.getByText('D', { exact: true })).toBeVisible();
-  await expect(page.getByText('F', { exact: true })).toBeVisible();
-  await expect(page.getByText('T', { exact: true })).toBeVisible();
+  // (≥1 box mesh + chrome) mounted from the live data, not an empty scene. Scope to the legend
+  // container so the assertions don't collide with the rail's type-id rows (Plan 06-04).
+  const legend = page.locator('[data-viewer-legend]');
+  await expect(legend.getByText('D', { exact: true })).toBeVisible();
+  await expect(legend.getByText('F', { exact: true })).toBeVisible();
+  await expect(legend.getByText('T', { exact: true })).toBeVisible();
 
   // No WebGL/three errors surfaced while building the scene.
   expect(errors.filter((e) => /webgl|three/i.test(e))).toHaveLength(0);
