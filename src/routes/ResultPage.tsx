@@ -35,7 +35,8 @@ import UnpackedPanel from '@/components/result/UnpackedPanel';
 import { queryClient } from '@/api/queryClient';
 import { mapDoneResponse } from '@/lib/result-mapper';
 import { colorForType } from '@/lib/palette';
-import type { PresetKind } from '@/lib/camera-presets';
+import { DECK_TOP_Y } from '@/lib/mapping';
+import type { Bbox, PresetKind } from '@/lib/camera-presets';
 import type { JobState } from '@/api/pack-schema';
 import type { DoneResponse, DoneResult } from '@/types/pack-contract';
 
@@ -69,7 +70,19 @@ export default function ResultPage() {
   const jobId = valid ? navState.jobId : undefined;
   const idToType = valid ? navState.idToType : undefined;
   const done = jobId ? queryClient.getQueryData<JobState>(['job', jobId]) : undefined;
-  const hasResult = !!done && done.status === 'done' && !!done.result;
+  // No-result guard (C-02 / threats T-06-03/04 + WR-02/WR-05): require a `done` job whose `result`
+  // is shape-valid for the render path. `result` is `z.unknown()` at the poll boundary
+  // (pack-schema.ts) — NOT shape-checked anywhere — so a malformed body (missing `pallets`, or a
+  // non-array `pallets`, or zero pallets) must REDIRECT here rather than crash `mapDoneResponse`'s
+  // `done.result.pallets.map(...)` (T-06-04: "redirects rather than crashing the render"). The
+  // non-empty check also protects `result.pallets[selIndex]` below from a `-1`/`undefined` read.
+  const resultPallets = (done?.result as { pallets?: unknown } | null | undefined)?.pallets;
+  const hasResult =
+    !!done &&
+    done.status === 'done' &&
+    !!done.result &&
+    Array.isArray(resultPallets) &&
+    resultPallets.length > 0;
 
   // No-result guard (C-02): no nav state / unknown jobId / non-'done' cached job → redirect home.
   // The body was zod-parsed upstream (Phase 5) so a wrong-shape `done` fails the status guard and
@@ -127,12 +140,19 @@ export default function ResultPage() {
   if (!hasResult || !result || !view) return null;
 
   // Read the selected pallet's footprint from the cached PalletResult (A2/A3 — MappedPallet drops
-  // `dimensions`). Clamp `sel` defensively so a stale index never reads past the array.
-  const selIndex = Math.min(sel, result.pallets.length - 1);
+  // `dimensions`). Clamp `sel` defensively so a stale index never reads past the array (high end)
+  // and never goes negative (WR-02): floor at 0 so even a `pallets.length === 1` case can't yield
+  // `-1`. `hasResult` already guarantees `pallets.length > 0`, so the floor + ceiling is well-formed.
+  const selIndex = Math.min(Math.max(sel, 0), result.pallets.length - 1);
   const selPallet = result.pallets[selIndex];
   const selMapped = view.pallets[selIndex]; // MappedPallet: items / utilisation / totalWeight
   const d = selPallet.dimensions;
   const palletLabel = selPallet.pallet_id || `Pallet ${selIndex + 1}`;
+
+  // Deck-footprint fallback frame (WR-01): when the selected pallet has ZERO boxes the measured
+  // boxes-group bbox is empty → NaN camera. CameraPresets falls back to THIS non-degenerate bbox
+  // (the deck centred on the world origin, top at DECK_TOP_Y) so the camera still frames the deck.
+  const fallbackBbox: Bbox = { center: [0, DECK_TOP_Y, 0], size: [d.L, 100, d.W] };
 
   // Computed per-selected-pallet overlay sub-line (D-03): item count + 1-decimal fill% + 1-decimal kg.
   const subline = `${selMapped.items.length} boxes placed · ${(selMapped.utilisation * 100).toFixed(1)}% fill · ${selMapped.totalWeight.toFixed(1)} kg`;
@@ -270,6 +290,7 @@ export default function ResultPage() {
             preset={active}
             presetNonce={presetNonce}
             measureNonce={selIndex}
+            fallbackBbox={fallbackBbox}
           />
         </Canvas>
 

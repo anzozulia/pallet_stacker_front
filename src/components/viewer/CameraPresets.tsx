@@ -29,6 +29,11 @@ export interface CameraPresetsProps {
   // swap (the new pallet's boxes feed the group). Distinct from presetNonce: a swap re-measures
   // but MUST NOT re-frame the camera (D-02) — see the ref decoupling below.
   measureNonce?: number;
+  // Fallback frame (WR-01): when the selected pallet has ZERO boxes the measured group bbox is
+  // EMPTY (`getCenter` → NaN, `getSize` → -Infinity), which would propagate a NaN camera transform
+  // and blank the viewer. The parent supplies the pallet-deck footprint as a non-degenerate bbox so
+  // the camera still frames the empty deck.
+  fallbackBbox?: Bbox;
   // Reports the computed bbox up to the parent (for any chrome that needs it).
   onBbox?: (bbox: Bbox) => void;
 }
@@ -41,6 +46,7 @@ export function CameraPresets({
   preset,
   presetNonce,
   measureNonce,
+  fallbackBbox,
   onBbox,
 }: CameraPresetsProps) {
   const controlsRef = useRef<OrbitControlsImpl>(null);
@@ -63,14 +69,22 @@ export function CameraPresets({
     const group = boxesRef.current;
     if (!group) return;
     const box = new Box3().setFromObject(group);
-    const c = box.getCenter(new Vector3());
-    const s = box.getSize(new Vector3());
-    const measured: Bbox = { center: [c.x, c.y, c.z], size: [s.x, s.y, s.z] };
+    // WR-01: an empty pallet (`items === []`) renders no meshes, so `setFromObject` returns an EMPTY
+    // box — `getCenter` → NaN, `getSize` → -Infinity — which would propagate a NaN camera transform
+    // and blank the viewer with no recovery. Fall back to the pallet-deck footprint (a real,
+    // non-degenerate bbox) so the camera still frames the empty deck.
+    const measured: Bbox = box.isEmpty()
+      ? (fallbackBbox ?? { center: [0, 0, 0], size: [1000, 1000, 1000] })
+      : (() => {
+          const c = box.getCenter(new Vector3());
+          const s = box.getSize(new Vector3());
+          return { center: [c.x, c.y, c.z], size: [s.x, s.y, s.z] };
+        })();
     bboxRef.current = measured;
     setBbox(measured);
     onBbox?.(measured);
     // Re-measure on mount AND on each pallet switch (measureNonce), never animating off it.
-  }, [boxesRef, onBbox, measureNonce]);
+  }, [boxesRef, onBbox, measureNonce, fallbackBbox]);
 
   // Distance limits stay reactive to the measured bbox (the min/max orbit distance may shift
   // with a differently-sized pallet) — but this only adjusts clamps, it does NOT animate.
