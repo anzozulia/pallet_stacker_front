@@ -99,6 +99,15 @@ test.describe('async submit→poll lifecycle (deterministic, stubbed API)', () =
 
     // queued→running→done across ~2 poll intervals → navigates to /result.
     await expect(page).toHaveURL(/\/result$/, { timeout: 15000 });
+
+    // The REAL scene mounted from the live cached payload (Plan 06-02): the r3f Canvas is visible and
+    // the overlay legend shows the whole-result type keys — proving live data, not the removed fixture
+    // import, drives /result.
+    await expect(page.locator('[data-testid="r3f-canvas"]')).toBeVisible();
+    await expect(page.getByText('D', { exact: true })).toBeVisible();
+    await expect(page.getByText('F', { exact: true })).toBeVisible();
+    await expect(page.getByText('T', { exact: true })).toBeVisible();
+
     expect(errors).toHaveLength(0);
   });
 
