@@ -24,8 +24,38 @@ findings:
   warning: 5
   info: 4
   total: 10
+findings_open:
+  critical: 0
+  warning: 2
+  info: 4
+  total: 6
+resolved:
+  - CR-01
+  - WR-01
+  - WR-02
+  - WR-05
+deferred:
+  - WR-03
+  - WR-04
+  - IN-01
+  - IN-02
+  - IN-03
+  - IN-04
 status: issues_found
 ---
+
+> **Resolution (2026-06-05):** The BLOCKER and the three render-crash warnings were fixed and
+> regression-tested during phase execution (commits `e9f62f4`, `ed77f4a`, `2553b08`):
+> - **CR-01** — palette key, box-tint key, PlacementList lookup, and legend label unified on the
+>   recovered `typeId` (`colorForType([...view.byType.keys()])`; `Boxes` tints by `item.typeId`;
+>   `buildPalette`/`typeKeyOf` no longer feed the palette). New `src/lib/palette-integration.test.ts`
+>   uses real `Da-0`-style ids and fails without the fix.
+> - **WR-01** — `CameraPresets` guards `box.isEmpty()` and falls back to a deck-footprint bbox.
+> - **WR-02** — `hasResult` requires non-empty `pallets`; `selIndex` floored at 0.
+> - **WR-05** — `hasResult` validates `Array.isArray(done.result.pallets)` before mapping.
+>
+> **Still open (deferred by decision):** WR-03 (raw unrounded weights), WR-04 (redundant memo
+> deps / non-null assertion), IN-01..IN-04. Address via `/gsd-code-review 06 --fix` when desired.
 
 # Phase 6: Code Review Report
 
