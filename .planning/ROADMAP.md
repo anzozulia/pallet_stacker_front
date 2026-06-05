@@ -224,7 +224,7 @@ Plans:
 
 **Wave 5** _(blocked on Wave 4)_
 
-- [ ] 06-05-PLAN.md — Wave 5: stability diagnostics slice — `CogMarker` (golden cog.z point-map + drop-line, toggle default ON, DIAG-01), `Boxes` support-heatmap colour mode + legend swap (toggle default OFF, DIAG-02), diagnostics e2e + phase gate
+- [x] 06-05-PLAN.md — Wave 5: stability diagnostics slice — `CogMarker` (golden cog.z point-map + drop-line, toggle default ON, DIAG-01), `Boxes` support-heatmap colour mode + legend swap (toggle default OFF, DIAG-02), diagnostics e2e + phase gate
 
 **UI hint**: yes
 

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Phase 6 UI-SPEC approved
-last_updated: "2026-06-05T10:21:40.361Z"
+status: verifying
+stopped_at: Completed 06-05-PLAN.md (phase 06 complete)
+last_updated: "2026-06-05T10:31:44.838Z"
 last_activity: 2026-06-05
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 25
-  completed_plans: 24
-  percent: 96
+  completed_plans: 25
+  percent: 100
 ---
 
 # Project State
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 
 Phase: 06 (result-page-3d-wiring) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-06-05
 
-Progress: [██████████] 96%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -79,6 +79,7 @@ _Updated after each plan completion_
 | Phase 06 P02 | 6min | 3 tasks | 6 files |
 | Phase 06 P03 | 6min | 4 tasks | 8 files |
 | Phase 06 P04 | 11min | 4 tasks | 9 files |
+| Phase 06 P05 | 13 | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -143,6 +144,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [06-04]: Placement→mesh hover is DECLARATIVE (emissiveIntensity prop on the per-mesh material; r3f patches it in place) — no imperative material.emissive.set, no ref, no remount, no InstancedMesh (D-11/D-12)
 - [Phase ?]: [06-04]: Support% ALWAYS shown on every placement card (DIAG-02); unpacked reason rendered as PLAIN text (T-06-07); UnpackedPanel omitted when none, replaced by an 'All items packed ✓' --color-pos affordance (D-06)
 - [Phase ?]: [06-04]: Added data-viewer-legend hook so e2e D/F/T assertions scope to the legend (rail type-id rows collide); e2e hover test iterates cards to skip ISO-occluded boxes
+- [Phase ?]: 06-05: CoG marker default ON (differentiator), support heatmap default OFF (by-type default, D-10); per-card support% always shown
+- [Phase ?]: 06-05: drei <Line> v10 matched the PATTERNS skeleton — no plain <line>+BufferGeometry fallback; drop-line from DECK_TOP_Y to mapCog
+- [Phase ?]: 06-05: Boxes keeps individual meshes (no InstancedMesh, D-12); heatmap recolour + emissive hover stay declarative prop changes
 
 ### Pending Todos
 
@@ -168,6 +172,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-05T10:21:18.343Z
-Stopped at: Phase 6 UI-SPEC approved
+Last session: 2026-06-05T10:31:44.830Z
+Stopped at: Completed 06-05-PLAN.md (phase 06 complete)
 Resume file: None
