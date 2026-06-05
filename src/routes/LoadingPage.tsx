@@ -128,10 +128,16 @@ export default function LoadingPage() {
 
   // Reaching `done` — INCLUDING when `unpacked_items.length > 0` (that is SUCCESS, never an error,
   // Anti-Pattern) — hands off to /result with `replace` so Back skips the spinner (D-03/D-05). The
-  // done payload remains in the react-query cache (gcTime:Infinity, Wave 2) for /result to read.
+  // done payload remains in the react-query cache (gcTime:Infinity, Wave 2) under ['job', jobId] for
+  // /result to read; we carry only the carrier { jobId, idToType } in nav state (NOT the payload —
+  // bloating history.state is the RESEARCH anti-pattern). This mirrors the Configure→Loading
+  // LoadingNavState hand-off pattern. ResultPage reads the body from the cache by jobId, recovers
+  // each item's type via idToType (map-primary, C-03), and redirects home if the cache is empty (C-02).
   useEffect(() => {
-    if (!cancelled && status === 'done') navigate('/result', { replace: true });
-  }, [cancelled, status, navigate]);
+    if (!cancelled && status === 'done' && jobId) {
+      navigate('/result', { replace: true, state: { jobId, idToType } });
+    }
+  }, [cancelled, status, jobId, idToType, navigate]);
 
   // Classify any transport throw (POST or poll) into a bucket WITHOUT reading a status (Pattern 3).
   // An 'aborted' throw is a user-leaving no-op (no error card, Pitfall 3); 'unreachable'/'contract-

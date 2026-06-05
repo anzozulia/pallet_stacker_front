@@ -81,14 +81,26 @@ describe('LoadingPage — happy-path submit→poll→summary→navigate (Plan 05
     expect(status).not.toHaveTextContent(/Generating candidate placements|Finalising layout/);
   });
 
-  test('reaching done navigates to /result with replace', async () => {
+  test('reaching done navigates to /result with replace, carrying { jobId, idToType }', async () => {
     server.use(makePollSequence([{ status: 'queued' }, { status: 'running' }, { status: 'done' }]));
     renderLoading();
 
     // queued→running→done spans ~2 poll intervals (POLL_INTERVAL_MS=1000), so allow ample time.
-    await waitFor(() => expect(navigateSpy).toHaveBeenCalledWith('/result', { replace: true }), {
-      timeout: 5000,
-    });
+    // The done-nav now carries the carrier so /result can read the cached payload + recover types.
+    await waitFor(
+      () =>
+        expect(navigateSpy).toHaveBeenCalledWith(
+          '/result',
+          expect.objectContaining({
+            replace: true,
+            state: expect.objectContaining({
+              jobId: expect.any(String),
+              idToType: expect.any(Map),
+            }),
+          }),
+        ),
+      { timeout: 5000 },
+    );
   });
 
   test('a deep-link with NO nav state redirects home rather than crashing (T-5-07)', async () => {
@@ -156,9 +168,14 @@ describe('LoadingPage — terminal-state distinction + cancel (Plan 05-04)', () 
     server.use(makePollSequence([{ status: 'running' }, { status: 'done' }]));
     renderLoading();
 
-    await waitFor(() => expect(navigateSpy).toHaveBeenCalledWith('/result', { replace: true }), {
-      timeout: 5000,
-    });
+    await waitFor(
+      () =>
+        expect(navigateSpy).toHaveBeenCalledWith(
+          '/result',
+          expect.objectContaining({ replace: true, state: expect.any(Object) }),
+        ),
+      { timeout: 5000 },
+    );
     // Not treated as an error: no error card rendered on the way.
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
