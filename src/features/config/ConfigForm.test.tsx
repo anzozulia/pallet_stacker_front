@@ -36,10 +36,17 @@ function renderForm() {
   );
 }
 
-// Both Run CTAs (topbar + footer) submit the same handler; the footer one is unambiguous.
+// The footer owns the single Run CTA (#1 removed the duplicate topbar button).
 function footerRunButton() {
-  const buttons = screen.getAllByRole('button', { name: /Run packing/ });
-  return buttons[buttons.length - 1];
+  return screen.getByRole('button', { name: /Run packing/ });
+}
+
+// PalletCard and BoxRow now BOTH have a "Length" field (#4), so getByLabelText('Length') is
+// ambiguous — target each by its bound input name instead.
+function inputByName(name: string): HTMLInputElement {
+  const el = document.querySelector<HTMLInputElement>(`input[name="${name}"]`);
+  if (!el) throw new Error(`no input named ${name}`);
+  return el;
 }
 
 describe('ConfigForm — Run gate (D-06)', () => {
@@ -48,7 +55,7 @@ describe('ConfigForm — Run gate (D-06)', () => {
     renderForm();
 
     // Clear the pallet Length input (a required mm field).
-    const length = screen.getByLabelText('Length');
+    const length = inputByName('pallet.length');
     await user.clear(length);
 
     await user.click(footerRunButton());
@@ -76,8 +83,8 @@ describe('ConfigForm — Run gate (D-06)', () => {
 
     // Make the box's length 5000mm — too big for the 1200×800×1800 deck in EVERY allowed
     // orientation (any footprint placement leaves the 5000mm extent exceeding a deck/height
-    // bound). The box-row "Dimensions" field binds `length`.
-    const dims = screen.getByLabelText('Dimensions');
+    // bound). The box-row "Length" field (#4, formerly "Dimensions") binds `length`.
+    const dims = inputByName('boxTypes.0.length');
     await user.clear(dims);
     await user.type(dims, '5000');
 
@@ -117,7 +124,7 @@ describe('ConfigForm — Run disabled while invalid (D-06)', () => {
     const user = userEvent.setup();
     renderForm();
 
-    const length = screen.getByLabelText('Length');
+    const length = inputByName('pallet.length');
     await user.clear(length);
     await user.click(footerRunButton());
 
