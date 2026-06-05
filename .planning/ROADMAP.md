@@ -202,7 +202,30 @@ Plans:
 4. A user can see which items could not be packed, each with its reason, in a first-class panel
 5. A user can see each pallet's centre-of-gravity in the 3D scene and per-box support-ratio diagnostics surfaced from the API
 
-**Plans**: TBD
+**Plans**: 5 plans (inside-out MVP: pure-lib foundation → carrier/live-data slice → summary+switcher → placement+unpacked → diagnostics; sequential waves 1→5)
+
+Plans:
+
+**Wave 1**
+
+- [ ] 06-01-PLAN.md — Wave 1: pure src/lib foundation — `result-summary` (whole-job aggregation, RESULT-03), `cog-map` (cog.z up-axis point-map + exported `DECK_TOP_Y`, DIAG-01), `support-scale` (synthetic-ratio heatmap scale, DIAG-02), `--color-pos`/`--color-warn` tokens; golden/synthetic tests, three-free (Nyquist Wave 0)
+
+**Wave 2** _(blocked on Wave 1)_
+
+- [ ] 06-02-PLAN.md — Wave 2: the carrier + live-data slice — `LoadingPage` carries `{ jobId, idToType }` on done-nav, `ResultPage` reads the real `done` from the react-query cache + no-result redirect (C-02) + `mapDoneResponse(done, idToType)` (C-03) + selected-pallet state + topbar/grid shell (D-07/D-08/D-09); makes /result REAL (RESULT-04, SC-1)
+
+**Wave 3** _(blocked on Wave 2)_
+
+- [ ] 06-03-PLAN.md — Wave 3: summary + switcher slice — `SummaryBlock` (whole-job 2×2, RESULT-03), `PalletSwitcher` (neutral fill single-select, RESULT-04/D-04/D-05), overlay sub-line (D-03), camera-preserved-on-switch guard (D-02/Pitfall 3) + e2e
+
+**Wave 4** _(blocked on Wave 3)_
+
+- [ ] 06-04-PLAN.md — Wave 4: placement + unpacked slice — `PlacementList` (per-pallet cards + always-shown support%, RESULT-05) with one-way row→mesh emissive hover (D-11), `UnpackedPanel` (conditional whole-job + reasons, RESULT-06/D-06), `Boxes` hoveredId emissive prop + hover e2e
+
+**Wave 5** _(blocked on Wave 4)_
+
+- [ ] 06-05-PLAN.md — Wave 5: stability diagnostics slice — `CogMarker` (golden cog.z point-map + drop-line, toggle default ON, DIAG-01), `Boxes` support-heatmap colour mode + legend swap (toggle default OFF, DIAG-02), diagnostics e2e + phase gate
+
 **UI hint**: yes
 
 ### Phase 7: Edge States, Exports & Self-Hosting
