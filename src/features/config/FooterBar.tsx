@@ -50,7 +50,7 @@ export default function FooterBar({ onRun, onSaveDraft, runDisabled = false }: F
   }
 
   return (
-    <div className="sticky bottom-0 mt-8 flex items-center gap-4 bg-[linear-gradient(transparent,var(--color-bg)_38%)] pt-7">
+    <div className="sticky bottom-0 mt-8 mb-2 flex items-center gap-4 rounded-[var(--radius)] border-t border-border bg-surface px-6 py-4 pb-5">
       <div className="flex flex-col gap-0.5">
         <span className="font-mono text-xs text-text-2">
           {types} box types · {units} units · est. {estKg} kg

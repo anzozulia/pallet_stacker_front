@@ -60,6 +60,22 @@ describe('BoxCatalogCard — add / remove (BOX-01)', () => {
   });
 });
 
+describe('BoxCatalogCard — default box-type numbering (#7)', () => {
+  test('the seeded first type is "Box type 1" and a newly-added type is "Box type 2"', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+
+    // The seeded DEFAULT_CONFIG box type reads "Box type 1".
+    const names = () =>
+      screen.getAllByLabelText('Box type name').map((i) => (i as HTMLInputElement).value);
+    expect(names()).toEqual(['Box type 1']);
+
+    await user.click(screen.getByRole('button', { name: 'Add box type' }));
+    // Numbered by additions: the new row is "Box type 2".
+    expect(names()).toEqual(['Box type 1', 'Box type 2']);
+  });
+});
+
 describe('BoxCatalogCard — live badge (BOX-05)', () => {
   test('badge reflects the live type/unit counts and updates on add', async () => {
     const user = userEvent.setup();

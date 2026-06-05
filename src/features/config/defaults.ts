@@ -15,11 +15,15 @@ import type { BoxType, PackConfig } from '@/types/config';
  * Mint a new catalog box type with a unique, letter-prefixed id (C-06). Defaults mirror
  * the mockup's "Standard carton" seed (dims in mm, weight in kg) and a non-fragile
  * `free`-rotation box with a reasonable top-load allowance.
+ *
+ * `n` (default 1) sets the human label `Box type ${n}`. Callers number by ADDITIONS —
+ * the catalog passes `fields.length + 1` so labels are not renumbered on removal — and
+ * the seeded `DEFAULT_CONFIG` first type therefore reads `Box type 1`.
  */
-export function makeDefaultBoxType(): BoxType {
+export function makeDefaultBoxType(n: number = 1): BoxType {
   return {
     id: `b${nanoid(8)}`,
-    label: 'Box type',
+    label: `Box type ${n}`,
     length: 400,
     width: 300,
     height: 250,

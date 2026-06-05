@@ -31,7 +31,8 @@ export default function BoxCatalogCard() {
   const allIds = watched.map((b) => b?.id ?? '').filter(Boolean);
 
   function onAdd() {
-    append(makeDefaultBoxType());
+    // Number by additions (current count + 1), NOT renumbered on removal (#7).
+    append(makeDefaultBoxType(fields.length + 1));
     // After RHF commits the new row, scroll it into view and focus+select its name input
     // (ports the mockup's addBox()). The new row is the last child of the list container.
     requestAnimationFrame(() => {
@@ -72,7 +73,7 @@ export default function BoxCatalogCard() {
       <button
         type="button"
         onClick={onAdd}
-        className="flex w-full items-center justify-center gap-2 rounded-[10px] border border-dashed border-border-strong bg-transparent px-4 py-3 text-sm font-semibold text-text-2 transition-colors duration-150 hover:border-accent hover:bg-accent-weak hover:text-accent-text"
+        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-dashed border-border-strong bg-transparent px-4 py-3 text-sm font-semibold text-text-2 transition-colors duration-150 hover:border-accent hover:bg-accent-weak hover:text-accent-text"
       >
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />

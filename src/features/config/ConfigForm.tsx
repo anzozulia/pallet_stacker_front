@@ -28,20 +28,6 @@ import { checkAllBoxesFit } from '@/lib/box-fit';
 import { buildPackRequest } from '@/lib/request-builder';
 import type { PackConfig } from '@/types/config';
 
-function RunIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d="M3 8h9M8.5 4l4 4-4 4"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 export default function ConfigForm() {
   const navigate = useNavigate();
 
@@ -131,16 +117,6 @@ export default function ConfigForm() {
         </nav>
 
         <div className="flex-1" />
-
-        <button
-          type="button"
-          onClick={onRun}
-          disabled={runDisabled}
-          className="flex cursor-pointer items-center gap-2 rounded-[var(--radius)] border border-transparent bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors duration-150 hover:bg-accent-text disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Run packing
-          <RunIcon />
-        </button>
       </header>
 
       <main className="mx-auto w-full max-w-[960px] px-6 pt-12 font-sans">

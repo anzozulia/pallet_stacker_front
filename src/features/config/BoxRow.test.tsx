@@ -55,6 +55,15 @@ describe('BoxRow — fragile ↔ maxLoad (D-08 / BOX-03)', () => {
 });
 
 describe('BoxRow — rotation control (BOX-04 / C-03)', () => {
+  test('offers exactly two options and "Fixed" is gone from the UI (#3)', () => {
+    render(<Harness box={{ rotation: 'free' }} />);
+    const radios = screen.getAllByRole('radio');
+    expect(radios).toHaveLength(2);
+    expect(screen.getByRole('radio', { name: 'Any orientation' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Keep this side up' })).toBeInTheDocument();
+    expect(screen.queryByRole('radio', { name: 'Fixed' })).not.toBeInTheDocument();
+  });
+
   test('selecting a rotation segment updates the rotation value', async () => {
     const user = userEvent.setup();
     render(<Harness box={{ rotation: 'free' }} />);
@@ -64,13 +73,37 @@ describe('BoxRow — rotation control (BOX-04 / C-03)', () => {
       'true',
     );
 
-    await user.click(screen.getByRole('radio', { name: 'Fixed' }));
+    await user.click(screen.getByRole('radio', { name: 'Keep this side up' }));
 
-    expect(screen.getByRole('radio', { name: 'Fixed' })).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByRole('radio', { name: 'Keep this side up' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
     const checked = screen
       .getAllByRole('radio')
       .filter((r) => r.getAttribute('aria-checked') === 'true');
     expect(checked).toHaveLength(1);
+  });
+});
+
+describe('BoxRow — dimensions layout + no id chip (#4 / #6)', () => {
+  test('renders three separate Length / Width / Height fields (no "Dimensions")', () => {
+    render(<Harness box={{ length: 400, width: 300, height: 250 }} />);
+    expect(screen.getByLabelText('Length')).toBeInTheDocument();
+    expect(screen.getByLabelText('Width')).toBeInTheDocument();
+    expect(screen.getByLabelText('Height')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Dimensions')).not.toBeInTheDocument();
+    // Weight is retained (moved out of the dims row, not dropped).
+    expect(screen.getByLabelText('Weight / unit')).toBeInTheDocument();
+  });
+
+  test('does not render the visible id chip but keeps the hidden id input registered', () => {
+    const { container } = render(<Harness box={{ id: 'btest' }} />);
+    // No visible id text in the row head.
+    expect(screen.queryByText('btest')).not.toBeInTheDocument();
+    // The hidden id input is still registered (drives the swatch colour + request ids).
+    const hiddenId = container.querySelector('input[type="hidden"][name="boxTypes.0.id"]');
+    expect(hiddenId).not.toBeNull();
   });
 });
 

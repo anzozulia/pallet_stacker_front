@@ -68,6 +68,18 @@ describe('FooterBar — large-job advisory threshold (D-03, strict >1000)', () =
   });
 });
 
+describe('FooterBar — bordered, padded footer (#2)', () => {
+  test('renders as a bordered, solid-surface bar (no gradient shade)', () => {
+    const { container } = render(<Harness boxTypes={[box(10, 1, 'ba')]} />);
+    const footer = container.firstElementChild as HTMLElement;
+    // Top border + real vertical padding + solid surface (not the old gradient class).
+    expect(footer.className).toContain('border-t');
+    expect(footer.className).toContain('bg-surface');
+    expect(footer.className).toContain('py-4');
+    expect(footer.className).not.toContain('linear-gradient');
+  });
+});
+
 describe('FooterBar — Save draft confirmation (D-07)', () => {
   test('clicking Save draft flushes and swaps the label to "Saved ✓"', async () => {
     const user = userEvent.setup();

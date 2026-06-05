@@ -24,10 +24,12 @@ import { colorForType } from '@/lib/palette';
 import { makeDefaultBoxType } from '@/features/config/defaults';
 import type { PackConfig, RotationMode } from '@/types/config';
 
+// UI rotation options: 'fixed' is intentionally absent (it maps to API 'none' and is
+// preserved in the RotationMode union + schema + request-builder for back-compat with a
+// persisted 'fixed' draft, but is no longer user-selectable).
 const ROTATION_OPTIONS: { value: RotationMode; label: string }[] = [
   { value: 'free', label: 'Any orientation' },
   { value: 'uprightOnly', label: 'Keep this side up' },
-  { value: 'fixed', label: 'Fixed' },
 ];
 
 type BoxRowProps = {
@@ -49,7 +51,7 @@ export default function BoxRow({ index, allIds, onRemove }: BoxRowProps) {
   } = useFormContext<PackConfig>();
 
   // The fit-check (Plan 07 Run gate) maps an unfittable box to an inline error on this
-  // row's `length` (the "Dimensions" field), so surface it there (D-01 / BOX-06).
+  // row's `length` field, so surface it on the Length NumberField (D-01 / BOX-06).
   const lengthError = errors.boxTypes?.[index]?.length?.message;
 
   // Stable identity + swatch colour. colorForType is order-independent (it sorts/dedupes),
@@ -92,10 +94,8 @@ export default function BoxRow({ index, allIds, onRemove }: BoxRowProps) {
           aria-label="Box type name"
           className="w-[200px] border-0 bg-transparent text-[13.5px] font-semibold text-text outline-none focus:shadow-[0_1px_0_var(--color-accent)]"
         />
-        <span className="rounded-[5px] border border-border bg-surface-2 px-[7px] py-0.5 font-mono text-[10.5px] text-text-3">
-          {id}
-        </span>
-        {/* read-only id is stored on the form but never user-editable (T-4-05) */}
+        {/* read-only id is stored on the form (drives the swatch colour) but never user-editable
+            (T-4-05); the visible id chip was removed for a cleaner row head. */}
         <input type="hidden" {...register(`boxTypes.${index}.id`)} />
         <div className="flex-1" />
         <button
@@ -116,26 +116,25 @@ export default function BoxRow({ index, allIds, onRemove }: BoxRowProps) {
         </button>
       </div>
 
-      {/* Body: dims · weight/qty/maxLoad+fragile · rotation */}
+      {/* Body: L|W|H dims row · weight/qty/maxLoad+fragile · rotation */}
       <div className="flex flex-col gap-6 px-6 py-[26px]">
-        <NumberField
-          label="Dimensions"
-          hint="length · width · height"
-          unit="mm"
-          error={lengthError}
-          {...register(`boxTypes.${index}.length`)}
-        />
         <div className="grid grid-cols-3 gap-7 max-[720px]:grid-cols-1">
+          <NumberField
+            label="Length"
+            unit="mm"
+            error={lengthError}
+            {...register(`boxTypes.${index}.length`)}
+          />
           <NumberField label="Width" unit="mm" {...register(`boxTypes.${index}.width`)} />
           <NumberField label="Height" unit="mm" {...register(`boxTypes.${index}.height`)} />
+        </div>
+        <div className="grid grid-cols-3 gap-7 max-[720px]:grid-cols-1">
           <NumberField
             label="Weight / unit"
             unit="kg"
             step="0.1"
             {...register(`boxTypes.${index}.weight`)}
           />
-        </div>
-        <div className="grid grid-cols-3 gap-7 max-[720px]:grid-cols-1">
           <NumberField label="Quantity" unit="pcs" {...register(`boxTypes.${index}.quantity`)} />
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between gap-2">
