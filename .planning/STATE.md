@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 Phase: 7
 Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-06-06 - Completed quick task 260606-01h: 12 UI/UX fixes + box-state desync bug
+Last activity: 2026-06-07 - Completed quick task 260607-1fa: config/result/3D-viewer fixes + realistic pallet model
 
 Progress: [██████████] 100%
 
@@ -168,6 +168,7 @@ None yet.
 | #         | Description                                                                 | Date       | Commit  | Status              | Directory                                                                                              |
 | --------- | --------------------------------------------------------------------------- | ---------- | ------- | ------------------- | ----------------------------------------------------------------------------------------------------- |
 | 260606-01h | 12 UI/UX fixes (config form, footer, results, 3D viewer) + box-state desync bug (#5/#8 root-caused: config-tally string-coercion) | 2026-06-06 | 8e4e014 | Needs visual review | [260606-01h](./quick/260606-01h-config-ui-results-3d-viewer-fixes-and-bo/) |
+| 260607-1fa | 11 fixes: full-width footer, drop Save draft + Max pallets, Allow-overhang switch (default 0); result declutter (type labels, drop unpacked stat/orientation/position/caption); opaque ISO/TOP/FRONT buttons + realistic two-direction pallet model | 2026-06-07 | af7178f | Verified (visual review pending) | [260607-1fa](./quick/260607-1fa-configure-footer-overhang-max-pallets-re/) |
 
 ## Deferred Items
 
