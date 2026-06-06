@@ -50,7 +50,6 @@ export default function ConfigForm() {
   const {
     handleSubmit,
     setError,
-    getValues,
     formState: { isValid, isSubmitted, errors },
   } = form;
 
@@ -59,8 +58,9 @@ export default function ConfigForm() {
   // some zod paths, directly on the field node).
   const catalogError = errors.boxTypes?.root?.message ?? errors.boxTypes?.message;
 
-  // Wire the debounced auto-save + flush to this form instance.
-  const { flushSave } = useLocalStorageAutosave(form);
+  // Wire the debounced auto-save to this form instance (the sole persistence path — the manual
+  // Save draft button was removed; the debounce captures work-in-progress unconditionally, D-07).
+  useLocalStorageAutosave(form);
 
   // The valid-parse path: feasibility gate, then build + hand off to /loading (D-06 / C-03 / C-05).
   function onValid(config: PackConfig) {
@@ -80,7 +80,6 @@ export default function ConfigForm() {
   }
 
   const onRun = handleSubmit(onValid);
-  const onSaveDraft = () => flushSave(getValues());
 
   // Disable Run only after the first submit (mode:onSubmit) once the form is known-invalid,
   // so the button is not pre-disabled before the user has tried (D-06 timing).
@@ -139,9 +138,11 @@ export default function ConfigForm() {
             ) : null}
           </div>
         </div>
-
-        <FooterBar onRun={onRun} onSaveDraft={onSaveDraft} runDisabled={runDisabled} />
       </main>
+
+      {/* Full-width sticky footer — sibling of header/main so its bar spans the viewport
+          (the inner content is re-centred to the 960px column inside FooterBar). */}
+      <FooterBar onRun={onRun} runDisabled={runDisabled} />
     </FormProvider>
   );
 }

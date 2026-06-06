@@ -37,8 +37,8 @@ export function makeDefaultBoxType(n: number = 1): BoxType {
 
 /**
  * EUR-pallet-shaped seed config (D-09): 1200×800 footprint, ~1800 mm stack height,
- * ~1000 kg / ~40 mm overhang limits, up to 2 pallets, and one default box type. Valid
- * against `packConfigSubmitSchema` on a fresh load.
+ * ~1000 kg max-weight, overhang disabled (0, behind the Allow-overhang switch — default
+ * OFF), and one default box type. Valid against `packConfigSubmitSchema` on a fresh load.
  */
 export const DEFAULT_CONFIG: PackConfig = {
   pallet: {
@@ -46,8 +46,8 @@ export const DEFAULT_CONFIG: PackConfig = {
     width: 800,
     height: 1800,
     maxWeight: 1000,
-    maxOverhang: 40,
+    maxOverhang: 0,
+    allowOverhang: false,
   },
   boxTypes: [makeDefaultBoxType()],
-  maxPallets: 2,
 };

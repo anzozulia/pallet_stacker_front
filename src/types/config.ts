@@ -29,6 +29,13 @@ export interface PalletConfig {
   height: number;
   maxWeight: number;
   maxOverhang: number;
+  /**
+   * Gate for `maxOverhang`: when false (the default) the UI zeroes + disables the overhang
+   * field so the pallet permits no overhang; when true the user may set a positive value.
+   * Mirrors the box-type `fragile` ↔ `maxLoad` interaction. Collected + persisted; the
+   * numeric `maxOverhang` is what reaches the API.
+   */
+  allowOverhang: boolean;
 }
 
 /**
@@ -68,13 +75,12 @@ export interface BoxType {
 }
 
 /**
- * The full app config model. `maxPallets` is the single user-facing packing option
- * (PACK-03 / D-03). The other API options (`time_budget_s`, `seed`, `support_ratio`)
- * are intentionally NOT here — they are baked in the request-builder (D-03, Plan 02),
- * not user-facing.
+ * The full app config model. There are NO user-facing packing-option fields: the API
+ * options (`max_pallets`, `time_budget_s`, `seed`, `support_ratio`) are all derived /
+ * baked in the request-builder (D-03, Plan 02) — `max_pallets` is set to the box count so
+ * the solver is never artificially capped, not surfaced as a user control.
  */
 export interface PackConfig {
   pallet: PalletConfig;
   boxTypes: BoxType[];
-  maxPallets: number;
 }

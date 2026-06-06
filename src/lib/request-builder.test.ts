@@ -18,6 +18,7 @@ const config: PackConfig = {
     height: 1000,
     maxWeight: 250,
     maxOverhang: 0,
+    allowOverhang: false,
   },
   boxTypes: [
     {
@@ -57,7 +58,6 @@ const config: PackConfig = {
       rotation: 'fixed',
     },
   ],
-  maxPallets: 2,
 };
 
 describe('buildPackRequest (PACK-02 expansion)', () => {
@@ -148,14 +148,16 @@ describe('rotationToApi (BOX-04 / SC-2 total table)', () => {
 });
 
 describe('buildPackRequest (options block, D-03)', () => {
-  it('sends user max_pallets plus baked time_budget_s/seed/support_ratio', () => {
+  it('sends max_pallets = boxes.length (uncapped) plus baked time_budget_s/seed/support_ratio', () => {
     const { request } = buildPackRequest(config);
+    // 3 + 2 + 1 = 6 expanded boxes → max_pallets is never an artificial cap.
     expect(request.options).toEqual({
-      max_pallets: 2,
+      max_pallets: request.boxes.length,
       time_budget_s: 25,
       seed: 7,
       support_ratio: 0.8,
     });
+    expect(request.options.max_pallets).toBe(6);
   });
 });
 

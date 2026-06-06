@@ -1,13 +1,12 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { FormProvider, useForm } from 'react-hook-form';
 // jsdom-WebGL-free component test (Pitfall 2): no Canvas/three import. Pins the FooterBar's
-// own behaviours (BOX-05 / D-03 / D-07): the live `{N} box types · {M} units · est. {K} kg`
+// own behaviours (BOX-05 / D-03): the live `{N} box types · {M} units · est. {K} kg`
 // total renders from given form state; the `Large job — …` advisory is STRICTLY >1000
-// (present at 1001, absent at exactly 1000) and is non-blocking; the `Saved ✓` confirmation
-// appears after a Save-draft click. Advisory assertions are text-based (the copy) — colour
-// is the human checkpoint's job. `@/` resolves via Vitest.
+// (present at 1001, absent at exactly 1000) and is non-blocking. There is NO Save draft button
+// (the debounced autosave is the sole persistence path). Advisory assertions are text-based
+// (the copy) — colour is the human checkpoint's job. `@/` resolves via Vitest.
 import type { PackConfig } from '@/types/config';
 import { DEFAULT_CONFIG } from '@/features/config/defaults';
 import FooterBar from '@/features/config/FooterBar';
@@ -17,12 +16,10 @@ import FooterBar from '@/features/config/FooterBar';
 function Harness({
   boxTypes,
   onRun = () => {},
-  onSaveDraft = () => {},
   runDisabled = false,
 }: {
   boxTypes: PackConfig['boxTypes'];
   onRun?: () => void;
-  onSaveDraft?: () => void;
   runDisabled?: boolean;
 }) {
   const methods = useForm<PackConfig>({
@@ -30,7 +27,7 @@ function Harness({
   });
   return (
     <FormProvider {...methods}>
-      <FooterBar onRun={onRun} onSaveDraft={onSaveDraft} runDisabled={runDisabled} />
+      <FooterBar onRun={onRun} runDisabled={runDisabled} />
     </FormProvider>
   );
 }
@@ -68,27 +65,25 @@ describe('FooterBar — large-job advisory threshold (D-03, strict >1000)', () =
   });
 });
 
-describe('FooterBar — bordered, padded footer (#2)', () => {
-  test('renders as a bordered, solid-surface bar (no gradient shade)', () => {
+describe('FooterBar — full-width sticky bar mirroring the header (#1)', () => {
+  test('renders as a full-bleed sticky top-bordered bar (header-like chrome)', () => {
     const { container } = render(<Harness boxTypes={[box(10, 1, 'ba')]} />);
     const footer = container.firstElementChild as HTMLElement;
-    // Top border + real vertical padding + solid surface (not the old gradient class).
+    // Full-width sticky bottom bar: top border + sticky + backdrop blur + real vertical padding,
+    // NOT the old rounded-card chrome with horizontal margins.
     expect(footer.className).toContain('border-t');
-    expect(footer.className).toContain('bg-surface');
+    expect(footer.className).toContain('sticky');
+    expect(footer.className).toContain('backdrop-blur');
     expect(footer.className).toContain('py-4');
+    expect(footer.className).not.toContain('rounded-');
     expect(footer.className).not.toContain('linear-gradient');
   });
 });
 
-describe('FooterBar — Save draft confirmation (D-07)', () => {
-  test('clicking Save draft flushes and swaps the label to "Saved ✓"', async () => {
-    const user = userEvent.setup();
-    const onSaveDraft = vi.fn();
-    render(<Harness boxTypes={[box(10, 1, 'ba')]} onSaveDraft={onSaveDraft} />);
-
-    await user.click(screen.getByRole('button', { name: 'Save draft' }));
-
-    expect(onSaveDraft).toHaveBeenCalledTimes(1);
-    expect(await screen.findByText('Saved ✓')).toBeInTheDocument();
+describe('FooterBar — no Save draft affordance (#2)', () => {
+  test('renders no Save draft button (autosave is the sole persistence path)', () => {
+    render(<Harness boxTypes={[box(10, 1, 'ba')]} />);
+    expect(screen.queryByRole('button', { name: /Save draft/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/Saved/)).not.toBeInTheDocument();
   });
 });

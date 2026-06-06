@@ -24,7 +24,15 @@ function box(partial: Partial<BoxType>): BoxType {
 
 // Pallet with NO overhang by default (overhang cases set it explicitly).
 function pallet(partial: Partial<PalletConfig> = {}): PalletConfig {
-  return { length: 1000, width: 800, height: 1800, maxWeight: 250, maxOverhang: 0, ...partial };
+  return {
+    length: 1000,
+    width: 800,
+    height: 1800,
+    maxWeight: 250,
+    maxOverhang: 0,
+    allowOverhang: false,
+    ...partial,
+  };
 }
 
 describe('orientationsFor (D-01 / BOX-06)', () => {

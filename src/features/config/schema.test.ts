@@ -48,6 +48,30 @@ describe('packConfigSubmitSchema (strict, D-02)', () => {
   test('accepts maxLoad of 0 (fragile boxes carry no load)', () => {
     expect(packConfigSubmitSchema.safeParse(boxOverrides({ maxLoad: 0 })).success).toBe(true);
   });
+
+  test('accepts pallet.maxOverhang of 0 (Allow-overhang OFF — previously rejected by positive())', () => {
+    const cfg = {
+      ...DEFAULT_CONFIG,
+      pallet: { ...DEFAULT_CONFIG.pallet, maxOverhang: 0, allowOverhang: false },
+    };
+    expect(packConfigSubmitSchema.safeParse(cfg).success).toBe(true);
+  });
+
+  test('accepts a positive pallet.maxOverhang with Allow-overhang ON', () => {
+    const cfg = {
+      ...DEFAULT_CONFIG,
+      pallet: { ...DEFAULT_CONFIG.pallet, maxOverhang: 40, allowOverhang: true },
+    };
+    expect(packConfigSubmitSchema.safeParse(cfg).success).toBe(true);
+  });
+
+  test('rejects a negative pallet.maxOverhang', () => {
+    const cfg = {
+      ...DEFAULT_CONFIG,
+      pallet: { ...DEFAULT_CONFIG.pallet, maxOverhang: -5, allowOverhang: true },
+    };
+    expect(packConfigSubmitSchema.safeParse(cfg).success).toBe(false);
+  });
 });
 
 describe('packConfigShapeSchema (lenient restore guard, Pitfall 4)', () => {
@@ -60,8 +84,8 @@ describe('packConfigShapeSchema (lenient restore guard, Pitfall 4)', () => {
   });
 
   test('rejects a structurally-broken config (missing pallet)', () => {
-    const { boxTypes, maxPallets } = DEFAULT_CONFIG;
-    expect(packConfigShapeSchema.safeParse({ boxTypes, maxPallets }).success).toBe(false);
+    const { boxTypes } = DEFAULT_CONFIG;
+    expect(packConfigShapeSchema.safeParse({ boxTypes }).success).toBe(false);
   });
 });
 

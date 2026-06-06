@@ -74,7 +74,10 @@ export function buildPackRequest(config: PackConfig): BuildResult {
   }
 
   const options: PackOptions = {
-    max_pallets: config.maxPallets,
+    // max_pallets is no longer a user control: cap it at the box count. You never need more
+    // pallets than boxes, so this is effectively unlimited — the solver is never artificially
+    // capped while still satisfying the API's required field.
+    max_pallets: boxes.length,
     ...BAKED_OPTIONS,
   };
 

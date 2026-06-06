@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
@@ -142,8 +142,8 @@ describe('ConfigForm — shell (D-05)', () => {
     const titles = headings.map((h) => h.textContent);
     expect(titles).toContain('Pallet configuration');
     expect(titles).toContain('Box catalog');
-    // within() import kept meaningful: assert the footer total renders.
-    const main = screen.getByRole('main');
-    expect(within(main).getByText(/box types · .* units · est\. .* kg/)).toBeInTheDocument();
+    // The footer is now a full-width sibling of <main> (#1), so it renders OUTSIDE main —
+    // assert the tally at the page-document level.
+    expect(screen.getByText(/box types · .* units · est\. .* kg/)).toBeInTheDocument();
   });
 });

@@ -36,7 +36,7 @@ function DesyncHarness({ onForm }: { onForm: (f: UseFormReturn<PackConfig>) => v
         <BoxCatalogCard />
       </div>
       <div data-tb="footer">
-        <FooterBar onRun={() => {}} onSaveDraft={() => {}} />
+        <FooterBar onRun={() => {}} />
       </div>
     </FormProvider>
   );

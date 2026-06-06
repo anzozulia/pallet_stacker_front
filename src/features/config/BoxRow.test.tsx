@@ -14,7 +14,7 @@ import BoxRow from '@/features/config/BoxRow';
 function Harness({ box, onRemove = () => {} }: { box?: Partial<BoxType>; onRemove?: () => void }) {
   const seed: BoxType = { ...makeDefaultBoxType(), id: 'btest', label: 'Carton A', ...box };
   const methods = useForm<PackConfig>({
-    defaultValues: { pallet: {} as PackConfig['pallet'], boxTypes: [seed], maxPallets: 1 },
+    defaultValues: { pallet: {} as PackConfig['pallet'], boxTypes: [seed] },
   });
   return (
     <FormProvider {...methods}>

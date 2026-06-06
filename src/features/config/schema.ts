@@ -23,6 +23,15 @@ const mmInt = z
   .transform((v) => Number(v))
   .pipe(z.number().int('Whole mm only').positive('Must be > 0'));
 
+// mm integer that ALSO accepts 0 (`.min(0)` instead of `.positive()`). Used ONLY for
+// `pallet.maxOverhang`, which is 0 when the Allow-overhang switch is OFF (the default).
+// All other mm fields keep `mmInt` (strictly > 0).
+const mmIntNonNeg = z
+  .union([z.string(), z.number()])
+  .refine((v) => v !== '' && v !== null && v !== undefined, { message: 'Required' })
+  .transform((v) => Number(v))
+  .pipe(z.number().int('Whole mm only').min(0, 'Must be ≥ 0'));
+
 // kg: required positive number, decimals allowed (no .int()). Reject "" before coercion.
 const kg = z
   .union([z.string(), z.number()])
@@ -72,10 +81,11 @@ export const packConfigSubmitSchema = z.object({
     width: mmInt,
     height: mmInt,
     maxWeight: kg,
-    maxOverhang: mmInt,
+    // Non-negative: 0 is valid (Allow-overhang OFF, the default).
+    maxOverhang: mmIntNonNeg,
+    allowOverhang: z.boolean(),
   }),
   boxTypes: z.array(boxTypeSubmit).min(1, 'Add at least one box type'),
-  maxPallets: mmInt,
 }) satisfies z.ZodType<PackConfig>;
 
 /**
@@ -91,6 +101,7 @@ export const packConfigShapeSchema = z.object({
     height: looseNumber,
     maxWeight: looseNumber,
     maxOverhang: looseNumber,
+    allowOverhang: z.boolean(),
   }),
   boxTypes: z.array(
     z.object({
@@ -106,5 +117,4 @@ export const packConfigShapeSchema = z.object({
       rotation,
     }),
   ),
-  maxPallets: looseNumber,
 });

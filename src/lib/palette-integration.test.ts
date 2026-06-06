@@ -24,8 +24,14 @@ import type { DoneResponse, PlacementOut } from '@/types/pack-contract';
 /** A config whose box-type ids are the REAL multi-char catalog ids that expand to `${id}-${index}`. */
 function realConfig(): PackConfig {
   return {
-    pallet: { length: 1200, width: 800, height: 1800, maxWeight: 1000, maxOverhang: 0 },
-    maxPallets: 1,
+    pallet: {
+      length: 1200,
+      width: 800,
+      height: 1800,
+      maxWeight: 1000,
+      maxOverhang: 0,
+      allowOverhang: false,
+    },
     boxTypes: [
       {
         id: 'Da',
