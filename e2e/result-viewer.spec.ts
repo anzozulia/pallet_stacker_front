@@ -152,9 +152,9 @@ test.describe('presets', () => {
     await expect(top).toBeVisible();
     await expect(front).toBeVisible();
 
-    // Active button carries the accent background class (rgba(99,90,245,0.32)) and white text;
-    // inactive buttons do not. Initial frame = ISO.
-    const accent = /bg-\[rgba\(99,90,245,0\.32\)\]/;
+    // Active button carries the solid accent background class (bg-accent, opaque — #9) and white
+    // text; inactive buttons do not. Initial frame = ISO.
+    const accent = /bg-accent/;
     await expect(iso).toHaveClass(accent);
 
     // Reframe to each preset and capture camera state + canvas pixels.

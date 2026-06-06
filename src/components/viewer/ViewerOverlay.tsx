@@ -147,8 +147,8 @@ export function ViewerOverlay({
               className={clsx(
                 'cursor-pointer rounded-md border px-[10px] py-[6px] font-mono text-xs leading-tight transition-colors',
                 isActive
-                  ? 'border-[rgba(124,116,255,0.6)] bg-[rgba(99,90,245,0.32)] text-white'
-                  : 'border-[var(--color-d-border)] bg-white/5 text-[var(--color-d-text-2)] hover:bg-white/10 hover:text-[var(--color-d-text)]',
+                  ? 'border-[rgba(124,116,255,0.6)] bg-accent text-white'
+                  : 'border-[var(--color-d-border)] bg-[#1a2030] text-[var(--color-d-text-2)] hover:bg-[#222a3d] hover:text-[var(--color-d-text)]',
               )}
             >
               {p}
