@@ -1,7 +1,9 @@
-// Whole-job Summary rail block (RESULT-03 / D-03): a 2×2 stat grid — Pallets used,
-// Utilisation (with an accent fill bar), Unpacked, and Total weight — aggregated from the
-// pure `summarise(view, maxPallets)` derivation (06-01). WHOLE-JOB scope: it reads the
-// job-level input_summary + Σ pallet weight, so it does NOT change on a pallet switch (D-03).
+// Whole-job Summary rail block (RESULT-03 / D-03): a 3-up stat grid — Pallets used,
+// Utilisation (with an accent fill bar), and Total weight — aggregated from the pure
+// `summarise(view, maxPallets)` derivation (06-01). The Unpacked STAT was removed here (the
+// Unpacked PANEL below the rail still lists un-packable items + reasons — user decision).
+// WHOLE-JOB scope: it reads the job-level input_summary + Σ pallet weight, so it does NOT
+// change on a pallet switch (D-03).
 //
 // Formatting lives HERE (the pure `summarise` preserves the raw utilisation product, 06-01):
 // counts render as integers, utilisation + weight to 1 decimal, all values mono tabular-nums.
@@ -56,7 +58,7 @@ export default function SummaryBlock({ view, maxPallets }: SummaryBlockProps) {
     // mono uppercase accent-dot SectionLabel — the whole-job rail block.
     <section className="rounded-[var(--radius-lg)] border border-border bg-surface p-[var(--card-body-padding)] shadow-[var(--shadow)]">
       <SectionLabel>Summary</SectionLabel>
-      <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-6">
+      <div className="mt-4 grid grid-cols-3 gap-x-4 gap-y-6">
         <Stat
           label="Pallets used"
           value={String(s.palletsUsed)}
@@ -74,7 +76,6 @@ export default function SummaryBlock({ view, maxPallets }: SummaryBlockProps) {
             />
           </div>
         </Stat>
-        <Stat label="Unpacked" value={`${s.unpacked} / ${s.totalItems}`} />
         <Stat label="Total weight" value={`${s.totalWeightKg.toFixed(1)} kg`} />
       </div>
     </section>

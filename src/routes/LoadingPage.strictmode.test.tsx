@@ -72,7 +72,11 @@ vi.mock('@/api/useSubmitJob', async () => {
 });
 
 // The same minimal nav payload shape the happy-path suite uses.
-function makeNavState(): { request: PackRequest; idToType: Map<string, string> } {
+function makeNavState(): {
+  request: PackRequest;
+  idToType: Map<string, string>;
+  typeToLabel: Map<string, string>;
+} {
   const request: PackRequest = {
     boxes: [
       { id: 'D-0', length: 400, width: 300, height: 200, weight: 4, rotations: 'all' },
@@ -87,7 +91,11 @@ function makeNavState(): { request: PackRequest; idToType: Map<string, string> }
     ['D-1', 'D'],
     ['F-0', 'F'],
   ]);
-  return { request, idToType };
+  const typeToLabel = new Map<string, string>([
+    ['D', 'Box type 1'],
+    ['F', 'Box type 2'],
+  ]);
+  return { request, idToType, typeToLabel };
 }
 
 // Render with <StrictMode> as the ROOT element so RTL actually replays the effect double-invoke

@@ -44,6 +44,8 @@ import type { DoneResponse, DoneResult } from '@/types/pack-contract';
 interface ResultNavState {
   jobId: string;
   idToType?: Map<string, string>;
+  /** typeId → human label (from the config), passed to PlacementList for the card identifier. */
+  typeToLabel?: Map<string, string>;
 }
 
 /**
@@ -54,9 +56,14 @@ interface ResultNavState {
  */
 function isResultNavState(state: unknown): state is ResultNavState {
   if (typeof state !== 'object' || state === null) return false;
-  const { jobId, idToType } = state as { jobId?: unknown; idToType?: unknown };
+  const { jobId, idToType, typeToLabel } = state as {
+    jobId?: unknown;
+    idToType?: unknown;
+    typeToLabel?: unknown;
+  };
   if (typeof jobId !== 'string') return false;
   if (idToType !== undefined && !(idToType instanceof Map)) return false;
+  if (typeToLabel !== undefined && !(typeToLabel instanceof Map)) return false;
   return true;
 }
 
@@ -69,6 +76,7 @@ export default function ResultPage() {
   const valid = isResultNavState(navState);
   const jobId = valid ? navState.jobId : undefined;
   const idToType = valid ? navState.idToType : undefined;
+  const typeToLabel = valid ? navState.typeToLabel : undefined;
   const done = jobId ? queryClient.getQueryData<JobState>(['job', jobId]) : undefined;
   // No-result guard (C-02 / threats T-06-03/04 + WR-02/WR-05): require a `done` job whose `result`
   // is shape-valid for the render path. `result` is `z.unknown()` at the poll boundary
@@ -326,6 +334,7 @@ export default function ResultPage() {
           items={selMapped.items}
           palette={palette}
           palletLabel={palletLabel}
+          typeToLabel={typeToLabel}
           onHover={setHoveredId}
         />
         {/* Whole-job unpacked panel (RESULT-06): does NOT change on pallet switch. idToType gives

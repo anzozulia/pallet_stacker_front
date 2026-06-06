@@ -75,8 +75,8 @@ export default function ConfigForm() {
     // Build the request AND retain idToType (C-05): both ride the navigation state into the
     // eager /loading route, which runs the submit→poll lifecycle. The form is NOT unmounted
     // destructively and the persisted draft survives (D-08) for a later Cancel/Back return.
-    const { request, idToType } = buildPackRequest(config);
-    navigate('/loading', { state: { request, idToType } });
+    const { request, idToType, typeToLabel } = buildPackRequest(config);
+    navigate('/loading', { state: { request, idToType, typeToLabel } });
   }
 
   const onRun = handleSubmit(onValid);

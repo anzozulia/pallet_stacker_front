@@ -1,8 +1,9 @@
 // jsdom-WebGL-free component test for the whole-job Summary block (Plan 06-03 Task 1, RESULT-03).
-// Builds the ResultView from the committed golden fixture and asserts the four rendered stat cells
-// read the whole-job golden values: Pallets used `2`, Utilisation `72.8 %` (1 decimal), Unpacked
-// `7 / 38`, Total weight `211.0 kg` (1 decimal). The block is three-free (Card/SectionLabel + the
-// pure `summarise` only); the WebGL canvas is never imported here. `@/` resolves via Vitest.
+// Builds the ResultView from the committed golden fixture and asserts the three rendered stat cells
+// read the whole-job golden values: Pallets used `2`, Utilisation `72.8 %` (1 decimal), Total weight
+// `211.0 kg` (1 decimal). The Unpacked STAT was removed (#5) — the Unpacked PANEL still renders
+// elsewhere. The block is three-free (Card/SectionLabel + the pure `summarise` only); the WebGL
+// canvas is never imported here. `@/` resolves via Vitest.
 import { render, screen } from '@testing-library/react';
 import { describe, expect, test } from 'vitest';
 import doneResponse from '@/lib/__fixtures__/pack-done-response.json';
@@ -13,23 +14,24 @@ import SummaryBlock from '@/components/result/SummaryBlock';
 const view = mapDoneResponse(doneResponse as DoneResponse);
 
 describe('SummaryBlock (whole-job stats, RESULT-03 / D-03)', () => {
-  test('renders the four whole-job golden stat cells', () => {
+  test('renders the three whole-job golden stat cells (no Unpacked stat — #5)', () => {
     render(<SummaryBlock view={view} />);
 
     // Pallets used → 2 (integer, no denominator when maxPallets omitted).
     expect(screen.getByText('2')).toBeInTheDocument();
     // Utilisation → 72.8 % (1 decimal of the raw 72.81 product).
     expect(screen.getByText(/72\.8/)).toBeInTheDocument();
-    // Unpacked → 7 / 38.
-    expect(screen.getByText('7 / 38')).toBeInTheDocument();
     // Total weight → 211.0 kg (1 decimal).
     expect(screen.getByText(/211\.0/)).toBeInTheDocument();
 
-    // The four cell labels.
+    // The three remaining cell labels.
     expect(screen.getByText('Pallets used')).toBeInTheDocument();
     expect(screen.getByText('Utilisation')).toBeInTheDocument();
-    expect(screen.getByText('Unpacked')).toBeInTheDocument();
     expect(screen.getByText('Total weight')).toBeInTheDocument();
+
+    // The Unpacked STAT was removed (#5) — neither the label nor the `7 / 38` value renders here.
+    expect(screen.queryByText('Unpacked')).not.toBeInTheDocument();
+    expect(screen.queryByText('7 / 38')).not.toBeInTheDocument();
   });
 
   test('shows the `/ {maxPallets}` denominator only when maxPallets is supplied', () => {

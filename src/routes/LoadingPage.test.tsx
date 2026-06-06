@@ -24,7 +24,11 @@ vi.mock('react-router', async () => {
 
 // A minimal hand-built nav payload: two box types expanded (D=2 units, F=1 unit) so types=2,
 // units=3, estKg = 2*4 + 1*9 = 17. Pallet 1200 × 800 × 1800.
-function makeNavState(): { request: PackRequest; idToType: Map<string, string> } {
+function makeNavState(): {
+  request: PackRequest;
+  idToType: Map<string, string>;
+  typeToLabel: Map<string, string>;
+} {
   const request: PackRequest = {
     boxes: [
       { id: 'D-0', length: 400, width: 300, height: 200, weight: 4, rotations: 'all' },
@@ -39,7 +43,11 @@ function makeNavState(): { request: PackRequest; idToType: Map<string, string> }
     ['D-1', 'D'],
     ['F-0', 'F'],
   ]);
-  return { request, idToType };
+  const typeToLabel = new Map<string, string>([
+    ['D', 'Box type 1'],
+    ['F', 'Box type 2'],
+  ]);
+  return { request, idToType, typeToLabel };
 }
 
 function renderLoading(state = makeNavState()) {
@@ -96,6 +104,8 @@ describe('LoadingPage — happy-path submit→poll→summary→navigate (Plan 05
             state: expect.objectContaining({
               jobId: expect.any(String),
               idToType: expect.any(Map),
+              // typeToLabel is forwarded end-to-end so /result can show human box-type labels (#6).
+              typeToLabel: expect.any(Map),
             }),
           }),
         ),

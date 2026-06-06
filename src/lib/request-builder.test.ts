@@ -112,6 +112,17 @@ describe('buildPackRequest (determinism, SC-1)', () => {
   });
 });
 
+describe('buildPackRequest (typeToLabel threading, #6)', () => {
+  it('maps each boxType.id to its boxType.label', () => {
+    const { typeToLabel } = buildPackRequest(config);
+    expect(typeToLabel.get('Da')).toBe('Box A');
+    expect(typeToLabel.get('Tb')).toBe('Box B');
+    expect(typeToLabel.get('Fc')).toBe('Box C');
+    // One entry per box TYPE (not per expanded box).
+    expect(typeToLabel.size).toBe(config.boxTypes.length);
+  });
+});
+
 describe('buildPackRequest (idToType O(1) recovery, SC-1)', () => {
   it('round-trips every emitted id back to its originating typeId', () => {
     const { request, idToType } = buildPackRequest(config);

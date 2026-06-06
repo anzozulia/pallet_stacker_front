@@ -44,6 +44,12 @@ function makeItemId(typeId: string, index: number): string {
 export interface BuildResult {
   request: PackRequest;
   idToType: Map<string, string>;
+  /**
+   * typeId → human display label (boxType.id → boxType.label). The label lives ONLY in the
+   * app config (never the type-agnostic API), so it is threaded alongside idToType so the
+   * /result placement cards can show "Box type 1" instead of the raw slug.
+   */
+  typeToLabel: Map<string, string>;
 }
 
 /**
@@ -55,9 +61,11 @@ export interface BuildResult {
  */
 export function buildPackRequest(config: PackConfig): BuildResult {
   const idToType = new Map<string, string>();
+  const typeToLabel = new Map<string, string>();
   const boxes: BoxRequest[] = [];
 
   for (const boxType of config.boxTypes) {
+    typeToLabel.set(boxType.id, boxType.label);
     const rotations = rotationToApi(boxType.rotation);
     for (let index = 0; index < boxType.quantity; index += 1) {
       const id = makeItemId(boxType.id, index);
@@ -93,5 +101,5 @@ export function buildPackRequest(config: PackConfig): BuildResult {
     options,
   };
 
-  return { request, idToType };
+  return { request, idToType, typeToLabel };
 }

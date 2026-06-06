@@ -37,6 +37,8 @@ import type { JobStatus } from '@/api/pack-schema';
 interface LoadingNavState {
   request: PackRequest;
   idToType: Map<string, string>;
+  /** typeId → human label, threaded through to /result so placement cards show "Box type 1". */
+  typeToLabel: Map<string, string>;
 }
 
 /**
@@ -58,12 +60,17 @@ const STATUS_SUBLINE: Partial<Record<JobStatus, string>> = {
  */
 function isLoadingNavState(state: unknown): state is LoadingNavState {
   if (typeof state !== 'object' || state === null) return false;
-  const { request, idToType } = state as { request?: unknown; idToType?: unknown };
+  const { request, idToType, typeToLabel } = state as {
+    request?: unknown;
+    idToType?: unknown;
+    typeToLabel?: unknown;
+  };
   if (typeof request !== 'object' || request === null) return false;
   const { boxes, pallet } = request as { boxes?: unknown; pallet?: unknown };
   if (!Array.isArray(boxes)) return false;
   if (typeof pallet !== 'object' || pallet === null) return false;
   if (!(idToType instanceof Map)) return false;
+  if (!(typeToLabel instanceof Map)) return false;
   return true;
 }
 
@@ -75,6 +82,7 @@ export default function LoadingPage() {
   const valid = isLoadingNavState(navState);
   const request = valid ? navState.request : undefined;
   const idToType = valid ? navState.idToType : undefined;
+  const typeToLabel = valid ? navState.typeToLabel : undefined;
 
   const submit = useSubmitJob();
 
@@ -146,9 +154,9 @@ export default function LoadingPage() {
   // each item's type via idToType (map-primary, C-03), and redirects home if the cache is empty (C-02).
   useEffect(() => {
     if (!cancelled && status === 'done' && jobId) {
-      navigate('/result', { replace: true, state: { jobId, idToType } });
+      navigate('/result', { replace: true, state: { jobId, idToType, typeToLabel } });
     }
-  }, [cancelled, status, jobId, idToType, navigate]);
+  }, [cancelled, status, jobId, idToType, typeToLabel, navigate]);
 
   // Classify any transport throw (POST or poll) into a bucket WITHOUT reading a status (Pattern 3).
   // An 'aborted' throw is a user-leaving no-op (no error card, Pitfall 3); 'unreachable'/'contract-
