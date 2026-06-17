@@ -37,7 +37,7 @@ export default function DemoPresets({ onPick }: DemoPresetsProps) {
             <span className="text-sm font-semibold text-text">{preset.name}</span>
             <span className="text-xs leading-relaxed text-text-3">{preset.description}</span>
             <span className="mt-0.5 font-mono text-[10.5px] text-text-3">
-              {preset.boxTypes.length} box types
+              {preset.boxTypes.length} box {preset.boxTypes.length === 1 ? 'type' : 'types'}
             </span>
           </button>
         ))}

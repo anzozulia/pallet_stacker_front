@@ -28,42 +28,50 @@ describe('DEMO_PRESETS', () => {
     }
   });
 
-  test('exposes the 3 interlocking-catalog presets in display order', () => {
+  test('exposes the 3 rotation-interlock presets in display order', () => {
     expect(DEMO_PRESETS.map((p) => p.name)).toEqual([
-      'Large unit + accessory fillers',
-      'Long crates + spacer cartons',
-      'Flat-pack panels — wide + narrow',
+      'Large unit + nesting fillers',
+      'Display slab + turned frame',
+      'Long cartons — six up, two crosswise',
     ]);
   });
 
-  test('preset 1 — large unit + two filler footprints', () => {
+  test('preset 1 — 900×500 unit + two yaw-wrapping filler footprints', () => {
     const preset = DEMO_PRESETS[0];
     expect(preset.boxTypes.map((b) => b.label)).toEqual([
       'Appliance carton',
       'Accessory box',
-      'Corner filler',
+      'Filler cube',
     ]);
     const appliance = preset.boxTypes[0];
-    expect([appliance.length, appliance.width, appliance.height]).toEqual([600, 500, 450]);
-    expect([appliance.weight, appliance.quantity]).toEqual([18, 16]);
+    expect([appliance.length, appliance.width, appliance.height]).toEqual([900, 500, 450]);
+    expect([appliance.weight, appliance.quantity]).toEqual([16, 8]);
+    // 1200−900 = 800−500 = 300: one filler size fits the right strip AND the top strip,
+    // so the solver must yaw it 90° to wrap both exposed faces of the big carton.
+    expect(1200 - appliance.length).toBe(800 - appliance.width);
   });
 
-  test('preset 2 — 900 + 300 mm length pairing', () => {
+  test('preset 2 — 1000×600 slab framed by a turned filler + corner cube', () => {
     const preset = DEMO_PRESETS[1];
-    expect(preset.boxTypes.map((b) => b.label)).toEqual(['Long crate', 'Spacer carton']);
-    const [crate, spacer] = preset.boxTypes;
-    expect([crate.length, crate.width, crate.height]).toEqual([900, 400, 450]);
-    expect([spacer.length, spacer.width, spacer.height]).toEqual([300, 400, 450]);
-    expect(crate.length + spacer.length).toBe(1200);
+    expect(preset.boxTypes.map((b) => b.label)).toEqual([
+      'Display carton',
+      'Edge filler',
+      'Corner cube',
+    ]);
+    const [slab, filler, cube] = preset.boxTypes;
+    expect([slab.length, slab.width, slab.height]).toEqual([1000, 600, 450]);
+    expect([filler.length, filler.width, filler.height]).toEqual([200, 400, 450]);
+    expect([cube.length, cube.width, cube.height]).toEqual([200, 200, 450]);
   });
 
-  test('preset 3 — 500 + 300 mm width pairing across full-length panels', () => {
+  test('preset 3 — single 200×600 carton, six upright + two crosswise per layer', () => {
     const preset = DEMO_PRESETS[2];
-    expect(preset.boxTypes.map((b) => b.label)).toEqual(['Wide panel', 'Narrow panel']);
-    const [wide, narrow] = preset.boxTypes;
-    expect([wide.length, wide.width, wide.height]).toEqual([1200, 500, 450]);
-    expect([narrow.length, narrow.width, narrow.height]).toEqual([1200, 300, 450]);
-    expect(wide.width + narrow.width).toBe(800);
+    expect(preset.boxTypes.map((b) => b.label)).toEqual(['Profile carton']);
+    const [profile] = preset.boxTypes;
+    expect([profile.length, profile.width, profile.height]).toEqual([200, 600, 450]);
+    // Six standing (200 wide) span the 1200 length over 600 of width; two laid crosswise
+    // (600 wide) cap the last 200 mm → a 100% rotation-only interlock.
+    expect(profile.width + profile.length).toBe(800);
   });
 });
 

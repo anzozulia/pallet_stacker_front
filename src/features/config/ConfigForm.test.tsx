@@ -137,13 +137,13 @@ describe('ConfigForm — demo presets', () => {
   test('renders the 3-preset picker', () => {
     renderForm();
     expect(
-      screen.getByRole('button', { name: /Large unit \+ accessory fillers/ }),
+      screen.getByRole('button', { name: /Large unit \+ nesting fillers/ }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /Long crates \+ spacer cartons/ }),
+      screen.getByRole('button', { name: /Display slab \+ turned frame/ }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /Flat-pack panels — wide \+ narrow/ }),
+      screen.getByRole('button', { name: /Long cartons — six up, two crosswise/ }),
     ).toBeInTheDocument();
   });
 
@@ -151,7 +151,7 @@ describe('ConfigForm — demo presets', () => {
     const user = userEvent.setup();
     renderForm();
 
-    await user.click(screen.getByRole('button', { name: /Large unit \+ accessory fillers/ }));
+    await user.click(screen.getByRole('button', { name: /Large unit \+ nesting fillers/ }));
 
     // RHF reset is async to the inputs — wait for the re-render to settle.
     await waitFor(() => {
@@ -166,7 +166,7 @@ describe('ConfigForm — demo presets', () => {
     const values = nameInputs.map((i) => i.value);
     expect(values).toContain('Appliance carton');
     expect(values).toContain('Accessory box');
-    expect(values).toContain('Corner filler');
+    expect(values).toContain('Filler cube');
   });
 });
 
