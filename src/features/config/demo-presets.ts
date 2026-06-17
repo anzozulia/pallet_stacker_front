@@ -44,41 +44,39 @@ function boxRow(
 }
 
 /**
- * The 4 vetted demo presets, in display order. The fixed pallet (1200×800×1800 / 1000 kg /
- * no overhang) is applied by `buildPresetConfig`; these templates carry only the box rows.
+ * The 3 vetted demo presets, in display order. Each demonstrates NON-OBVIOUS optimal
+ * packing — multiple footprints interlocking to near-zero waste, not trivial uniform
+ * grids. The fixed pallet (1200×800×1800 / 1000 kg / no overhang) is applied by
+ * `buildPresetConfig`; these templates carry only the box rows. All verified clean
+ * against the live API (0 unpacked, support 1.0, single LWH orientation, no overhang).
  */
 export const DEMO_PRESETS: DemoPreset[] = [
   {
-    name: 'Office supply cartons',
-    description: 'Two uniform square cartons that fill two pallets perfectly.',
+    name: 'Large unit + accessory fillers',
+    description:
+      'A big appliance carton whose leftover strip and corners are filled by two smaller box sizes — three footprints interlocking to near-zero waste.',
     boxTypes: [
-      boxRow('Paper-ream carton', 400, 400, 300, 10, 36),
-      boxRow('File-storage box', 400, 400, 450, 14, 24),
+      boxRow('Appliance carton', 600, 500, 450, 18, 16),
+      boxRow('Accessory box', 300, 200, 450, 5, 24),
+      boxRow('Corner filler', 200, 200, 450, 3, 24),
     ],
   },
   {
-    name: 'Distribution-centre mix',
-    description: 'Three DC cartons, each cleanly fills its own pallet.',
+    name: 'Long crates + spacer cartons',
+    description:
+      'Long crates that only fit when each is paired with a short carton — 900 + 300 mm makes the full 1200 mm row. Four tightly-packed pallets.',
     boxTypes: [
-      boxRow('Master carton (tall)', 600, 400, 450, 20, 16),
-      boxRow('Case box', 600, 400, 300, 15, 24),
-      boxRow('Square tote', 400, 400, 300, 9, 36),
+      boxRow('Long crate', 900, 400, 450, 22, 32),
+      boxRow('Spacer carton', 300, 400, 450, 8, 32),
     ],
   },
   {
-    name: 'Stationery & archive boxes',
-    description: 'Two square cartons at volume → three tidy pallets.',
+    name: 'Flat-pack panels — wide + narrow',
+    description:
+      'Full-length panels in two widths that pair across the deck — 500 + 300 mm spans the 800 mm width. Three pallets, every layer a perfect fit.',
     boxTypes: [
-      boxRow('Archive box', 400, 400, 300, 10, 48),
-      boxRow('Catalogue box', 400, 400, 450, 14, 36),
-    ],
-  },
-  {
-    name: 'Wholesale grocery cases',
-    description: 'Heavy cases + totes at volume → four full pallets.',
-    boxTypes: [
-      boxRow('Grocery case (heavy)', 600, 400, 300, 16, 48),
-      boxRow('Produce tote', 400, 400, 300, 10, 72),
+      boxRow('Wide panel', 1200, 500, 450, 28, 12),
+      boxRow('Narrow panel', 1200, 300, 450, 17, 12),
     ],
   },
 ];

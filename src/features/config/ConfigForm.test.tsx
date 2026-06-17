@@ -134,19 +134,24 @@ describe('ConfigForm — Run disabled while invalid (D-06)', () => {
 });
 
 describe('ConfigForm — demo presets', () => {
-  test('renders the 4-preset picker', () => {
+  test('renders the 3-preset picker', () => {
     renderForm();
-    expect(screen.getByRole('button', { name: /Office supply cartons/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Distribution-centre mix/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Stationery & archive boxes/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Wholesale grocery cases/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Large unit \+ accessory fillers/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Long crates \+ spacer cartons/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Flat-pack panels — wide \+ narrow/ }),
+    ).toBeInTheDocument();
   });
 
   test('clicking a preset re-seeds the form (fixed pallet + that preset catalog)', async () => {
     const user = userEvent.setup();
     renderForm();
 
-    await user.click(screen.getByRole('button', { name: /Distribution-centre mix/ }));
+    await user.click(screen.getByRole('button', { name: /Large unit \+ accessory fillers/ }));
 
     // RHF reset is async to the inputs — wait for the re-render to settle.
     await waitFor(() => {
@@ -159,9 +164,9 @@ describe('ConfigForm — demo presets', () => {
     const nameInputs = screen.getAllByLabelText('Box type name') as HTMLInputElement[];
     expect(nameInputs).toHaveLength(3);
     const values = nameInputs.map((i) => i.value);
-    expect(values).toContain('Master carton (tall)');
-    expect(values).toContain('Case box');
-    expect(values).toContain('Square tote');
+    expect(values).toContain('Appliance carton');
+    expect(values).toContain('Accessory box');
+    expect(values).toContain('Corner filler');
   });
 });
 

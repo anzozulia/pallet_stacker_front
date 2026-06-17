@@ -16,8 +16,8 @@ const FIXED_PALLET = {
 } as const;
 
 describe('DEMO_PRESETS', () => {
-  test('has exactly 4 entries', () => {
-    expect(DEMO_PRESETS.length).toBe(4);
+  test('has exactly 3 entries', () => {
+    expect(DEMO_PRESETS.length).toBe(3);
   });
 
   test('each preset has a name, description, and ≥1 box-type template', () => {
@@ -26,6 +26,44 @@ describe('DEMO_PRESETS', () => {
       expect(preset.description.length).toBeGreaterThan(0);
       expect(preset.boxTypes.length).toBeGreaterThanOrEqual(1);
     }
+  });
+
+  test('exposes the 3 interlocking-catalog presets in display order', () => {
+    expect(DEMO_PRESETS.map((p) => p.name)).toEqual([
+      'Large unit + accessory fillers',
+      'Long crates + spacer cartons',
+      'Flat-pack panels — wide + narrow',
+    ]);
+  });
+
+  test('preset 1 — large unit + two filler footprints', () => {
+    const preset = DEMO_PRESETS[0];
+    expect(preset.boxTypes.map((b) => b.label)).toEqual([
+      'Appliance carton',
+      'Accessory box',
+      'Corner filler',
+    ]);
+    const appliance = preset.boxTypes[0];
+    expect([appliance.length, appliance.width, appliance.height]).toEqual([600, 500, 450]);
+    expect([appliance.weight, appliance.quantity]).toEqual([18, 16]);
+  });
+
+  test('preset 2 — 900 + 300 mm length pairing', () => {
+    const preset = DEMO_PRESETS[1];
+    expect(preset.boxTypes.map((b) => b.label)).toEqual(['Long crate', 'Spacer carton']);
+    const [crate, spacer] = preset.boxTypes;
+    expect([crate.length, crate.width, crate.height]).toEqual([900, 400, 450]);
+    expect([spacer.length, spacer.width, spacer.height]).toEqual([300, 400, 450]);
+    expect(crate.length + spacer.length).toBe(1200);
+  });
+
+  test('preset 3 — 500 + 300 mm width pairing across full-length panels', () => {
+    const preset = DEMO_PRESETS[2];
+    expect(preset.boxTypes.map((b) => b.label)).toEqual(['Wide panel', 'Narrow panel']);
+    const [wide, narrow] = preset.boxTypes;
+    expect([wide.length, wide.width, wide.height]).toEqual([1200, 500, 450]);
+    expect([narrow.length, narrow.width, narrow.height]).toEqual([1200, 300, 450]);
+    expect(wide.width + narrow.width).toBe(800);
   });
 });
 
