@@ -57,7 +57,7 @@ export default function PalletSwitcher({ pallets, selected, onSelect }: PalletSw
               className={clsx(
                 'flex w-full cursor-pointer items-center gap-3 rounded-[var(--radius)] border px-4 py-3 text-left transition-colors duration-150',
                 isSelected
-                  ? 'border-accent bg-accent-weak ring-1 ring-inset ring-accent'
+                  ? 'border-accent bg-accent/15 ring-1 ring-inset ring-accent'
                   : 'border-border bg-surface hover:bg-surface-2',
               )}
             >
