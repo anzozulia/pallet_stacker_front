@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
@@ -130,6 +130,38 @@ describe('ConfigForm — Run disabled while invalid (D-06)', () => {
 
     // After the failed submit the form is known-invalid → Run disabled (D-06).
     expect(footerRunButton()).toBeDisabled();
+  });
+});
+
+describe('ConfigForm — demo presets', () => {
+  test('renders the 4-preset picker', () => {
+    renderForm();
+    expect(screen.getByRole('button', { name: /Office supply cartons/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Distribution-centre mix/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Stationery & archive boxes/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Wholesale grocery cases/ })).toBeInTheDocument();
+  });
+
+  test('clicking a preset re-seeds the form (fixed pallet + that preset catalog)', async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    await user.click(screen.getByRole('button', { name: /Distribution-centre mix/ }));
+
+    // RHF reset is async to the inputs — wait for the re-render to settle.
+    await waitFor(() => {
+      expect(inputByName('pallet.length').value).toBe('1200');
+    });
+    expect(inputByName('pallet.width').value).toBe('800');
+    expect(inputByName('pallet.height').value).toBe('1800');
+
+    // The catalog now holds exactly the preset's 3 box-type labels (replacing the default).
+    const nameInputs = screen.getAllByLabelText('Box type name') as HTMLInputElement[];
+    expect(nameInputs).toHaveLength(3);
+    const values = nameInputs.map((i) => i.value);
+    expect(values).toContain('Master carton (tall)');
+    expect(values).toContain('Case box');
+    expect(values).toContain('Square tote');
   });
 });
 

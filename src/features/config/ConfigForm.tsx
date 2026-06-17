@@ -21,6 +21,7 @@ import { FormProvider, useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import PalletCard from '@/features/config/PalletCard';
 import BoxCatalogCard from '@/features/config/BoxCatalogCard';
+import DemoPresets from '@/features/config/DemoPresets';
 import FooterBar from '@/features/config/FooterBar';
 import { packConfigSubmitSchema } from '@/features/config/schema';
 import { readPersistedConfig, useLocalStorageAutosave } from '@/hooks/useLocalStorageAutosave';
@@ -116,6 +117,10 @@ export default function ConfigForm() {
       </header>
 
       <main className="mx-auto w-full max-w-[960px] px-6 pb-32 pt-12 font-sans">
+        {/* Demo presets sit at the very top of the page (above the H1): a one-click prefill
+            of the whole form via form.reset, re-seeding the catalog + pallet fields. */}
+        <DemoPresets onPick={(cfg) => form.reset(cfg)} />
+
         <div className="mb-12">
           <h1 className="text-[22px] font-semibold tracking-[-0.02em] text-text">Packing task</h1>
           <p className="mt-1.5 max-w-[560px] text-sm leading-relaxed text-text-2">
