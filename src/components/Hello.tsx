@@ -3,5 +3,5 @@
 // `@/` path alias inside Vitest). NOT a real product component — the actual UI
 // arrives in later phases. It deliberately imports nothing from three/r3f.
 export default function Hello() {
-  return <h1>Palletize</h1>;
+  return <h1>Pallet Packer</h1>;
 }

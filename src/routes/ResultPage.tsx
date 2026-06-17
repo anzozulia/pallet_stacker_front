@@ -176,10 +176,7 @@ export default function ResultPage() {
             aria-hidden="true"
             className="relative h-[22px] w-[22px] flex-none rounded-[6px] bg-[linear-gradient(150deg,#6d63f5,#4f46e5)] after:absolute after:inset-[5px] after:rounded-[2px] after:border-[1.5px] after:border-white/90 after:content-['']"
           />
-          Palletize
-          <small className="ml-0.5 font-mono text-[10px] font-normal uppercase text-text-3">
-            pack&nbsp;studio
-          </small>
+          Pallet Packer
         </div>
 
         <nav aria-label="Steps" className="ml-1.5 flex items-center gap-2 max-[720px]:hidden">

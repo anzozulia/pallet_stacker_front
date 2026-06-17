@@ -93,10 +93,7 @@ export default function ConfigForm() {
             aria-hidden="true"
             className="relative h-[22px] w-[22px] flex-none rounded-[6px] bg-[linear-gradient(150deg,#6d63f5,#4f46e5)] after:absolute after:inset-[5px] after:rounded-[2px] after:border-[1.5px] after:border-white/90 after:content-['']"
           />
-          Palletize
-          <small className="ml-0.5 font-mono text-[10px] font-normal uppercase text-text-3">
-            pack&nbsp;studio
-          </small>
+          Pallet Packer
         </div>
 
         <nav aria-label="Steps" className="ml-1.5 flex items-center gap-2 max-[720px]:hidden">
@@ -118,7 +115,7 @@ export default function ConfigForm() {
         <div className="flex-1" />
       </header>
 
-      <main className="mx-auto w-full max-w-[960px] px-6 pt-12 font-sans">
+      <main className="mx-auto w-full max-w-[960px] px-6 pb-32 pt-12 font-sans">
         <div className="mb-12">
           <h1 className="text-[22px] font-semibold tracking-[-0.02em] text-text">Packing task</h1>
           <p className="mt-1.5 max-w-[560px] text-sm leading-relaxed text-text-2">

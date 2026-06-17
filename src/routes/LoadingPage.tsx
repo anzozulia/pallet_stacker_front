@@ -298,7 +298,7 @@ export default function LoadingPage() {
           <button
             type="button"
             onClick={handleCancel}
-            className="mt-[30px] inline-flex cursor-pointer items-center gap-[7px] rounded-[6px] px-[10px] py-[6px] text-[12.5px] font-medium text-text-3 transition-colors duration-150 hover:text-text"
+            className="mt-[30px] inline-flex cursor-pointer items-center gap-[7px] rounded-[6px] px-[10px] py-[6px] text-[12.5px] font-medium text-text-3 transition-colors duration-150 hover:text-danger"
           >
             Cancel
           </button>
@@ -317,10 +317,7 @@ function Topbar() {
           aria-hidden="true"
           className="relative h-[22px] w-[22px] flex-none rounded-[6px] bg-[linear-gradient(150deg,#6d63f5,#4f46e5)] after:absolute after:inset-[5px] after:rounded-[2px] after:border-[1.5px] after:border-white/90 after:content-['']"
         />
-        Palletize
-        <small className="ml-0.5 font-mono text-[10px] font-normal uppercase text-text-3">
-          pack&nbsp;studio
-        </small>
+        Pallet Packer
       </div>
     </header>
   );
