@@ -10,14 +10,13 @@
 import { type RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { OrbitControls } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Box3, type Group, Quaternion, Vector3 } from 'three';
+import { Box3, type Group, Matrix4, Quaternion, Vector3 } from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import {
   type Bbox,
   type PresetKind,
   type Vec4Tuple,
   distanceLimitsFromBbox,
-  lookQuaternion,
   presetFromBbox,
   slerpQuat,
 } from '@/lib/camera-presets';
@@ -117,24 +116,26 @@ export function CameraPresets({
     // target a correct frame without depending on `bbox` — a pallet swap re-measures the bbox
     // but must not re-trigger this animation (D-02 / Pitfall 3).
     const { position, target } = presetFromBbox(bboxRef.current, preset);
-    const fromPos: [number, number, number] = [
-      camera.position.x,
-      camera.position.y,
-      camera.position.z,
-    ];
-    const fromTarget: [number, number, number] = [
-      controls.target.x,
-      controls.target.y,
-      controls.target.z,
-    ];
+    const toPosVec = new Vector3(...position);
+    const toTargetVec = new Vector3(...target);
+
+    // Orientation endpoints (#6 BUG fix — TOP end-snap): derive BOTH endpoints from three's own
+    // look-at so the slerp endpoint EQUALS the orientation OrbitControls.update() settles to on the
+    // final frame. `fromQuat` = the camera's ACTUAL current orientation; `toQuat` = three's look-at
+    // at the target pose using `camera.up`. The pure `lookQuaternion` handled the straight-down TOP
+    // view's degenerate up with `altUp=[1,0,0]`, producing a different roll than three's Matrix4
+    // .lookAt — so on the last frame the camera snapped ~90°. Matching three's exact look-at (same
+    // `camera.up` OrbitControls uses) gives a continuous handoff with NO end-snap, for every preset.
+    const fromQ = camera.quaternion.clone();
+    const lookM = new Matrix4().lookAt(toPosVec, toTargetVec, camera.up);
+    const toQ = new Quaternion().setFromRotationMatrix(lookM);
     anim.current = {
       fromPos: camera.position.clone(),
-      toPos: new Vector3(...position),
+      toPos: toPosVec,
       fromTarget: controls.target.clone(),
-      toTarget: new Vector3(...target),
-      // Orientation endpoints: the look-rotation at the CURRENT pose and at the target pose.
-      fromQuat: lookQuaternion(fromPos, fromTarget),
-      toQuat: lookQuaternion(position, target),
+      toTarget: toTargetVec,
+      fromQuat: [fromQ.x, fromQ.y, fromQ.z, fromQ.w],
+      toQuat: [toQ.x, toQ.y, toQ.z, toQ.w],
       start: performance.now(),
     };
     // Re-run ONLY on an explicit preset press (preset change OR nonce bump). `bbox` is

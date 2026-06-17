@@ -27,18 +27,19 @@ export function CogMarker({ cog, palletL, palletW }: CogMarkerProps) {
   const [x, y, z] = mapCog(cog, { L: palletL, W: palletW });
   return (
     <group>
-      {/* Marker sphere at the mapped CoG — emissive white so it reads over the dark scene. */}
-      <mesh position={[x, y, z]}>
-        <sphereGeometry args={[14, 20, 20]} />
-        <meshStandardMaterial
-          color="#ffffff"
-          emissive="#ffffff"
-          emissiveIntensity={0.6}
-          roughness={0.4}
-          metalness={0}
-        />
+      {/* Marker sphere at the mapped CoG — the CoG sits dead-centre INSIDE the opaque box
+          tower, so without disabling depth it is fully occluded and the user sees nothing
+          (#4 BUG). Draw it as an always-visible overlay: meshBasicMaterial (lit-independent,
+          reads consistently as a marker) with depthTest/depthWrite off and a high renderOrder
+          so it paints OVER the boxes regardless of position. Radius bumped 14 -> 18 for
+          legibility through the stack. */}
+      <mesh position={[x, y, z]} renderOrder={999}>
+        <sphereGeometry args={[18, 20, 20]} />
+        <meshBasicMaterial color="#ffffff" depthTest={false} depthWrite={false} />
       </mesh>
-      {/* Vertical drop-line from the deck [x, DECK_TOP_Y, z] up to the CoG [x, y, z]. */}
+      {/* Vertical drop-line from the deck [x, DECK_TOP_Y, z] up to the CoG [x, y, z]. Same
+          overlay treatment (depthTest off + high renderOrder) so the dashed line is visible
+          over the box meshes too. */}
       <Line
         points={[
           [x, DECK_TOP_Y, z],
@@ -51,6 +52,8 @@ export function CogMarker({ cog, palletL, palletW }: CogMarkerProps) {
         gapSize={12}
         transparent
         opacity={0.8}
+        depthTest={false}
+        renderOrder={999}
       />
     </group>
   );
