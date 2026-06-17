@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 Phase: 7
 Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-06-17 - Completed quick task 260617-v8x: rebrand to Pallet Packer + UI fixes + CoG/TOP-camera bug fixes
+Last activity: 2026-06-17 - Completed quick task 260617-w8a: demo box-catalog presets (4 API-vetted, pickable on Configure page)
 
 Progress: [██████████] 100%
 
@@ -170,6 +170,7 @@ None yet.
 | 260606-01h | 12 UI/UX fixes (config form, footer, results, 3D viewer) + box-state desync bug (#5/#8 root-caused: config-tally string-coercion) | 2026-06-06 | 8e4e014 | Needs visual review | [260606-01h](./quick/260606-01h-config-ui-results-3d-viewer-fixes-and-bo/) |
 | 260607-1fa | 11 fixes: full-width footer, drop Save draft + Max pallets, Allow-overhang switch (default 0); result declutter (type labels, drop unpacked stat/orientation/position/caption); opaque ISO/TOP/FRONT buttons + realistic two-direction pallet model | 2026-06-07 | af7178f | Verified (visual review pending) | [260607-1fa](./quick/260607-1fa-configure-footer-overhang-max-pallets-re/) |
 | 260617-v8x | 8 fixes: rebrand → "Pallet Packer", Configure footer spacing, Cancel-hover red; result legend type-names, wider rail (15%), distinct selected card; BUGS: CoG marker occlusion (now renders over boxes) + TOP camera end-snap (slerp endpoint matches OrbitControls via three Matrix4.lookAt) | 2026-06-17 | ae069c8 | Verified (visual review pending) | [260617-v8x](./quick/260617-v8x-config-spacing-rebrand-to-pallet-packer-/) |
+| 260617-w8a | Demo box-catalog presets: 4 API-vetted catalogs (2-3 box types, resolve 2-4 pallets, clean layers) pickable at top of Configure page; click pre-fills the form via form.reset (fixed pallet 1200×800×1800/1000kg, only boxes vary) | 2026-06-17 | 73440a7 | Verified (code; 225 tests green) | [260617-w8a](./quick/260617-w8a-add-demo-box-catalog-presets-pickable-at/) |
 
 ## Deferred Items
 
