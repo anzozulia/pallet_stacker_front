@@ -1,8 +1,10 @@
 {
-  "name": "palletize",
+  "name": "pallet-packer",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "description": "A free, open-source, self-hostable web tool for pallet packing.",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
