@@ -7,6 +7,12 @@ test-results
 *.local
 *.tsbuildinfo
 
+# Local build/deploy config — VITE_API_URL is passed as a build-arg, not committed.
+# Use .env.example as the template.
+.env
+.env.*
+!.env.example
+
 # Local agent tooling: GSD framework + machine-local Claude Code settings.
 # Reinstall via `npx @opengsd/gsd-core`; not part of the shipped app.
 .claude/
