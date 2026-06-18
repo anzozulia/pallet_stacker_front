@@ -6,3 +6,7 @@ test-results
 .DS_Store
 *.local
 *.tsbuildinfo
+
+# Local agent tooling: GSD framework + machine-local Claude Code settings.
+# Reinstall via `npx @opengsd/gsd-core`; not part of the shipped app.
+.claude/
