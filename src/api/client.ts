@@ -6,9 +6,14 @@
 // and fetch — no three/React, stays outside the lazy /result chunk.
 //
 // Base-URL resolution (D-16, the two-seam model): in DEV the base is '' so requests hit
-// the relative `/api/...` path that the Vite dev proxy forwards CORS-free; in a PROD build
-// the base is the build-time-baked VITE_API_URL ORIGIN (Open Question 1 — the env var is
-// the origin only; THIS client owns the `/api/v1` path prefix).
+// the relative `/api/...` path that the Vite dev proxy forwards CORS-free. In a PROD build
+// the base comes from the build-time-baked VITE_API_URL, with three cases:
+//   - an absolute ORIGIN (e.g. https://api.example.com) → that origin (THIS client owns the
+//     `/api/v1` path prefix);
+//   - '/' or 'same-origin' → '' (relative): the browser issues same-origin `/api/...` requests
+//     that a reverse proxy on the serving origin forwards to the API — no CORS, no public API
+//     domain (see nginx.conf + docker-compose.local-api.yml);
+//   - unset/empty → throw at module load (fail-loud, WR-01).
 import { jobAcceptedSchema, jobStateSchema, type JobState } from '@/api/pack-schema';
 import { PackError } from '@/api/errors';
 import type { PackRequest } from '@/types/pack-contract';
@@ -30,21 +35,33 @@ async function packErrorFromResponse(res: Response): Promise<PackError> {
 }
 
 /**
- * The resolved API origin. Empty in dev (relative path → Vite proxy, no CORS); the baked
- * VITE_API_URL origin in a production build. Resolved ONCE at module load.
+ * The resolved API base, computed ONCE at module load. Empty ('') in dev (relative path →
+ * Vite proxy, no CORS). In a production build it is derived from the build-time-baked
+ * VITE_API_URL:
+ *   - '/' or 'same-origin' → '' (relative): same-origin requests for a reverse-proxy deploy —
+ *     the serving origin forwards `/api/...` to the API (see docker-compose.local-api.yml).
+ *   - any other non-empty value → treated as the API ORIGIN (THIS client owns `/api/v1`).
  *
  * Fail LOUD in a production build with no VITE_API_URL (WR-01): without this guard every fetch
  * URL would silently become `"undefined/api/v1/..."` (a broken request that looks like a generic
  * network error). Under dev/test `import.meta.env.DEV` is true (Vitest sets it), so the guard is
  * never tripped and the base is '' — the relative path the dev proxy / MSW intercept.
  */
-const rawBase = import.meta.env.DEV ? '' : import.meta.env.VITE_API_URL;
-if (!import.meta.env.DEV && !rawBase) {
-  throw new Error(
-    'VITE_API_URL must be set at build time for production builds (docker build --build-arg VITE_API_URL=...).',
-  );
+function resolveApiBase(): string {
+  if (import.meta.env.DEV) return '';
+  const raw = import.meta.env.VITE_API_URL;
+  // Explicit same-origin opt-in → relative `/api/...` for a reverse-proxy deployment.
+  if (raw === '/' || raw === 'same-origin') return '';
+  if (!raw) {
+    throw new Error(
+      'VITE_API_URL must be set at build time for production builds (docker build --build-arg VITE_API_URL=...). ' +
+        "Use an absolute API origin (https://api.example.com) or '/' for a same-origin reverse-proxy deployment.",
+    );
+  }
+  return raw;
 }
-export const API_BASE: string = rawBase ?? '';
+
+export const API_BASE: string = resolveApiBase();
 
 /** POST endpoint path — this client owns the `/api/v1` prefix (the env var is origin-only). */
 export const PACK_PATH = '/api/v1/pack';
