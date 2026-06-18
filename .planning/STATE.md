@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 06-05-PLAN.md (phase 06 complete)
-last_updated: "2026-06-05T11:04:52.586Z"
-last_activity: 2026-06-05
+stopped_at: Phase 8 context gathered
+last_updated: "2026-06-18T22:16:47.676Z"
+last_activity: "2026-06-18 - Completed quick task 260618-eg4: demo-deploy readiness (README + open-source/self-host docs, branding cleanup, build hardening; Docker image verified serving)"
 progress:
-  total_phases: 7
+  total_phases: 8
   completed_phases: 6
   total_plans: 25
   completed_plans: 25
-  percent: 86
+  percent: 75
 ---
 
 # Project State
@@ -83,6 +83,10 @@ _Updated after each plan completion_
 | Phase 06 P05 | 13 | 3 tasks | 7 files |
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 8 added: Assembly Insight — layer explode + layer isolation in the 3D viewer, so densely-packed pallets stay legible (small/interior boxes hidden by outer stacks become visible). Two composable controls sharing one pure `computeLayers` model.
 
 ### Decisions
 
@@ -183,6 +187,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-05T10:31:44.830Z
-Stopped at: Completed 06-05-PLAN.md (phase 06 complete)
-Resume file: None
+Last session: 2026-06-18T22:16:47.673Z
+Stopped at: Phase 8 context gathered
+Resume file: .planning/phases/08-assembly-insight-layer-explode-isolation-in-the-3d-viewer/08-CONTEXT.md
