@@ -1,13 +1,38 @@
-# Pallet Packer — single static service, built from source.
-# VITE_API_URL is BUILD-TIME only: it is baked into the static bundle during the image
-# build. Override it via your shell env (e.g. `VITE_API_URL=... docker compose up --build`).
-# Changing it requires a rebuild (`--build`).
+# Pallet Packer front-end — same-server deployment (the default).
+#
+# By default the front-end runs in SAME-ORIGIN mode: the SPA issues relative /api/...
+# requests and THIS container's nginx reverse-proxies them to the API container over the
+# shared Docker network `pallet-packer-net`. No public API domain, no CORS — the browser
+# only ever talks to this container (host port 8080).
+#
+# Prerequisite — bring the API stack up FIRST; it creates `pallet-packer-net` and the
+# `pallet-packer-api` alias that nginx.conf proxies to:
+#     cd ../pallet_packer_api_service && docker compose up -d --build
+# Then here:
+#     docker compose up -d --build          # then open http://localhost:8080
+#
+# To target a PUBLIC API instead (browser calls it cross-origin; the API must send CORS
+# headers), that path does NOT use the shared network — build a standalone image with an
+# absolute origin and run it on its own:
+#     docker build --build-arg VITE_API_URL=https://packerapi.example.com -t pallet-packer .
+#     docker run --rm -p 8080:8080 pallet-packer
+#
+# VITE_API_URL is BUILD-TIME only (baked into the static bundle); changing it needs --build.
 services:
   pallet-packer:
     build:
       context: .
       args:
-        VITE_API_URL: ${VITE_API_URL:-https://packerapi.anzozulia.xyz}
+        # Same-origin by default: relative /api/... → nginx → pallet-packer-api:8000.
+        VITE_API_URL: ${VITE_API_URL:-/}
     ports:
       - '8080:8080'
     restart: unless-stopped
+
+networks:
+  # Join the shared bridge created and owned by the API stack (external to this project).
+  # `docker compose up` here fails with "network pallet-packer-net ... could not be found"
+  # if the API stack is not up yet — bring it up first (see the header).
+  default:
+    name: pallet-packer-net
+    external: true

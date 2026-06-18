@@ -51,19 +51,25 @@ The image is a static build served by `nginx-unprivileged` — it runs as a **no
 user and listens on **port 8080**, which is friendly to rootless Docker and Kubernetes
 `runAsNonRoot` policies.
 
-## Quick start (docker compose)
+## Quick start (docker compose) — same-server, talks to the API over Docker
+
+`docker compose up` defaults to **same-origin** mode: the SPA issues relative `/api/...`
+requests and this container's nginx reverse-proxies them to the API container over the
+shared Docker network `pallet-packer-net` — **no public API domain and no CORS**. Bring
+the API stack up **first** (it creates that network), then start the front-end:
 
 ```sh
-docker compose up --build
+# 1. API stack (creates pallet-packer-net + the pallet-packer-api alias)
+cd ../pallet_packer_api_service && docker compose up -d --build
+
+# 2. front-end (joins that network, builds with VITE_API_URL=/)
+cd ../pallet_stacker_front && docker compose up -d --build
 ```
 
-`VITE_API_URL` is read from your shell environment (or the default in
-[`docker-compose.yml`](./docker-compose.yml)) and passed as a build arg. To target a
-different backend:
-
-```sh
-VITE_API_URL=https://my-packer.example.com docker compose up --build
-```
+Then open <http://localhost:8080>. See [Co-located API](#co-located-api-same-origin-no-public-api-domain)
+for the topology. To point the browser at a **public** API instead (cross-origin — the
+API must send CORS headers), use the standalone image build in
+[Quick start (Docker)](#quick-start-docker) with an absolute `VITE_API_URL`.
 
 Because the URL is baked at build time, changing it requires `--build` again.
 
@@ -77,8 +83,11 @@ Because the URL is baked at build time, changing it requires `--build` again.
   static bundle. To change the backend, **rebuild** the image.
 - **Fail-loud.** A production build with **no** `VITE_API_URL` throws at module load
   rather than silently shipping a broken/URL-less app.
-- **CORS.** Because the static app calls the API directly from the browser, the API must
-  send CORS headers allowing your serving origin.
+- **Same-origin (default).** Set `VITE_API_URL=/` (the `docker compose` default) to issue
+  relative `/api/...` requests that a co-located reverse proxy forwards to the API — **no
+  CORS needed**. This is the same-server Docker deployment above.
+- **CORS (public API only).** If `VITE_API_URL` is an absolute origin, the browser calls
+  the API cross-origin, so the API must send CORS headers allowing your serving origin.
 - **Origin only.** The client owns the `/api/v1` path prefix — set `VITE_API_URL` to the
   API **origin** (e.g. `https://packerapi.anzozulia.xyz`), not a full path.
 
@@ -178,19 +187,23 @@ frontend container. So to keep API traffic on the server (no public API domain, 
 the API under the **same origin** as the app: the frontend's nginx reverse-proxies `/api/` to the
 API container over a shared Docker network, and the browser only ever talks to the app's origin.
 
-This pairs with an API stack that publishes a shared bridge network. The reference API stack
+This is the **default** `docker compose up` mode (see [Quick start (docker compose)](#quick-start-docker-compose--same-server-talks-to-the-api-over-docker)).
+It pairs with an API stack that publishes a shared bridge network: the reference API stack
 creates `pallet-packer-net` and exposes the API on it at the alias `pallet-packer-api:8000`
-(redis and the workers stay private). Then:
+(redis and the workers stay private). So:
 
-1. **Bring the API stack up first** — it creates and owns `pallet-packer-net`.
-2. Build + run the frontend in same-origin mode, joining that network:
+1. **Bring the API stack up first** — it creates and owns `pallet-packer-net`. The
+   frontend's `docker-compose.yml` joins that network as `external`, so `docker compose up`
+   here errors if the API stack isn't running yet.
+2. Start the frontend — its `docker-compose.yml` already builds with `VITE_API_URL=/` and
+   joins the network:
 
    ```bash
-   VITE_API_URL=/ docker compose -f docker-compose.yml -f docker-compose.local-api.yml up -d --build
+   docker compose up -d --build
    ```
 
 Result: `browser → frontend origin → nginx proxies /api/ → pallet-packer-api:8000` (internal).
-No CORS, and the API needs no public domain or host ports. The nginx upstream is
+No CORS, and the API needs no public domain. The nginx upstream is
 `http://pallet-packer-api:8000` (see [`nginx.conf`](./nginx.conf)) — change it if your API uses a
 different network alias or port.
 
