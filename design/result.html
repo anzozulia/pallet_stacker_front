@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palletize · Result</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f8fa;--surface:#ffffff;--surface-2:#fcfcfd;
+    --border:#ededf1;--border-strong:#dfe1e6;
+    --text:#1a1c20;--text-2:#5c6069;--text-3:#9094a0;
+    --accent:#4f46e5;--accent-weak:#edecfd;--accent-text:#4338ca;
+    --pos:#16a34a;--warn:#d97706;
+    --radius-sm:7px;
+    --shadow:0 1px 2px rgba(16,18,22,.04);
+    --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+    --sans:'Inter',system-ui,-apple-system,sans-serif;
+    --d-bg:#0c0f17;--d-border:#222838;--d-text:#e6e8ee;--d-text-2:#838b9e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-0.006em;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+  /* topbar */
+  .topbar{height:58px;display:flex;align-items:center;gap:20px;padding:0 24px;background:rgba(255,255,255,.85);backdrop-filter:saturate(180%) blur(8px);border-bottom:1px solid var(--border);flex:none;z-index:20}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;letter-spacing:-0.02em}
+  .brand .glyph{width:22px;height:22px;border-radius:6px;background:linear-gradient(150deg,#6d63f5,#4f46e5);position:relative;flex:none}
+  .brand .glyph::after{content:"";position:absolute;inset:5px;border:1.5px solid rgba(255,255,255,.9);border-radius:2px}
+  .brand small{font-family:var(--mono);font-size:10px;color:var(--text-3);font-weight:400;margin-left:2px;text-transform:uppercase}
+  .steps{display:flex;align-items:center;gap:8px;margin-left:6px}
+  .step{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-3)}
+  .step .num{width:19px;height:19px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-family:var(--mono);border:1px solid var(--border-strong);color:var(--text-3)}
+  .step.done .num{background:#eceef1;border-color:var(--border-strong);color:var(--text-2)}
+  .step.active{color:var(--text);font-weight:500}
+  .step.active .num{background:var(--accent);border-color:var(--accent);color:#fff}
+  .steps .sep{width:22px;height:1px;background:var(--border-strong)}
+  .topbar .spacer{flex:1}
+  .btn{font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;border-radius:var(--radius-sm);padding:8px 14px;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:7px;transition:.12s}
+  .btn:hover{background:var(--surface-2);border-color:#c7c9d1}
+  .btn.ghost{border-color:transparent;background:transparent;color:var(--text-2)}
+  .btn.ghost:hover{background:#eceef1}
+  .pill{font-family:var(--mono);font-size:11px;color:var(--pos);background:#eafaf0;border:1px solid #c5edd3;padding:4px 9px;border-radius:6px;display:inline-flex;align-items:center;gap:6px}
+  .pill .dot{width:6px;height:6px;border-radius:50%;background:var(--pos)}
+
+  /* main = viewer | rail */
+  .main{flex:1;display:grid;grid-template-columns:1fr 384px;min-height:0}
+
+  /* ---- viewer (hero) ---- */
+  .viewer{position:relative;background:radial-gradient(130% 120% at 50% -10%,#161d2b 0%,var(--d-bg) 62%);min-width:0;overflow:hidden}
+  #scene{width:100%;height:100%;display:block}
+  .v-overlay{position:absolute;top:26px;left:30px;right:30px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none}
+  .v-title{color:var(--d-text);font-size:15px;font-weight:600;letter-spacing:-0.015em;display:flex;align-items:center;gap:10px}
+  .v-title .tag{font-family:var(--mono);font-size:10.5px;color:var(--d-text-2);font-weight:400;background:rgba(255,255,255,.05);border:1px solid var(--d-border);padding:3px 8px;border-radius:5px}
+  .v-sub{color:var(--d-text-2);font-size:12px;margin-top:5px;font-family:var(--mono)}
+  .legend{display:flex;flex-direction:column;gap:7px;align-items:flex-end}
+  .legend .li{display:flex;align-items:center;gap:8px;color:var(--d-text-2);font-size:11px;font-family:var(--mono)}
+  .legend .li .sw{width:9px;height:9px;border-radius:3px}
+  .v-hint{position:absolute;bottom:24px;left:30px;color:var(--d-text-2);font-size:11px;font-family:var(--mono);display:flex;gap:16px;pointer-events:none;opacity:.85}
+  .v-hint b{color:var(--d-text);font-weight:500}
+  .axisbtns{position:absolute;bottom:22px;right:30px;display:flex;gap:6px}
+  .axisbtns button{pointer-events:auto;font-family:var(--mono);font-size:11px;color:var(--d-text-2);background:rgba(255,255,255,.05);border:1px solid var(--d-border);border-radius:6px;padding:6px 10px;cursor:pointer;transition:.12s}
+  .axisbtns button:hover{color:var(--d-text);background:rgba(255,255,255,.1)}
+  .axisbtns button.on{color:#fff;background:rgba(99,90,245,.32);border-color:rgba(124,116,255,.6)}
+
+  /* ---- right rail (one calm column) ---- */
+  .rail{border-left:1px solid var(--border);background:var(--surface);overflow-y:auto;display:flex;flex-direction:column}
+  .rail-block{padding:24px 26px;border-bottom:1px solid var(--border)}
+  .rail-block:last-child{border-bottom:0;flex:1}
+  .blk-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+
+  /* summary 2x2 */
+  .sum{display:grid;grid-template-columns:1fr 1fr;gap:22px 18px}
+  .stat .k{font-size:11px;color:var(--text-3);font-weight:500;margin-bottom:4px}
+  .stat .v{font-size:24px;font-weight:600;letter-spacing:-0.025em;font-variant-numeric:tabular-nums;line-height:1;display:flex;align-items:baseline;gap:5px}
+  .stat .v small{font-size:12px;font-weight:450;color:var(--text-3)}
+  .stat .ubar{height:4px;border-radius:99px;background:#edeef1;margin-top:10px;overflow:hidden;max-width:120px}
+  .stat .ubar i{display:block;height:100%;background:linear-gradient(90deg,#6d63f5,#4f46e5);border-radius:99px}
+
+  /* pallet switcher — compact rows */
+  .pallets{display:flex;flex-direction:column;gap:8px}
+  .pallet{display:flex;align-items:center;gap:12px;border:1px solid var(--border);border-radius:10px;padding:11px 13px;cursor:pointer;transition:.12s;background:var(--surface)}
+  .pallet:hover{border-color:var(--border-strong);background:var(--surface-2)}
+  .pallet.sel{border-color:var(--accent);background:var(--accent-weak);box-shadow:inset 0 0 0 1px var(--accent)}
+  .pallet .ix{width:26px;height:26px;border-radius:7px;background:#eceef1;display:grid;place-items:center;font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text-2);flex:none}
+  .pallet.sel .ix{background:var(--accent);color:#fff}
+  .pallet .pmid{flex:1;min-width:0}
+  .pallet .pname{font-weight:500;font-size:13px}
+  .pallet .pmeta{font-size:11px;color:var(--text-3);font-family:var(--mono);font-variant-numeric:tabular-nums;margin-top:1px}
+  .pallet .pfill{text-align:right;flex:none}
+  .pallet .pfill .pct{font-family:var(--mono);font-size:13px;font-weight:500;font-variant-numeric:tabular-nums}
+  .pallet .pfill .mini{width:46px;height:3px;border-radius:99px;background:#e7e8ec;margin-top:6px;overflow:hidden;margin-left:auto}
+  .pallet .pfill .mini i{display:block;height:100%;background:var(--accent);border-radius:99px}
+  .pallet.warn .pfill .mini i{background:var(--warn)}
+  .pallet.warn .pfill .pct{color:var(--warn)}
+
+  /* placement cards */
+  .place-head{display:flex;align-items:baseline;justify-content:space-between}
+  .place-head .cnt{font-family:var(--mono);font-size:10.5px;color:var(--text-3);text-transform:none;letter-spacing:0}
+  .note{font-size:11px;color:var(--text-3);margin:-6px 0 16px;font-family:var(--mono)}
+  .pcards{display:flex;flex-direction:column;gap:10px}
+  .pcard{border:1px solid var(--border);border-radius:10px;padding:13px 14px;transition:.12s;cursor:default}
+  .pcard:hover,.pcard.hi{border-color:var(--accent);background:var(--accent-weak)}
+  .pc-top{display:flex;align-items:center;gap:9px}
+  .pc-top .sw{width:11px;height:11px;border-radius:3px;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.07)}
+  .pc-top .bid{font-weight:600;font-size:13px;font-family:var(--mono)}
+  .pc-top .rtag{font-family:var(--mono);font-size:10px;color:var(--accent-text);background:var(--accent-weak);border:1px solid #d7d5fb;padding:1px 6px;border-radius:4px}
+  .pc-top .wt{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--text-2);font-variant-numeric:tabular-nums}
+  .pc-type{font-size:11.5px;color:var(--text-3);margin:6px 0 11px;padding-left:20px}
+  .pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding-left:20px}
+  .pc-grid .cell{display:flex;flex-direction:column;gap:2px}
+  .pc-grid .cell .lbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3)}
+  .pc-grid .cell .val{font-family:var(--mono);font-size:11.5px;color:var(--text-2);font-variant-numeric:tabular-nums}
+
+  @media(max-width:900px){.main{grid-template-columns:1fr}.rail{display:none}.steps{display:none}}
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="glyph"></span>Palletize <small>pack&nbsp;studio</small></div>
+    <nav class="steps">
+      <div class="step done"><span class="num">✓</span>Configure</div>
+      <div class="sep"></div>
+      <div class="step active"><span class="num">2</span>Result</div>
+    </nav>
+    <div class="spacer"></div>
+    <span class="pill"><span class="dot"></span>Solved in 1.84s</span>
+    <button class="btn ghost" onclick="window.location.href='config.html'">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13 8H4M7.5 4l-4 4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Edit configuration
+    </button>
+    <button class="btn">Export</button>
+  </header>
+
+  <div class="main">
+    <!-- HERO 3D VIEWER -->
+    <div class="viewer">
+      <canvas id="scene"></canvas>
+      <div class="v-overlay">
+        <div>
+          <div class="v-title"><span id="vName">Pallet A</span><span class="tag" id="vDims">1200 × 800 × 1800 mm</span></div>
+          <div class="v-sub" id="vSub">12 boxes placed · 84.3% fill · 101.0 kg</div>
+        </div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="v-hint"><span><b>drag</b> orbit</span><span><b>scroll</b> zoom</span><span><b>right-drag</b> pan</span></div>
+      <div class="axisbtns">
+        <button data-v="iso" class="on" onclick="setView('iso',this)">ISO</button>
+        <button data-v="top" onclick="setView('top',this)">TOP</button>
+        <button data-v="front" onclick="setView('front',this)">FRONT</button>
+      </div>
+    </div>
+
+    <!-- RIGHT RAIL -->
+    <aside class="rail">
+      <div class="rail-block">
+        <div class="blk-label">Summary</div>
+        <div class="sum">
+          <div class="stat"><div class="k">Pallets used</div><div class="v">5<small>/ 5</small></div></div>
+          <div class="stat"><div class="k">Utilisation</div><div class="v">78.4<small>%</small></div><div class="ubar"><i style="width:78.4%"></i></div></div>
+          <div class="stat"><div class="k">Unpacked</div><div class="v">3<small>/ 168</small></div></div>
+          <div class="stat"><div class="k">Total weight</div><div class="v">412.6<small>kg</small></div></div>
+        </div>
+      </div>
+
+      <div class="rail-block">
+        <div class="blk-label"><span>Pallets</span><span style="text-transform:none;letter-spacing:0">5 generated</span></div>
+        <div class="pallets" id="palletList"></div>
+      </div>
+
+      <div class="rail-block">
+        <div class="blk-label place-head"><span>Placement</span><span class="cnt" id="placeCnt">Pallet A · 12 items</span></div>
+        <div class="note">positions are box-centre · mm · origin = pallet corner</div>
+        <div class="pcards" id="placeList"></div>
+      </div>
+    </aside>
+  </div>
+
+<script type="importmap">
+{ "imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// box counts are <= the 12-box reference scene; selecting a pallet shows that many
+const PALLETS = [
+  {id:'A', boxes:12, fill:84.3, kg:101.0, warn:false},
+  {id:'B', boxes:11, fill:82.1, kg:96.4,  warn:false},
+  {id:'C', boxes:10, fill:79.6, kg:88.2,  warn:false},
+  {id:'D', boxes:9,  fill:71.8, kg:74.5,  warn:true},
+  {id:'E', boxes:8,  fill:68.2, kg:52.5,  warn:true},
+];
+const TYPES = {
+  'BX-01':{name:'Standard carton', color:'#6d63f5', kg:6.4},
+  'BX-02':{name:'Heavy tote',      color:'#0ea5a3', kg:18.0},
+  'BX-03':{name:'Glassware tray',  color:'#e0892b', kg:3.2},
+};
+const PL = {L:1200, W:800, H:1800};
+const BOXES = [
+  {bx:'B01', t:'BX-02', l:600,w:400,h:320, x:300,  y:200, rot:'H↑ base'},
+  {bx:'B02', t:'BX-02', l:600,w:400,h:320, x:900,  y:200, rot:'H↑ base'},
+  {bx:'B03', t:'BX-02', l:600,w:400,h:320, x:300,  y:600, rot:'H↑ base'},
+  {bx:'B04', t:'BX-02', l:600,w:400,h:320, x:900,  y:600, rot:'H↑ base'},
+  {bx:'B05', t:'BX-01', l:400,w:300,h:250, x:200,  y:150, base:320, rot:'H↑ base'},
+  {bx:'B06', t:'BX-01', l:400,w:300,h:250, x:600,  y:150, base:320, rot:'H↑ base'},
+  {bx:'B07', t:'BX-01', l:400,w:300,h:250, x:1000, y:150, base:320, rot:'H↑ 90°'},
+  {bx:'B08', t:'BX-01', l:400,w:300,h:250, x:200,  y:500, base:320, rot:'H↑ base'},
+  {bx:'B09', t:'BX-01', l:400,w:300,h:250, x:600,  y:500, base:320, rot:'H↑ base'},
+  {bx:'B10', t:'BX-01', l:400,w:300,h:250, x:1000, y:500, base:320, rot:'H↑ 90°'},
+  {bx:'B11', t:'BX-03', l:500,w:350,h:180, x:350,  y:300, base:570, rot:'H↑ base'},
+  {bx:'B12', t:'BX-03', l:500,w:350,h:180, x:850,  y:300, base:570, rot:'H↑ base'},
+];
+
+// legend
+document.getElementById('legend').innerHTML = Object.entries(TYPES).map(([id,t])=>
+  `<span class="li"><span class="sw" style="background:${t.color}"></span>${t.name}</span>`).join('');
+
+// pallet rail
+const listEl = document.getElementById('palletList');
+function renderRail(sel){
+  listEl.innerHTML = PALLETS.map(p=>`
+    <div class="pallet ${p.id==sel?'sel':''} ${p.warn?'warn':''}" onclick="selectPallet('${p.id}')">
+      <span class="ix">${p.id}</span>
+      <div class="pmid"><div class="pname">Pallet ${p.id}</div><div class="pmeta">${p.boxes} boxes · ${p.kg.toFixed(1)} kg</div></div>
+      <div class="pfill"><div class="pct">${p.fill.toFixed(1)}%</div><div class="mini"><i style="width:${p.fill}%"></i></div></div>
+    </div>`).join('');
+}
+const placeListEl = document.getElementById('placeList');
+// build the first `count` placement cards and (re)bind hover<->mesh highlight
+function renderPlacement(count){
+  placeListEl.innerHTML = BOXES.slice(0, count).map(b=>{
+    const t = TYPES[b.t]; const z = (b.base||0) + b.h/2;
+    return `<div class="pcard" data-bx="${b.bx}">
+      <div class="pc-top">
+        <span class="sw" style="background:${t.color}"></span>
+        <span class="bid">${b.bx}</span>
+        <span class="rtag">${b.rot}</span>
+        <span class="wt">${t.kg.toFixed(1)} kg</span>
+      </div>
+      <div class="pc-type">${b.t} · ${t.name}</div>
+      <div class="pc-grid">
+        <div class="cell"><span class="lbl">Size L·W·H</span><span class="val">${b.l}·${b.w}·${b.h}</span></div>
+        <div class="cell"><span class="lbl">Position x,y,z</span><span class="val">${b.x}, ${b.y}, ${z}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+  placeListEl.querySelectorAll('.pcard').forEach(card=>{
+    card.addEventListener('mouseenter',()=>{ const m=meshByBx[card.dataset.bx]; if(m){m.material.emissive.set('#fff');m.material.emissiveIntensity=0.18;} });
+    card.addEventListener('mouseleave',()=>{ const m=meshByBx[card.dataset.bx]; if(m){m.material.emissiveIntensity=0;} });
+  });
+}
+
+window.selectPallet = (id)=>{
+  renderRail(id);
+  const p = PALLETS.find(x=>x.id==id);
+  document.getElementById('vName').textContent = 'Pallet '+id;
+  document.getElementById('vSub').textContent = `${p.boxes} boxes placed · ${p.fill.toFixed(1)}% fill · ${p.kg.toFixed(1)} kg`;
+  document.getElementById('placeCnt').textContent = `Pallet ${id} · ${p.boxes} items`;
+  renderPlacement(p.boxes);
+  setMeshVisibility(p.boxes);
+};
+
+// ===== THREE.JS =====
+const canvas = document.getElementById('scene');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#0c0f17');
+scene.fog = new THREE.Fog('#0c0f17', 2800, 5600);
+
+const camera = new THREE.PerspectiveCamera(40, 1, 1, 12000);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.minDistance = 800; controls.maxDistance = 4600;
+controls.maxPolarAngle = Math.PI*0.495;
+controls.target.set(0, 380, 0);
+
+scene.add(new THREE.AmbientLight('#9fb0d0', 0.55));
+scene.add(new THREE.HemisphereLight('#cdd7f0','#0b0d14', 0.5));
+const key = new THREE.DirectionalLight('#fff6e8', 1.15);
+key.position.set(900, 1750, 1150); key.castShadow = true;
+key.shadow.mapSize.set(2048,2048);
+const d=1600; Object.assign(key.shadow.camera,{left:-d,right:d,top:d,bottom:-d,near:200,far:5000});
+scene.add(key);
+const fillL = new THREE.DirectionalLight('#6d7cff', 0.35);
+fillL.position.set(-1000, 600, -800); scene.add(fillL);
+
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(9000,9000),
+  new THREE.MeshStandardMaterial({color:'#0e1320', roughness:1}));
+ground.rotation.x = -Math.PI/2; ground.position.y = -2; ground.receiveShadow = true; scene.add(ground);
+const grid = new THREE.GridHelper(9000, 90, '#243049', '#19202f');
+grid.position.y = -1; grid.material.opacity = 0.5; grid.material.transparent = true; scene.add(grid);
+
+// pallet model
+const woodTop = new THREE.MeshStandardMaterial({color:'#caa06a', roughness:0.85});
+const woodSide = new THREE.MeshStandardMaterial({color:'#b08a55', roughness:0.85});
+const deckH = 22, blockH = 78;
+const slatN = 6, slatGap = PL.W/slatN;
+for(let i=0;i<slatN;i++){
+  const s = new THREE.Mesh(new THREE.BoxGeometry(PL.L, deckH, slatGap*0.72),
+    [woodSide,woodSide,woodTop,woodSide,woodSide,woodSide]);
+  s.position.set(0, blockH+deckH/2, -PL.W/2 + slatGap*(i+0.5));
+  s.castShadow = s.receiveShadow = true; scene.add(s);
+}
+[-PL.W/2+90, 0, PL.W/2-90].forEach(zp=>{
+  const blk = new THREE.Mesh(new THREE.BoxGeometry(PL.L, blockH, 90), woodSide);
+  blk.position.set(0, blockH/2, zp); blk.castShadow=blk.receiveShadow=true; scene.add(blk);
+});
+const deckTopY = blockH + deckH;
+
+// boxes
+function tint(hex,amt){ const c=new THREE.Color(hex); c.offsetHSL(0,-0.04,amt); return c; }
+const meshByBx = {};
+BOXES.forEach(b=>{
+  const t = TYPES[b.t];
+  const geo = new THREE.BoxGeometry(b.l, b.h, b.w);
+  const mat = new THREE.MeshStandardMaterial({color:t.color, roughness:0.62, metalness:0.04});
+  const m = new THREE.Mesh(geo, mat); m.castShadow = m.receiveShadow = true;
+  m.position.set(b.x - PL.L/2, deckTopY + (b.base||0) + b.h/2, b.y - PL.W/2);
+  const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo),
+    new THREE.LineBasicMaterial({color: tint(t.color,0.18), transparent:true, opacity:0.55}));
+  m.add(edges); scene.add(m); meshByBx[b.bx]=m;
+});
+const ORDER = BOXES.map(b=>b.bx);
+// show only the first `count` boxes (lighter pallets carry fewer)
+function setMeshVisibility(count){ ORDER.forEach((id,i)=>{ meshByBx[id].visible = i < count; }); }
+
+// camera presets
+function setView(kind, btn){
+  if(btn){document.querySelectorAll('.axisbtns button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+  const tgt = new THREE.Vector3(0,360,0);
+  let p;
+  if(kind==='iso')   p = new THREE.Vector3(1650, 1300, 1850);
+  if(kind==='top')   p = new THREE.Vector3(0.1, 2800, 0.1);
+  if(kind==='front') p = new THREE.Vector3(0, 720, 2600);
+  controls.target.copy(tgt);
+  const start = camera.position.clone(); const t0 = performance.now();
+  (function anim(){ const k=Math.min((performance.now()-t0)/520,1); const e=1-Math.pow(1-k,3);
+    camera.position.lerpVectors(start,p,e); controls.update();
+    if(k<1) requestAnimationFrame(anim); })();
+}
+window.setView = setView;
+camera.position.set(1650, 1300, 1850); // start at ISO so the first frame is composed
+setView('iso');
+
+function resize(){
+  const r = canvas.parentElement.getBoundingClientRect();
+  renderer.setSize(r.width, r.height, false);
+  camera.aspect = r.width/r.height; camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(canvas.parentElement);
+resize();
+(function loop(){ requestAnimationFrame(loop); controls.update(); renderer.render(scene,camera); })();
+
+selectPallet('A'); // sets rail, viewer labels, placement cards & mesh visibility in sync
+</script>
+</body>
+</html>

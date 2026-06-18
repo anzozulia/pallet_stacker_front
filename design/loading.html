@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palletize · Packing…</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbfbfc;--ink:#16181d;--border:#e6e7eb;--border-2:#d7d9df;
+    --text-2:#5c6069;--text-3:#9ea2ad;--accent:#4f46e5;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+    --sans:'Inter',system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--sans);color:var(--ink);background:var(--bg);font-size:14px;line-height:1.5;
+    -webkit-font-smoothing:antialiased;letter-spacing:-0.006em;min-height:100vh;display:flex;flex-direction:column}
+
+  .topbar{height:58px;display:flex;align-items:center;padding:0 26px;flex:none}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;letter-spacing:-0.02em}
+  .brand .glyph{width:20px;height:20px;border-radius:5px;background:linear-gradient(150deg,#6d63f5,#4f46e5);position:relative;flex:none}
+  .brand .glyph::after{content:"";position:absolute;inset:5px;border:1.5px solid #fff;border-radius:1px}
+  .brand small{font-family:var(--mono);font-size:10px;color:var(--text-3);font-weight:400;margin-left:2px;text-transform:uppercase}
+
+  .wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 24px 96px;gap:0}
+  .stack{display:flex;flex-direction:column;align-items:center;animation:fade .6s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* conic "comet" spinner — minimal, smooth */
+  .spinner{width:40px;height:40px;border-radius:50%;
+    background:conic-gradient(from 0deg, rgba(79,70,229,0) 8%, rgba(79,70,229,.18) 30%, var(--accent) 100%);
+    -webkit-mask:radial-gradient(farthest-side, #0000 calc(100% - 3.5px), #000 calc(100% - 3px));
+            mask:radial-gradient(farthest-side, #0000 calc(100% - 3.5px), #000 calc(100% - 3px));
+    animation:spin .85s linear infinite}
+  @keyframes spin{to{transform:rotate(1turn)}}
+
+  .label{margin-top:26px;font-size:15px;font-weight:500;color:var(--ink);letter-spacing:-0.01em}
+  .label .dots span{opacity:.25;animation:blink 1.4s infinite}
+  .label .dots span:nth-child(2){animation-delay:.2s}
+  .label .dots span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,100%{opacity:.2}40%{opacity:1}}
+  .sub{margin-top:7px;font-family:var(--mono);font-size:12px;color:var(--text-3)}
+  .sub .msg{transition:opacity .25s}
+
+  /* minimal job summary (from configuration) */
+  .summary{margin-top:28px;display:flex;align-items:stretch;border:1px solid var(--border);border-radius:11px;
+    background:#fff;box-shadow:0 1px 2px rgba(16,18,22,.03);overflow:hidden}
+  .summary .cell{padding:11px 18px;display:flex;flex-direction:column;gap:3px;border-right:1px solid var(--border)}
+  .summary .cell:last-child{border-right:0}
+  .summary .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3)}
+  .summary .val{font-size:13px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+  .skip{margin-top:30px;font-family:var(--sans);font-size:12.5px;font-weight:500;color:var(--text-3);background:none;border:0;
+    cursor:pointer;display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:6px;transition:.14s}
+  .skip:hover{color:var(--ink)}
+  .skip svg{width:13px;height:13px;transition:transform .14s}
+  .skip:hover svg{transform:translateX(2px)}
+
+  @media (max-width:460px){
+    .summary{flex-direction:column}
+    .summary .cell{border-right:0;border-bottom:1px solid var(--border);align-items:center;text-align:center}
+    .summary .cell:last-child{border-bottom:0}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .spinner{animation:none;background:conic-gradient(from 0deg,var(--border) 0%,var(--border) 75%,var(--accent) 100%)}
+    .label .dots span{animation:none;opacity:.6}
+  }
+</style>
+</head>
+<body>
+  <header class="topbar"><div class="brand"><span class="glyph"></span>Palletize <small>pack&nbsp;studio</small></div></header>
+
+  <main class="wrap">
+    <div class="stack">
+      <div class="spinner" aria-hidden="true"></div>
+      <div class="label">Packing your pallets<span class="dots"><span>.</span><span>.</span><span>.</span></span></div>
+      <div class="sub"><span class="msg" id="msg">Generating candidate placements</span></div>
+
+      <div class="summary">
+        <div class="cell"><span class="k">Pallet</span><span class="val">1200 × 800 × 1800 mm</span></div>
+        <div class="cell"><span class="k">Boxes</span><span class="val">3 types · 168 units</span></div>
+        <div class="cell"><span class="k">Est. weight</span><span class="val">412 kg</span></div>
+      </div>
+
+      <button class="skip" onclick="go()">Skip to result
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h9M8.5 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </main>
+
+<script>
+  let done=false;
+  function go(){ if(done) return; done=true; window.location.href='result.html'; }
+
+  // cycle a quiet status line (no fake % — this is indeterminate)
+  const phases=['Generating candidate placements','Packing boxes by footprint','Balancing centre of gravity',
+                'Checking overhang & stack limits','Finalising layout'];
+  const msg=document.getElementById('msg'); let i=0;
+  setInterval(()=>{ i=(i+1)%phases.length; msg.style.opacity=0;
+    setTimeout(()=>{ msg.textContent=phases[i]; msg.style.opacity=1; },200); }, 2000);
+
+  // no real progress signal -> hand off after a short indeterminate wait (Skip always available)
+  setTimeout(go, 6000);
+</script>
+</body>
+</html>

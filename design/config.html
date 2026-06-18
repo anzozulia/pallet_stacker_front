@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palletize · Configure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f8fa;
+    --surface:#ffffff;
+    --surface-2:#fcfcfd;
+    --border:#ededf1;
+    --border-strong:#dfe1e6;
+    --text:#1a1c20;
+    --text-2:#5c6069;
+    --text-3:#8a8f99;
+    --accent:#4f46e5;
+    --accent-weak:#ecebfd;
+    --accent-text:#4338ca;
+    --danger:#dc2626;
+    --radius:10px;
+    --radius-sm:7px;
+    --shadow:0 1px 2px rgba(16,18,22,.04),0 1px 1px rgba(16,18,22,.03);
+    --shadow-pop:0 8px 28px -8px rgba(16,18,22,.18);
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:'Inter',system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:var(--sans);
+    background:var(--bg);
+    color:var(--text);
+    font-size:14px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    letter-spacing:-0.006em;
+  }
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    height:56px;display:flex;align-items:center;gap:20px;
+    padding:0 22px;background:rgba(255,255,255,.82);
+    backdrop-filter:saturate(180%) blur(8px);
+    border-bottom:1px solid var(--border);
+    position:sticky;top:0;z-index:20;
+  }
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;letter-spacing:-0.02em}
+  .brand .glyph{width:22px;height:22px;border-radius:6px;background:linear-gradient(150deg,#6d63f5,#4f46e5);position:relative;flex:none}
+  .brand .glyph::after{content:"";position:absolute;inset:5px;border:1.5px solid rgba(255,255,255,.9);border-radius:2px}
+  .brand small{font-family:var(--mono);font-size:10px;color:var(--text-3);font-weight:400;letter-spacing:0;margin-left:2px;text-transform:uppercase}
+
+  .steps{display:flex;align-items:center;gap:8px;margin-left:6px}
+  .step{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-3)}
+  .step .num{width:19px;height:19px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-family:var(--mono);border:1px solid var(--border-strong);color:var(--text-3)}
+  .step.active{color:var(--text);font-weight:500}
+  .step.active .num{background:var(--accent);border-color:var(--accent);color:#fff}
+  .steps .sep{width:22px;height:1px;background:var(--border-strong)}
+
+  .topbar .spacer{flex:1}
+  .btn{
+    font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;
+    border-radius:var(--radius-sm);padding:8px 14px;border:1px solid var(--border-strong);
+    background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:7px;
+    transition:background .12s,border-color .12s,box-shadow .12s;
+  }
+  .btn:hover{background:var(--surface-2);border-color:#c7c9d1}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(79,70,229,.4)}
+  .btn.primary:hover{background:#4338ca;border-color:#4338ca}
+  .btn.ghost{border-color:transparent;background:transparent;color:var(--text-2)}
+  .btn.ghost:hover{background:#eceef1}
+
+  /* ---------- layout ---------- */
+  .wrap{max-width:960px;margin:0 auto;padding:44px 28px 112px}
+  .page-head{margin-bottom:38px}
+  .page-head h1{font-size:22px;font-weight:600;letter-spacing:-0.02em}
+  .page-head p{color:var(--text-2);font-size:13.5px;margin-top:6px;max-width:560px;line-height:1.6}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow)}
+  .card + .card{margin-top:34px}
+  .card-head{display:flex;align-items:center;gap:12px;padding:20px 28px;border-bottom:1px solid var(--border)}
+  .card-head h2{font-size:14.5px;font-weight:600;letter-spacing:-0.01em}
+  .card-head .desc{color:var(--text-3);font-size:12.5px}
+  .card-head .spacer{flex:1}
+  .card-body{padding:30px 28px}
+
+  .section-label{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:18px}
+  .section-label::before{content:"";width:6px;height:6px;border-radius:2px;background:var(--accent)}
+
+  /* fields */
+  .grid{display:grid;gap:22px 26px}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+  .grid.cols-2{grid-template-columns:repeat(2,1fr)}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-size:12px;font-weight:500;color:var(--text-2)}
+  .field .hint{font-size:11px;color:var(--text-3)}
+  .input-affix{display:flex;align-items:center;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface);overflow:hidden;transition:border-color .12s,box-shadow .12s}
+  .input-affix:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-weak)}
+  .input-affix input{border:0;outline:0;padding:10px 12px;font-family:var(--mono);font-size:13px;color:var(--text);width:100%;background:transparent}
+  .input-affix .unit{font-family:var(--mono);font-size:11px;color:var(--text-3);padding:0 11px;border-left:1px solid var(--border);background:var(--surface-2);align-self:stretch;display:flex;align-items:center}
+
+  /* toggle */
+  .switch-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 0}
+  .switch-row .txt strong{display:block;font-size:12.5px;font-weight:500}
+  .switch-row .txt span{font-size:11.5px;color:var(--text-3)}
+  .switch{--w:38px;--h:22px;position:relative;width:var(--w);height:var(--h);flex:none}
+  .switch input{opacity:0;width:0;height:0;position:absolute}
+  .switch .track{position:absolute;inset:0;background:#d6d8de;border-radius:99px;transition:background .15s;cursor:pointer}
+  .switch .track::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;background:#fff;border-radius:50%;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .15s}
+  .switch input:checked + .track{background:var(--accent)}
+  .switch input:checked + .track::after{transform:translateX(16px)}
+
+  /* box catalog */
+  .box-list{display:flex;flex-direction:column;gap:18px}
+  .box-item{border:1px solid var(--border);border-radius:12px;background:var(--surface);overflow:hidden}
+  .box-item .bi-head{display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--border);background:var(--surface-2)}
+  .swatch{width:13px;height:13px;border-radius:4px;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+  .bi-head .name-input{border:0;outline:0;background:transparent;font-weight:600;font-size:13.5px;color:var(--text);width:200px}
+  .bi-head .name-input:focus{box-shadow:0 1px 0 var(--accent)}
+  .id-tag{font-family:var(--mono);font-size:10.5px;color:var(--text-3);background:var(--surface-2);border:1px solid var(--border);padding:2px 7px;border-radius:5px}
+  .bi-head .spacer{flex:1}
+  .icon-btn{width:30px;height:30px;border-radius:7px;border:1px solid transparent;background:transparent;color:var(--text-3);cursor:pointer;display:grid;place-items:center;transition:.12s}
+  .icon-btn:hover{background:#f0eded;color:var(--danger)}
+  .bi-body{padding:26px 24px}
+  .bi-stack{display:flex;flex-direction:column;gap:24px}
+  .bi-row3{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+  .dims-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:420px}
+  .lbl-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .lbl-row .frag{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-3)}
+  .switch.sm{--w:32px;--h:18px}
+  .switch.sm .track::after{width:14px;height:14px}
+  .switch.sm input:checked + .track::after{transform:translateX(14px)}
+
+  .rot-wrap{margin-top:26px;padding-top:26px;border-top:1px solid var(--border)}
+  .rot-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+  .rot-head .lbl{font-size:12px;font-weight:500;color:var(--text-2)}
+  .rot-head .mini{font-size:11px;color:var(--text-3);cursor:pointer}
+  .rot-head .mini:hover{color:var(--accent)}
+  .chips{display:flex;flex-wrap:wrap;gap:9px}
+  .chip{font-family:var(--mono);font-size:11px;border:1px solid var(--border-strong);background:var(--surface);color:var(--text-2);padding:7px 11px;border-radius:7px;cursor:pointer;user-select:none;transition:.12s;display:inline-flex;align-items:center;gap:6px}
+  .chip .dot{width:6px;height:6px;border-radius:50%;background:var(--border-strong)}
+  .chip.on{border-color:var(--accent);background:var(--accent-weak);color:var(--accent-text)}
+  .chip.on .dot{background:var(--accent)}
+
+  .add-row{margin-top:22px}
+  .btn.dashed{width:100%;justify-content:center;border-style:dashed;background:transparent;color:var(--text-2);padding:14px}
+  .btn.dashed:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-weak)}
+
+  .footer-actions{position:sticky;bottom:0;margin-top:34px;background:linear-gradient(transparent,var(--bg) 38%);padding-top:28px;display:flex;align-items:center;gap:14px}
+  .footer-actions .meta{font-size:12.5px;color:var(--text-2);font-family:var(--mono)}
+  .footer-actions .spacer{flex:1}
+
+  @media(max-width:720px){
+    .grid.cols-3{grid-template-columns:1fr 1fr}
+    .bi-row3{grid-template-columns:1fr}
+    .dims-3{max-width:none}
+    .steps{display:none}
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="glyph"></span>Palletize <small>pack&nbsp;studio</small></div>
+    <nav class="steps">
+      <div class="step active"><span class="num">1</span>Configure</div>
+      <div class="sep"></div>
+      <div class="step"><span class="num">2</span>Result</div>
+    </nav>
+    <div class="spacer"></div>
+    <button class="btn primary" onclick="window.location.href='loading.html'">
+      Run packing
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M8.5 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </header>
+
+  <main class="wrap">
+    <div class="page-head">
+      <h1>Packing task</h1>
+      <p>Define the target pallet and the boxes to place on it. The solver fits each box type respecting weight, overhang, centre-of-gravity, and stacking limits.</p>
+    </div>
+
+    <!-- ============ PALLET CONFIG ============ -->
+    <section class="card">
+      <div class="card-head">
+        <h2>Pallet configuration</h2>
+        <span class="desc">— the physical envelope and constraints</span>
+      </div>
+      <div class="card-body">
+        <div class="section-label">Dimensions</div>
+        <div class="grid cols-3">
+          <div class="field">
+            <label>Length</label>
+            <div class="input-affix"><input type="number" value="1200"><span class="unit">mm</span></div>
+          </div>
+          <div class="field">
+            <label>Width</label>
+            <div class="input-affix"><input type="number" value="800"><span class="unit">mm</span></div>
+          </div>
+          <div class="field">
+            <label>Max stack height</label>
+            <div class="input-affix"><input type="number" value="1800"><span class="unit">mm</span></div>
+          </div>
+        </div>
+
+        <div class="section-label" style="margin-top:34px">Limits</div>
+        <div class="grid cols-3">
+          <div class="field">
+            <label>Max weight</label>
+            <div class="input-affix"><input type="number" value="1000"><span class="unit">kg</span></div>
+          </div>
+          <div class="field">
+            <label>Max overhang</label>
+            <div class="input-affix"><input type="number" value="40"><span class="unit">mm</span></div>
+          </div>
+          <div class="field">
+            <label>CoG envelope <span class="hint">(% of pallet centre)</span></label>
+            <div class="input-affix"><input type="number" value="20"><span class="unit">%</span></div>
+          </div>
+        </div>
+
+        <div style="margin-top:30px;border-top:1px solid var(--border);padding-top:8px">
+          <div class="switch-row">
+            <div class="txt"><strong>Allow overhang</strong><span>Boxes may extend past the pallet edge up to the max overhang above.</span></div>
+            <label class="switch"><input type="checkbox" checked><span class="track"></span></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BOX CATALOG ============ -->
+    <section class="card">
+      <div class="card-head">
+        <h2>Box catalog</h2>
+        <span class="desc">— item types available to pack</span>
+        <div class="spacer"></div>
+        <span class="id-tag" id="typeCount">3 types · 168 units</span>
+      </div>
+      <div class="card-body">
+        <div class="box-list" id="boxList"></div>
+        <div class="add-row">
+          <button class="btn dashed" onclick="addBox()">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            Add box type
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-actions">
+      <span class="meta" id="footMeta">3 box types · 168 units · est. 412 kg</span>
+      <div class="spacer"></div>
+      <button class="btn ghost">Save draft</button>
+      <button class="btn primary" onclick="window.location.href='loading.html'">
+        Run packing
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M8.5 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </main>
+
+<script>
+  const ROTATIONS = [
+    {id:'h0', label:'H↑', sub:'base'},
+    {id:'h1', label:'H↑', sub:'90°'},
+    {id:'l0', label:'L↑', sub:'base'},
+    {id:'l1', label:'L↑', sub:'90°'},
+    {id:'w0', label:'W↑', sub:'base'},
+    {id:'w1', label:'W↑', sub:'90°'},
+  ];
+
+  const seed = [
+    {id:'BX-01', name:'Standard carton', color:'#6d63f5', l:400, w:300, h:250, kg:6.4, qty:64, maxload:90, fragile:false, rot:['h0','h1','l0','l1','w0','w1']},
+    {id:'BX-02', name:'Heavy tote', color:'#0ea5a3', l:600, w:400, h:320, kg:18.0, qty:40, maxload:160, fragile:false, rot:['h0','h1']},
+    {id:'BX-03', name:'Glassware tray', color:'#e0892b', l:500, w:350, h:180, kg:3.2, qty:64, maxload:0, fragile:true, rot:['h0','h1']},
+  ];
+
+  let counter = 3;
+  const list = document.getElementById('boxList');
+
+  function chipHTML(b, r){
+    const on = b.rot.includes(r.id);
+    return `<span class="chip ${on?'on':''}" data-rot="${r.id}" onclick="toggleRot(this)">
+      <span class="dot"></span>${r.label}<span style="color:var(--text-3);font-size:10px">${r.sub}</span></span>`;
+  }
+
+  function boxHTML(b){
+    return `<div class="box-item" data-id="${b.id}">
+      <div class="bi-head">
+        <span class="swatch" style="background:${b.color}"></span>
+        <input class="name-input" value="${b.name}">
+        <span class="id-tag">${b.id}</span>
+        <div class="spacer"></div>
+        <button class="icon-btn" title="Remove" onclick="this.closest('.box-item').remove();recount()">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M6.5 4V3h3v1M5 4l.5 9h5L11 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="bi-body">
+        <div class="bi-stack">
+          <div class="field">
+            <label>Dimensions <span class="hint">length · width · height</span></label>
+            <div class="dims-3">
+              <div class="input-affix"><input type="number" value="${b.l}"><span class="unit">mm</span></div>
+              <div class="input-affix"><input type="number" value="${b.w}"><span class="unit">mm</span></div>
+              <div class="input-affix"><input type="number" value="${b.h}"><span class="unit">mm</span></div>
+            </div>
+          </div>
+          <div class="bi-row3">
+            <div class="field">
+              <label>Weight / unit</label>
+              <div class="input-affix"><input type="number" step="0.1" value="${b.kg}"><span class="unit">kg</span></div>
+            </div>
+            <div class="field">
+              <label>Quantity</label>
+              <div class="input-affix"><input type="number" value="${b.qty}" oninput="recount()"><span class="unit">pcs</span></div>
+            </div>
+            <div class="field">
+              <div class="lbl-row">
+                <label>Max load on top</label>
+                <span class="frag">Fragile
+                  <label class="switch sm"><input type="checkbox" ${b.fragile?'checked':''} onchange="toggleFragile(this)"><span class="track"></span></label>
+                </span>
+              </div>
+              <div class="input-affix"><input type="number" class="maxload" value="${b.maxload}" ${b.fragile?'disabled':''}><span class="unit">kg</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="rot-wrap">
+          <div class="rot-head">
+            <span class="lbl">Allowed rotations <span class="hint" style="font-weight:400">— toggle each orientation on or off</span></span>
+            <span class="hint" style="font-weight:400" data-rotcount>${b.rot.length} / 6 allowed</span>
+          </div>
+          <div class="chips">${ROTATIONS.map(r=>chipHTML(b,r)).join('')}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function render(){ list.innerHTML = seed.map(boxHTML).join(''); recount(); }
+
+  function addBox(){
+    counter++;
+    const id = 'BX-'+String(counter).padStart(2,'0');
+    const palette=['#3b82f6','#db2777','#16a34a','#9333ea','#0891b2'];
+    const nb={id,name:'New box type',color:palette[counter%palette.length],l:400,w:300,h:200,kg:5.0,qty:24,maxload:80,fragile:false,rot:['h0','h1','l0','l1','w0','w1']};
+    list.insertAdjacentHTML('beforeend', boxHTML(nb));
+    const el = list.lastElementChild;
+    el.scrollIntoView({behavior:'smooth',block:'center'});
+    el.querySelector('.name-input').focus();
+    el.querySelector('.name-input').select();
+    recount();
+  }
+
+  function toggleRot(el){
+    el.classList.toggle('on');
+    const card=el.closest('.box-item');
+    const n=card.querySelectorAll('.chip.on').length;
+    card.querySelector('[data-rotcount]').textContent = `${n} / 6 allowed`;
+  }
+  function toggleFragile(input){
+    const ml=input.closest('.bi-body').querySelector('.maxload');
+    if(input.checked){ ml.dataset.prev=ml.value; ml.value=0; ml.disabled=true; }
+    else { ml.disabled=false; ml.value=ml.dataset.prev||80; }
+  }
+  function recount(){
+    let types=0, units=0, kg=0;
+    list.querySelectorAll('.box-item').forEach(b=>{
+      types++;
+      const qty=+b.querySelector('input[oninput]').value||0;
+      const w=+b.querySelectorAll('.input-affix input')[3].value||0;
+      units+=qty; kg+=qty*w;
+    });
+    document.getElementById('typeCount').textContent=`${types} types · ${units} units`;
+    document.getElementById('footMeta').textContent=`${types} box types · ${units} units · est. ${Math.round(kg)} kg`;
+  }
+  render();
+</script>
+</body>
+</html>
