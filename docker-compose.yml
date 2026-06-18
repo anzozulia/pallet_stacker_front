@@ -1,0 +1,13 @@
+# Pallet Packer — single static service, built from source.
+# VITE_API_URL is BUILD-TIME only: it is baked into the static bundle during the image
+# build. Override it via your shell env (e.g. `VITE_API_URL=... docker compose up --build`).
+# Changing it requires a rebuild (`--build`).
+services:
+  pallet-packer:
+    build:
+      context: .
+      args:
+        VITE_API_URL: ${VITE_API_URL:-https://packerapi.anzozulia.xyz}
+    ports:
+      - '8080:8080'
+    restart: unless-stopped
