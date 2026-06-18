@@ -5,3 +5,11 @@ playwright-report
 coverage
 e2e
 *.md
+.planning
+.claude
+design
+test-results
+.husky
+.github
+*.tsbuildinfo
+.DS_Store

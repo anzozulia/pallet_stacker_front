@@ -20,6 +20,7 @@ jobs:
       - run: npm run lint
       - run: npm run test
       - run: npm run build
+      - run: node scripts/check-code-split.mjs
 
   e2e:
     runs-on: ubuntu-latest
