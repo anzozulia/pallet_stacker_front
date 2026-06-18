@@ -171,6 +171,29 @@ src/
 - **Reconfigure = rebuild.** Runtime API-URL override is out of scope for v1; to change
   the backend, rebuild the image with a new `VITE_API_URL` build arg.
 
+### Co-located API (same-origin, no public API domain)
+
+Because this is a static SPA, the API calls are made by the visitor's **browser** — not by the
+frontend container. So to keep API traffic on the server (no public API domain, no CORS), serve
+the API under the **same origin** as the app: the frontend's nginx reverse-proxies `/api/` to the
+API container over a shared Docker network, and the browser only ever talks to the app's origin.
+
+This pairs with an API stack that publishes a shared bridge network. The reference API stack
+creates `pallet-packer-net` and exposes the API on it at the alias `pallet-packer-api:8000`
+(redis and the workers stay private). Then:
+
+1. **Bring the API stack up first** — it creates and owns `pallet-packer-net`.
+2. Build + run the frontend in same-origin mode, joining that network:
+
+   ```bash
+   VITE_API_URL=/ docker compose -f docker-compose.yml -f docker-compose.local-api.yml up -d --build
+   ```
+
+Result: `browser → frontend origin → nginx proxies /api/ → pallet-packer-api:8000` (internal).
+No CORS, and the API needs no public domain or host ports. The nginx upstream is
+`http://pallet-packer-api:8000` (see [`nginx.conf`](./nginx.conf)) — change it if your API uses a
+different network alias or port.
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the dev loop, the full pre-PR gate, and the
