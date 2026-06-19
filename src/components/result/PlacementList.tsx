@@ -34,10 +34,8 @@ interface PlacementListProps {
   typeToLabel?: Map<string, string>;
   /** One-way hover link (D-11): the hovered item_id, or null on leave. Drives the mesh emissive. */
   onHover: (id: string | null) => void;
-  /** Row-click → isolate seam (D-12): ResultPage maps item_id → that box's layer and isolates it. */
-  onIsolate?: (itemId: string) => void;
-  /** The item_id that drove the CURRENT isolation, for a PERSISTENT selected cue distinct from hover. */
-  selectedId?: string | null;
+  /** Row-click → build up to this box's layer (D-12): ResultPage reveals floor-up through it. */
+  onRevealToLayer?: (itemId: string) => void;
 }
 
 /** One field cell: a small uppercase mono label over a mono tabular-nums value. */
@@ -58,8 +56,7 @@ export default function PlacementList({
   palletLabel,
   typeToLabel,
   onHover,
-  onIsolate,
-  selectedId,
+  onRevealToLayer,
 }: PlacementListProps) {
   // Local hover id only drives this block's own accent cue; the mesh glow is owned by the parent
   // (onHover → ResultPage state → Boxes). Kept one-way (D-11) — no inbound highlight from the mesh.
@@ -78,9 +75,6 @@ export default function PlacementList({
         {items.map((item) => {
           const swatch = palette.get(item.typeId) ?? '#6d63f5';
           const isHovered = hovered === item.item_id;
-          // PERSISTENT selected cue (D-12): the row whose click drove the current isolation. Kept
-          // DISTINCT from the transient hover cue so "this row is the active isolation" stays legible.
-          const isSelected = selectedId != null && selectedId === item.item_id;
           const { L, W, H } = item.dimensions;
           // Human box-type label (#6): fall back to the raw typeId when no label was threaded.
           const typeLabel = typeToLabel?.get(item.typeId) ?? item.typeId;
@@ -89,7 +83,6 @@ export default function PlacementList({
             <div
               key={item.item_id}
               data-placement-card
-              data-selected={isSelected || undefined}
               role="button"
               tabIndex={0}
               onMouseEnter={() => {
@@ -100,18 +93,13 @@ export default function PlacementList({
                 setHovered(null);
                 onHover(null);
               }}
-              // Row-click → isolate that box's layer (D-12). Hover stays the SEPARATE one-way
+              // Row-click → build up to this box's layer (D-12). Hover stays the SEPARATE one-way
               // emissive seam (above) — clicking does NOT alter hover, and vice-versa (SC-4).
-              onClick={() => onIsolate?.(item.item_id)}
+              onClick={() => onRevealToLayer?.(item.item_id)}
               className={clsx(
                 'cursor-pointer rounded-[12px] border px-5 py-4 transition-colors duration-150',
-                // Selected: persistent accent ring (the active isolation). Hover: accent-weak fill.
-                // Selected takes visual precedence; both can apply (ring + weak bg) without clashing.
-                isSelected
-                  ? 'border-accent ring-1 ring-accent'
-                  : isHovered
-                    ? 'border-accent bg-accent-weak'
-                    : 'border-border bg-surface',
+                // Hover: accent border + accent-weak fill; otherwise the resting card surface.
+                isHovered ? 'border-accent bg-accent-weak' : 'border-border bg-surface',
               )}
             >
               {/* Head: swatch · type label · spacer · weight */}

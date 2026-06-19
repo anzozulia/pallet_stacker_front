@@ -108,10 +108,9 @@ export default function ResultPage() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   // Layer build-up state (D-08/D-12). `focusIndex` is the 1-based revealed-up-to layer or null =
-  // "All" (the no-op default, SC-3); build-up reveals floor-up through it. `selectedId` is the
-  // legacy row-click cue (removed in the row-click rewrite). Both reset on a pallet switch (D-11).
+  // "All" (the no-op default, SC-3); build-up reveals floor-up through it. Resets on a pallet
+  // switch (D-11, below).
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   // Diagnostics overlay toggles (DIAG-01/02 / D-10). `cogOn` shows the per-pallet CoG marker —
   // default ON (the differentiator, RESEARCH Open Q2). `heatmap` recolours boxes by support ratio
@@ -152,7 +151,6 @@ export default function ResultPage() {
     setSel(i);
     setExplode(0);
     setFocusIndex(null);
-    setSelectedId(null);
   };
 
   // D-06 visibility decision (single source of truth): the CoG marker shows only when its toggle
@@ -418,18 +416,14 @@ export default function ResultPage() {
           palletLabel={palletLabel}
           typeToLabel={typeToLabel}
           onHover={setHoveredId}
-          // Row click → isolate that box's layer (D-12): map item_id → its 0-based layer via the
-          // computeLayers itemToLayer, then set Isolate focus at that layer (+1 → 1-based) and record
-          // the clicked id for the persistent selected cue. The `li != null` guard keeps a missing
-          // mapping a no-op (T-08-DOS). Reveals the layer if it was hidden (isolate keeps all visible).
-          onIsolate={(id) => {
+          // Row click → build UP to that box's layer (D-12): map item_id → its 0-based layer via the
+          // computeLayers itemToLayer, then reveal floor-up THROUGH that layer (+1 → 1-based) so the
+          // clicked box becomes visible. The `li != null` guard keeps a missing mapping a no-op
+          // (T-08-DOS). This is a cumulative build-up reveal — no persistent selected cue.
+          onRevealToLayer={(id) => {
             const li = layerModel.itemToLayer.get(id);
-            if (li != null) {
-              setFocusIndex(li + 1);
-              setSelectedId(id);
-            }
+            if (li != null) setFocusIndex(li + 1);
           }}
-          selectedId={selectedId}
         />
         {/* Whole-job unpacked panel (RESULT-06): does NOT change on pallet switch. idToType gives
             map-PRIMARY type recovery (C-03). */}
