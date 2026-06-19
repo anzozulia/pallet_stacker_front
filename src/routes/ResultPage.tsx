@@ -306,15 +306,16 @@ export default function ResultPage() {
         >
           <fog attach="fog" args={['#0c0f17', 2800, 5600]} />
 
-          {/* Lights (UI-SPEC scene constants). Shading deliberately kept gentle: a soft key (0.23,
-              ~5x lower than the original 1.15) over a high uniform fill (ambient 0.8 + hemisphere
-              0.65 with a lifted ground colour) so the bottom layer stays legible when zoomed out and
-              cast shadows read as a hint, not a hard darkening. */}
+          {/* Lights (UI-SPEC scene constants). Shading deliberately kept very flat — max shade is
+              capped at ~30% of the prior look: a near-flat hemisphere (sky #cdd7f0 ≈ ground #c2cae0
+              so undersides/bottom are not darkened) over a uniform ambient fill (0.8), with only a
+              faint key (0.08) for a hint of form. The darkest face stays within ~10% of the
+              brightest; cast shadows are barely perceptible at this key intensity. */}
           <ambientLight color="#9fb0d0" intensity={0.8} />
-          <hemisphereLight color="#cdd7f0" groundColor="#737d9c" intensity={0.65} />
+          <hemisphereLight color="#cdd7f0" groundColor="#c2cae0" intensity={0.65} />
           <directionalLight
             color="#fff6e8"
-            intensity={0.23}
+            intensity={0.08}
             position={[900, 1750, 1150]}
             castShadow
             shadow-mapSize-width={2048}
@@ -326,7 +327,7 @@ export default function ResultPage() {
             shadow-camera-near={200}
             shadow-camera-far={5000}
           />
-          <directionalLight color="#6d7cff" intensity={0.15} position={[-1000, 600, -800]} />
+          <directionalLight color="#6d7cff" intensity={0.06} position={[-1000, 600, -800]} />
 
           <Pallet length={d.L} width={d.W} />
 
