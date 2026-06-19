@@ -107,11 +107,9 @@ export default function ResultPage() {
   const [sel, setSel] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  // Layer-focus state (D-08/D-09/D-12). `focusMode` selects Build-up (cumulative reveal) vs Isolate
-  // (ghost the rest); `focusIndex` is the 1-based focused layer or null = "All" (the no-op default,
-  // SC-3). `selectedId` tracks WHICH placement-row click drove the current isolation so PlacementList
-  // can show a persistent selected cue (D-12). All three reset on a pallet switch (D-11, below).
-  const [focusMode, setFocusMode] = useState<'buildup' | 'isolate'>('buildup');
+  // Layer build-up state (D-08/D-12). `focusIndex` is the 1-based revealed-up-to layer or null =
+  // "All" (the no-op default, SC-3); build-up reveals floor-up through it. `selectedId` is the
+  // legacy row-click cue (removed in the row-click rewrite). Both reset on a pallet switch (D-11).
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -142,7 +140,7 @@ export default function ResultPage() {
   };
 
   // Pallet-switch path (D-11): a switch RESETS both assembly-insight controls — explode back to 0
-  // and layer-focus back to its default (Build-up / All / no selection). The camera is PRESERVED
+  // and layer build-up back to its default (All / no selection). The camera is PRESERVED
   // across the switch itself (D-05/D-02/Pitfall 1): CameraPresets re-measures on measureNonce={selIndex}
   // WITHOUT animating, and only re-frames on presetNonce/explodeNonce. We DELIBERATELY do NOT bump
   // explodeNonce here — doing so would fire the explode re-fit effect, which reads bboxRef.current
@@ -153,7 +151,6 @@ export default function ResultPage() {
   const selectPallet = (i: number) => {
     setSel(i);
     setExplode(0);
-    setFocusMode('buildup');
     setFocusIndex(null);
     setSelectedId(null);
   };
@@ -345,7 +342,6 @@ export default function ResultPage() {
             heatmap={heatmap}
             layerModel={layerModel}
             explode={explode}
-            focusMode={focusMode}
             focusIndex={focusIndex}
           />
 
@@ -384,8 +380,6 @@ export default function ResultPage() {
           explode={explode}
           onExplode={onExplode}
           layerCount={layerModel.layers.length}
-          focusMode={focusMode}
-          onFocusMode={setFocusMode}
           focusIndex={focusIndex}
           onFocusIndex={setFocusIndex}
         />
@@ -431,7 +425,6 @@ export default function ResultPage() {
           onIsolate={(id) => {
             const li = layerModel.itemToLayer.get(id);
             if (li != null) {
-              setFocusMode('isolate');
               setFocusIndex(li + 1);
               setSelectedId(id);
             }
