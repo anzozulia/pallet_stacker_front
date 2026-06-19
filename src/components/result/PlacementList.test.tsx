@@ -85,4 +85,44 @@ describe('PlacementList (per-pallet cards + one-way hover, RESULT-05 / D-11)', (
     await userEvent.unhover(card);
     expect(onHover).toHaveBeenLastCalledWith(null);
   });
+
+  test('fires onIsolate(item_id) on row click (D-12 row-click → isolate seam)', async () => {
+    const onIsolate = vi.fn();
+    render(
+      <PlacementList
+        items={items}
+        palette={palette}
+        palletLabel="P001"
+        typeToLabel={typeToLabel}
+        onHover={() => {}}
+        onIsolate={onIsolate}
+      />,
+    );
+
+    const card = (screen
+      .getAllByText('Box type T')[0]
+      .closest('[data-placement-card]') as HTMLElement)!;
+    await userEvent.click(card);
+    expect(onIsolate).toHaveBeenCalledWith('T000');
+  });
+
+  test('marks the selectedId row with the persistent selected cue (data-selected), distinct from hover', () => {
+    render(
+      <PlacementList
+        items={items}
+        palette={palette}
+        palletLabel="P001"
+        typeToLabel={typeToLabel}
+        onHover={() => {}}
+        selectedId="T000"
+      />,
+    );
+
+    const card = (screen
+      .getAllByText('Box type T')[0]
+      .closest('[data-placement-card]') as HTMLElement)!;
+    // The persistent selected cue is present (data-selected attribute + the ring class).
+    expect(card).toHaveAttribute('data-selected', 'true');
+    expect(card.className).toContain('ring-accent');
+  });
 });
