@@ -247,7 +247,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase                                  | Plans Complete | Status      | Completed  |
 | -------------------------------------- | -------------- | ----------- | ---------- |
@@ -258,3 +258,36 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 5. API Client & Async Polling          | 4/4 | Complete    | 2026-06-04 |
 | 6. Result Page & 3D Wiring             | 5/5 | Complete    | 2026-06-05 |
 | 7. Edge States, Exports & Self-Hosting | 0/TBD          | Not started | -          |
+| 8. Assembly Insight (layer explode/isolation) | 0/3     | Not started | -          |
+
+### Phase 8: Assembly Insight — Layer Explode & Isolation in the 3D Viewer
+
+**Goal**: A densely-packed pallet is made legible — boxes hidden deep inside the stack become visible and their placement understandable — via two complementary, composable controls in the existing 3D viewer that share one derived layer model: (1) an **Explode** slider that vertically separates the solver's layers (0 = the real assembled stack → max = clearly gapped, animated), and (2) a **Layer-focus** control that reveals layers cumulatively from the floor up (build-up) or isolates a single layer, dimming/hiding the rest. Layers come from a pure, three-free `computeLayers(placements)` (base-z banding, tolerant of tall/floating boxes) so the math stays testable and the viewer stays in the lazy `/result` chunk.
+**Mode:** mvp
+**Depends on**: Phase 6
+**Requirements**: RESULT-07
+**Success Criteria** (what must be TRUE):
+
+1. A pure `computeLayers(placements)` groups each pallet's boxes into ordered layers by base z (with tolerance), unit-tested incl. single-layer, uneven-height, and tall/floating-box cases — imports no three/r3f (code-split gate stays green)
+2. An "Explode" control in the viewer overlay animates the layers apart vertically: 0 reproduces the true assembled stack, higher values clearly gap each layer; the CoG marker and pallet wireframe behave sensibly while exploded
+3. A "Layers" control reveals layers cumulatively (build-up) and/or isolates a single layer, dimming or hiding non-focused layers; default is all-visible + assembled (no behavior change until used)
+4. The new controls compose without regression with the ISO/TOP/FRONT presets, CoG + support-heatmap toggles, the pallet switcher, and placement-list hover highlighting
+5. Works on real multi-layer results (the demo presets) at interactive frame rates
+
+**Plans**: 3 plans (inside-out MVP: pure layer-model foundation -> Explode vertical slice -> Layers focus slice; sequential waves 1->3)
+
+Plans:
+
+**Wave 1**
+
+- [ ] 08-01-PLAN.md — pure foundation: three-free `computeLayers(placements)` base-z banding + 8 golden SC-1 tests, pure `inflateBboxForExplode` (D-05 helper) + golden cases, promote `maath` to a direct dep, add the RESULT-07 requirement
+
+**Wave 2** _(blocked on Wave 1)_
+
+- [ ] 08-02-PLAN.md — Explode vertical slice: per-layer offset + `maath` animation in Boxes, explode-decoupled camera re-fit in CameraPresets, the bottom-center LayerControls Explode slider + ResultPage explode state + CoG-hide gate, route-intercepted explode e2e (0=assembled, >0 gaps, camera-unchanged-on-switch, compose)
+
+**Wave 3** _(blocked on Wave 2)_
+
+- [ ] 08-03-PLAN.md — Layers focus slice: build-up hide + isolate ghost-opacity in Boxes, the Layers slider + Build-up/Isolate toggle, PlacementList row-click -> isolate (+ selected cue), ResultPage focus state + reset-on-switch + row wiring, isolate/build-up/compose/reset e2e + phase gate
+
+**UI hint**: yes
