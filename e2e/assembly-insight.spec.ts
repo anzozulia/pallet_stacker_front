@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path';
 
 // Phase-8 assembly-insight e2e (RESULT-07). Proves, against the STUBBED Configure → Run → /result
 // flow (never the live API, mirroring result-viewer.spec.ts's route-interception harness):
-//   - assembled-default reproduces the Phase-6 view (SC-3) — Explode toggle off, readout `Assembled`.
+//   - assembled-default reproduces the Phase-6 view (SC-3) — Explode toggle off (aria-checked=false).
 //   - explode-gaps separates the layers (SC-2) — toggle ON canvas DIFFERS from the assembled shot.
 //   - CoG-hidden-while-exploded (D-06) — the DETERMINISTIC window.__cogVisible hook flips
 //     true→false→true across off → on → off (NOT a console-error proxy).
@@ -88,10 +88,21 @@ function revealFewerButton(page: Page) {
   return page.getByRole('button', { name: 'Reveal one fewer layer' });
 }
 
+/** The Layers build-up `+` stepper, by its accessible name (UI-SPEC aria-label). */
+function revealMoreButton(page: Page) {
+  return page.getByRole('button', { name: 'Reveal one more layer' });
+}
+
 /** Click the `−` stepper `count` times to reveal fewer layers, settling once after. */
 async function revealFewer(page: Page, count = 1): Promise<void> {
   for (let i = 0; i < count; i += 1) await revealFewerButton(page).click();
   // No camera re-fit on focus change, but let a frame or two land.
+  await page.waitForTimeout(250);
+}
+
+/** Click the `+` stepper `count` times to reveal more layers (circular), settling once after. */
+async function revealMore(page: Page, count = 1): Promise<void> {
+  for (let i = 0; i < count; i += 1) await revealMoreButton(page).click();
   await page.waitForTimeout(250);
 }
 
@@ -121,9 +132,8 @@ test('assembled-default reproduces the Phase-6 view (SC-3)', async ({ page }) =>
 
   await reachResultViaStubbedFlow(page);
 
-  // On landing the Explode toggle is OFF (assembled) and reads `Assembled` (byte-identical stack).
+  // On landing the Explode toggle is OFF (assembled) — byte-identical stack, no state-word readout.
   await expect(explodeToggle(page)).toHaveAttribute('aria-checked', 'false');
-  await expect(page.getByText('Assembled', { exact: true })).toBeVisible();
 
   // Capture the assembled baseline (scenario 2 diffs against this). No WebGL/three errors.
   const baseline = await page.locator('[data-testid="r3f-canvas"]').screenshot();
@@ -140,7 +150,7 @@ test('explode-gaps separates the layers (SC-2)', async ({ page }) => {
 
   // Toggle Explode ON and let the layers animate apart.
   await setExplode(page, true);
-  await expect(page.getByText('Exploded', { exact: true })).toBeVisible();
+  await expect(explodeToggle(page)).toHaveAttribute('aria-checked', 'true');
   const exploded = await page.locator('[data-testid="r3f-canvas"]').screenshot();
 
   // The exploded canvas must DIFFER from the assembled one (layers visibly separated, SC-2/SC-3).
@@ -225,21 +235,25 @@ test('compose-with-preset+heatmap (SC-4)', async ({ page }) => {
 });
 
 // ── Layers build-up slice ───────────────────────────────────────────────────────────────────────
-// P001 (the default-selected pallet) has 2 base-z layers, so revealing layer 1 of 2 (− once from
-// All) is a meaningful partial build-up that hides the upper layer.
+// P001 (the default-selected pallet) has 2 base-z layers. The stepper is CIRCULAR: from All, `+`
+// reveals layer 1 of 2 (a meaningful partial that hides the upper layer); `+` again wraps to All.
 
-test('build-up-hides upper layers (D-08)', async ({ page }) => {
+test('build-up-hides upper layers + circular wrap (D-08)', async ({ page }) => {
   await reachResultViaStubbedFlow(page);
 
   // Default landing is All (full stack) — byte-identical assembled baseline.
   await expect(page.getByText('All', { exact: true })).toBeVisible();
   const all = await page.locator('[data-testid="r3f-canvas"]').screenshot();
 
-  // Step DOWN to layer 1 of 2: the upper layer is HIDDEN → the canvas differs from All.
-  await revealFewer(page, 1);
-  await expect(page.getByText('Layers 1–1 / 2', { exact: true })).toBeVisible();
+  // From All, `+` reveals layer 1 of 2: the upper layer is HIDDEN → the canvas differs from All.
+  await revealMore(page, 1);
+  await expect(page.getByText('1–1 / 2', { exact: true })).toBeVisible();
   const buildup = await page.locator('[data-testid="r3f-canvas"]').screenshot();
   expect(buildup.equals(all)).toBe(false);
+
+  // Circular: `+` again from the last partial level wraps back to All (the no-op default returns).
+  await revealMore(page, 1);
+  await expect(page.getByText('All', { exact: true })).toBeVisible();
 });
 
 test('row-click → builds up to that box layer, hover unchanged (D-12)', async ({ page }) => {
@@ -268,8 +282,8 @@ test('reset-on-switch resets explode + focus, camera preserved (D-11/D-05)', asy
   // Toggle explode ON and step a layer build-up on P001.
   await setExplode(page, true);
   await revealFewer(page, 1);
-  await expect(page.getByText('Exploded', { exact: true })).toBeVisible();
-  await expect(page.getByText('Layers 1–1 / 2', { exact: true })).toBeVisible();
+  await expect(explodeToggle(page)).toHaveAttribute('aria-checked', 'true');
+  await expect(page.getByText('1–1 / 2', { exact: true })).toBeVisible();
 
   // Record the camera AFTER the explode re-fit has settled (so the switch comparison is clean).
   await page.waitForFunction(() => {
@@ -281,10 +295,10 @@ test('reset-on-switch resets explode + focus, camera preserved (D-11/D-05)', asy
     () => (window as Window & { __cameraState?: unknown }).__cameraState,
   )) as CamState;
 
-  // Switch pallets: readouts must return to Assembled / All (reset), camera preserved (no snap).
+  // Switch pallets: explode resets (toggle OFF) + Layers returns to All, camera preserved (no snap).
   await page.getByRole('button', { name: 'P002' }).click();
   await page.waitForTimeout(600);
-  await expect(page.getByText('Assembled', { exact: true })).toBeVisible();
+  await expect(explodeToggle(page)).toHaveAttribute('aria-checked', 'false');
   await expect(page.getByText('All', { exact: true })).toBeVisible();
 
   const after = (await page.evaluate(

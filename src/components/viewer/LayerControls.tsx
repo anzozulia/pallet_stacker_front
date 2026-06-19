@@ -1,9 +1,9 @@
 // Bottom-center viewer control bar (L-04): the Phase-8 assembly-insight cluster, layered over the
 // <Canvas> as absolute-positioned DOM in the SAME pointer-events-none / pointer-events-auto
 // convention ViewerOverlay uses. This bar carries TWO compact controls: an Explode TOGGLE button
-// (Assembled ⇄ Exploded) and a Layers build-up − / readout / + STEPPER cluster (build-up is the
-// only layer mode). The + reveals one more layer floor-up, the − one fewer; the top of the range
-// collapses to `All`.
+// (On/Off, no state-word readout) and a Layers build-up − / readout / + STEPPER cluster (build-up is
+// the only layer mode). The stepper is CIRCULAR: All → 1 → 2 → … → (N-1) → All, wrapping both ways,
+// so `+` from All reveals layer 1 and never lands on a 0/"no boxes" state.
 //
 // `layerCount` drives the build-up range top (= All) AND the disabled states: `layerCount === 0`
 // disables the whole bar (readout `No boxes`); `layerCount === 1` disables the Layers steppers (a
@@ -25,7 +25,7 @@ export interface LayerControlsProps {
   layerCount: number;
   // 1-based revealed-up-to layer, or null = "All" (the no-op default, D-08).
   focusIndex: number | null;
-  // Layers stepper handler — null = All; ResultPage maps the numeric level back to null at the top.
+  // Layers stepper handler — receives the next level (1..N-1) or null = All (the stepper wraps here).
   onFocusIndex: (index: number | null) => void;
 }
 
@@ -40,29 +40,34 @@ export function LayerControls({
   const single = layerCount === 1;
   // The Layers control is meaningful only with >=2 layers; disabled (but Explode stays usable) below.
   const focusDisabled = empty || single;
-  // Explode is a binary toggle now: pressed = Exploded (explode 1), unpressed = Assembled (0).
+  // Explode is a binary toggle: pressed = Exploded (explode 1), unpressed = Assembled (0).
   const exploded = explode > 0;
-  // Explode readout (UI-SPEC): `No boxes` when empty, else `Exploded`/`Assembled`. Kept visible so
-  // the e2e `getByText('Assembled')` / `getByText('Exploded')` text assertions resolve.
-  const explodeReadout = empty ? 'No boxes' : exploded ? 'Exploded' : 'Assembled';
-  // Current numeric build-up level: All shows as N (the full stack). Clamped to [0..layerCount].
-  const level = focusIndex ?? layerCount;
+  // Build-up level. All = the full N-layer stack; the partial levels are 1..N-1 (level N ≡ All).
+  // null = All (the no-op default, D-08).
   const atAll = focusIndex == null || focusIndex >= layerCount;
-  const atNone = level <= 0;
+  const level = focusIndex ?? layerCount;
   // Layers readout (UI-SPEC Copywriting): `No boxes` / `Single layer` for the degenerate counts,
-  // `All` at the top (the no-op default), else `Layers 1–{k} / {N}` (k 1-based, floor-up, D-08).
+  // `All` for the full stack, else `1–{k} / {N}` (k 1-based, floor-up). The word "Layers" is dropped
+  // from the partial states to keep the bar compact.
   const layersReadout = empty
     ? 'No boxes'
     : single
       ? 'Single layer'
       : atAll
         ? 'All'
-        : `Layers 1–${level} / ${layerCount}`;
+        : `1–${level} / ${layerCount}`;
 
-  // Step the build-up level by ±1, clamped to [0..layerCount]; collapse to All (null) at the top.
+  // Circular build-up stepper. Cycle: All → 1 → 2 → … → (N-1) → All, wrapping both directions.
+  // From All, `+` reveals layer 1 and `−` jumps to the last partial level; stepping past either end
+  // of the partial range collapses back to All. The 0/"no boxes" state is intentionally unreachable.
   const step = (delta: number) => {
-    const next = Math.min(Math.max(level + delta, 0), layerCount);
-    onFocusIndex(next >= layerCount ? null : next);
+    const maxPartial = layerCount - 1; // All represents the full N-layer state, so partials cap at N-1
+    if (atAll) {
+      onFocusIndex(delta > 0 ? 1 : maxPartial);
+      return;
+    }
+    const next = level + delta;
+    onFocusIndex(next < 1 || next > maxPartial ? null : next);
   };
 
   return (
@@ -91,9 +96,6 @@ export function LayerControls({
         >
           {exploded ? 'On' : 'Off'}
         </button>
-        <span className="w-[68px] text-right tabular-nums text-[var(--color-d-text-2)]">
-          {explodeReadout}
-        </span>
 
         {/* Divider between the two control clusters. */}
         <span aria-hidden="true" className="h-4 w-px bg-[var(--color-d-border)]" />
@@ -106,7 +108,7 @@ export function LayerControls({
           <button
             type="button"
             aria-label="Reveal one fewer layer"
-            disabled={focusDisabled || atNone}
+            disabled={focusDisabled}
             onClick={() => step(-1)}
             className="grid h-[22px] w-[22px] cursor-pointer place-items-center rounded-[5px] border border-[var(--color-d-border)] bg-[#1a2030] text-[13px] leading-none text-[var(--color-d-text-2)] transition-colors hover:bg-[#222a3d] hover:text-[var(--color-d-text)] disabled:cursor-not-allowed disabled:opacity-50"
           >
@@ -118,7 +120,7 @@ export function LayerControls({
           <button
             type="button"
             aria-label="Reveal one more layer"
-            disabled={focusDisabled || atAll}
+            disabled={focusDisabled}
             onClick={() => step(1)}
             className="grid h-[22px] w-[22px] cursor-pointer place-items-center rounded-[5px] border border-[var(--color-d-border)] bg-[#1a2030] text-[13px] leading-none text-[var(--color-d-text-2)] transition-colors hover:bg-[#222a3d] hover:text-[var(--color-d-text)] disabled:cursor-not-allowed disabled:opacity-50"
           >
