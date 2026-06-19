@@ -258,7 +258,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. API Client & Async Polling          | 4/4 | Complete    | 2026-06-04 |
 | 6. Result Page & 3D Wiring             | 5/5 | Complete    | 2026-06-05 |
 | 7. Edge States, Exports & Self-Hosting | 0/TBD          | Not started | -          |
-| 8. Assembly Insight (layer explode/isolation) | 0/3     | Not started | -          |
+| 8. Assembly Insight (layer explode/isolation) | 2/3 | In Progress|  |
 
 ### Phase 8: Assembly Insight — Layer Explode & Isolation in the 3D Viewer
 
@@ -284,7 +284,7 @@ Plans:
 
 **Wave 2** _(blocked on Wave 1)_
 
-- [ ] 08-02-PLAN.md — Explode vertical slice: per-layer offset + `maath` animation in Boxes, explode-decoupled camera re-fit in CameraPresets, the bottom-center LayerControls Explode slider + ResultPage explode state + CoG-hide gate, route-intercepted explode e2e (0=assembled, >0 gaps, camera-unchanged-on-switch, compose)
+- [x] 08-02-PLAN.md — Explode vertical slice: per-layer offset + `maath` animation in Boxes, explode-decoupled camera re-fit in CameraPresets, the bottom-center LayerControls Explode slider + ResultPage explode state + CoG-hide gate, route-intercepted explode e2e (0=assembled, >0 gaps, camera-unchanged-on-switch, compose)
 
 **Wave 3** _(blocked on Wave 2)_
 
