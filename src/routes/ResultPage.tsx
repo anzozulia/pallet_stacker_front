@@ -26,6 +26,7 @@ import { Canvas } from '@react-three/fiber';
 import { Boxes } from '@/components/viewer/Boxes';
 import { CameraPresets } from '@/components/viewer/CameraPresets';
 import { CogMarker } from '@/components/viewer/CogMarker';
+import { LayerControls } from '@/components/viewer/LayerControls';
 import { Pallet } from '@/components/viewer/Pallet';
 import { ViewerOverlay } from '@/components/viewer/ViewerOverlay';
 import SummaryBlock from '@/components/result/SummaryBlock';
@@ -35,6 +36,7 @@ import UnpackedPanel from '@/components/result/UnpackedPanel';
 import { queryClient } from '@/api/queryClient';
 import { mapDoneResponse } from '@/lib/result-mapper';
 import { colorForType } from '@/lib/palette';
+import { computeLayers, EXPLODE_FIXED_UNIT } from '@/lib/computeLayers';
 import { DECK_TOP_Y } from '@/lib/mapping';
 import type { Bbox, PresetKind } from '@/lib/camera-presets';
 import type { JobState } from '@/api/pack-schema';
@@ -120,6 +122,27 @@ export default function ResultPage() {
     setPresetNonce((n) => n + 1);
   };
 
+  // Explode state (D-04/D-05) — mirrors the presetNonce idiom: `explode` (0..1) drives the Boxes
+  // per-layer offset + the CoG-hide gate; `explodeNonce` bumps on every change so CameraPresets
+  // re-frames to the growing stack each time (re-selecting the same value still re-fits). The
+  // pallet-switch path is left untouched here — the reset-on-switch is Plan 03's job (D-03).
+  const [explode, setExplode] = useState(0);
+  const [explodeNonce, setExplodeNonce] = useState(0);
+  const onExplode = (v: number) => {
+    setExplode(v);
+    setExplodeNonce((n) => n + 1);
+  };
+
+  // D-06 visibility decision (single source of truth): the CoG marker shows only when its toggle
+  // is ON AND the stack is assembled (explode === 0) — once exploded the assembled-stack CoG is
+  // misleading. Computed here so BOTH the render gate and the deterministic e2e hook read the same
+  // boolean. The window write is a side effect, so it lives in an effect (not the render body).
+  const cogVisible = cogOn && explode === 0;
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    (window as Window & { __cogVisible?: boolean }).__cogVisible = cogVisible;
+  }, [cogVisible]);
+
   // All hooks above the JSX guard so hook order is stable across the redirect render.
   const result = (done?.result ?? null) as DoneResult | null;
 
@@ -163,6 +186,19 @@ export default function ResultPage() {
   const selMapped = view.pallets[selIndex]; // MappedPallet: items / utilisation / totalWeight
   const d = selPallet.dimensions;
   const palletLabel = selPallet.pallet_id || `Pallet ${selIndex + 1}`;
+
+  // Base-z layer banding for the selected pallet (computeLayers, Plan 01). A plain const (NOT a
+  // hook) because it is computed AFTER the `return null` guard — hook order stays stable. Drives
+  // the Boxes per-layer offset and the camera extra-height. computeLayers is pure + memo-cheap
+  // (≤19 items, runs only on render of an already-settled result).
+  const layerModel = computeLayers(selMapped.items);
+  // The TALLEST layer's total lift (RESEARCH Pattern 3): `(layers.length - 1) * explode *
+  // EXPLODE_FIXED_UNIT`. Uses the SAME EXPLODE_FIXED_UNIT constant Boxes uses for the visual
+  // offset (single source of truth) so the camera re-fit frames exactly the inflated stack — the
+  // camera lift cannot diverge from the visual offset. Guard against a single-layer pallet (the
+  // factor is 0 when layers.length <= 1, so no lift / no re-frame growth).
+  const explodeExtraHeight =
+    Math.max(0, layerModel.layers.length - 1) * explode * EXPLODE_FIXED_UNIT;
 
   // Deck-footprint fallback frame (WR-01): when the selected pallet has ZERO boxes the measured
   // boxes-group bbox is empty → NaN camera. CameraPresets falls back to THIS non-degenerate bbox
@@ -282,11 +318,17 @@ export default function ResultPage() {
             palette={palette}
             hoveredId={hoveredId}
             heatmap={heatmap}
+            layerModel={layerModel}
+            explode={explode}
           />
 
           {/* CoG marker (DIAG-01): rendered INSIDE the Canvas, toggle-able (default ON). Fed the
-              SELECTED pallet's cog + footprint so it moves on a pallet switch. */}
-          {cogOn && (
+              SELECTED pallet's cog + footprint so it moves on a pallet switch. D-06: the marker is
+              also HIDDEN while exploded (explode > 0) because the CoG of the assembled stack is
+              misleading once the layers are pulled apart — it returns at explode === 0 respecting
+              cogOn. `cogVisible` (computed above) is the single decision the deterministic e2e hook
+              also reads, so the test asserts the real gate, not a proxy. */}
+          {cogVisible && (
             <CogMarker
               cog={selPallet.cog}
               palletL={selPallet.dimensions.L}
@@ -303,8 +345,19 @@ export default function ResultPage() {
             presetNonce={presetNonce}
             measureNonce={selIndex}
             fallbackBbox={fallbackBbox}
+            explodeNonce={explodeNonce}
+            explodeExtraHeight={explodeExtraHeight}
           />
         </Canvas>
+
+        {/* Bottom-center assembly-insight bar (L-04): the Explode slider drives explode state →
+            Boxes offset + CameraPresets re-fit + CoG hide. Sibling of ViewerOverlay inside the
+            viewer div so it overlays the Canvas. layerCount → empty-state disable + Plan-03 range. */}
+        <LayerControls
+          explode={explode}
+          onExplode={onExplode}
+          layerCount={layerModel.layers.length}
+        />
 
         <ViewerOverlay
           title={palletLabel}
