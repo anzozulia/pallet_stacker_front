@@ -304,18 +304,14 @@ export default function ResultPage() {
           gl={{ antialias: true, preserveDrawingBuffer: true }}
           camera={{ fov: 45, near: 1, far: 20000, position: [2000, 1600, 2200] }}
         >
-          {/* Distance fog fades geometry into the background only at the far edge. Kept well beyond
-              the pallet (camera sits ~3360u out) so far/back/bottom boxes are NOT darkened on
-              zoom-out or explode — the earlier near=2800/far=5600 fogged the deep layers to near
-              black. */}
-          <fog attach="fog" args={['#0c0f17', 7000, 20000]} />
+          <fog attach="fog" args={['#0c0f17', 2800, 5600]} />
 
           {/* Lights (UI-SPEC scene constants). Shading deliberately kept gentle: a soft key (0.23,
               ~5x lower than the original 1.15) over a high uniform fill (ambient 0.8 + hemisphere
               0.65 with a lifted ground colour) so the bottom layer stays legible when zoomed out and
               cast shadows read as a hint, not a hard darkening. */}
-          <ambientLight color="#9fb0d0" intensity={1.0} />
-          <hemisphereLight color="#cdd7f0" groundColor="#8a93ad" intensity={0.8} />
+          <ambientLight color="#9fb0d0" intensity={0.8} />
+          <hemisphereLight color="#cdd7f0" groundColor="#737d9c" intensity={0.65} />
           <directionalLight
             color="#fff6e8"
             intensity={0.23}
