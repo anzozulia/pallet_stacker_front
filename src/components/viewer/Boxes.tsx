@@ -48,6 +48,43 @@ export interface BoxesProps {
   // SC-3 / Pitfall 5). >0 lifts each layer group by `layerIndex * explode * EXPLODE_FIXED_UNIT`
   // (D-04 uniform additive gap), animated each frame via maath easing.damp (D-07).
   explode: number;
+  // Layer-focus mode (D-08/D-09). `buildup` reveals layers cumulatively from the floor — layers
+  // above the focused one are HIDDEN; `isolate` keeps every layer visible but DIMS the non-focused
+  // ones to translucent ghosts (GHOST_OPACITY) so the focused layer stands out solid. Only matters
+  // when `focusIndex` is non-null; at null both modes collapse to the All default (all opaque).
+  focusMode: 'buildup' | 'isolate';
+  // 1-based focused layer (D-08, floor-up), or null = "All" (the no-op default). null reproduces the
+  // Plan-02 behaviour EXACTLY: every layer visible + opaque, transparent never set (SC-3 / Pitfall 5).
+  focusIndex: number | null;
+}
+
+// Ghost opacity for non-focused layers in isolate mode (D-09). A 3D-material constant (UI-SPEC
+// "Color": ghost ~0.12-0.18, NOT a design token). Low enough to read as a translucent ghost yet
+// keep the heatmap colour + hover glow legible THROUGH it (Pitfall 4 / SC-4).
+const GHOST_OPACITY = 0.15;
+
+// Pure per-layer appearance for the current focus (RESEARCH Pattern 2). `layerIndex` is 0-based;
+// `focusIndex` is 1-based (floor-up) or null. Returns whether the layer's wrapper group renders at
+// all + the opacity applied to its meshes. NEVER recolours (Pitfall 4) — colour/emissive stay with
+// the heatmap/hover logic; this only drives visibility + opacity:
+//   - focusIndex == null  -> { visible: true,  opacity: 1 }            (All default — byte-identical)
+//   - buildup             -> show layers <= focusIndex-1, HIDE above   (cumulative reveal, D-08)
+//   - isolate             -> focused layer solid, all others ghosted   (dim-the-rest, D-09)
+// Pitfall 5: opacity 1 means the caller sets transparent=FALSE, so the default has no sort artifacts.
+export function layerAppearance(
+  layerIndex: number,
+  focusMode: 'buildup' | 'isolate',
+  focusIndex: number | null,
+): { visible: boolean; opacity: number } {
+  if (focusIndex == null) return { visible: true, opacity: 1 };
+  const k0 = focusIndex - 1; // 0-based focused layer
+  if (focusMode === 'buildup') {
+    return { visible: layerIndex <= k0, opacity: 1 };
+  }
+  // isolate
+  return layerIndex === k0
+    ? { visible: true, opacity: 1 }
+    : { visible: true, opacity: GHOST_OPACITY };
 }
 
 // Edge tint: from the box colour via offsetHSL(0, -0.04, +0.18) (mockup tint()).
@@ -56,7 +93,7 @@ function edgeTint(hex: string): Color {
 }
 
 export const Boxes = forwardRef<Group, BoxesProps>(function Boxes(
-  { items, dimensions, palette, hoveredId, heatmap, layerModel, explode },
+  { items, dimensions, palette, hoveredId, heatmap, layerModel, explode, focusMode, focusIndex },
   ref,
 ) {
   const mapped = useMemo(
@@ -109,34 +146,48 @@ export const Boxes = forwardRef<Group, BoxesProps>(function Boxes(
 
   return (
     <group ref={ref}>
-      {layered.map(([layerIndex, boxes]) => (
-        <group
-          key={layerIndex}
-          ref={(g) => {
-            if (g) groupRefs.current.set(layerIndex, g);
-            else groupRefs.current.delete(layerIndex);
-          }}
-        >
-          {boxes.map((b) => (
-            <mesh key={b.id} position={b.center} castShadow receiveShadow>
-              <boxGeometry args={b.size} />
-              {/* Declarative hover glow (D-11): r3f diffs emissiveIntensity and patches the live
-                  material in place — no imperative material.emissive.set, no remount. Keyed by the
-                  box id (= item_id). Individual meshes (D-12) keep per-box emissive trivial. */}
-              <meshStandardMaterial
-                color={b.color}
-                emissive={b.color}
-                emissiveIntensity={hoveredId === b.id ? 0.45 : 0}
-                roughness={0.62}
-                metalness={0.04}
-              />
-              <Edges lineWidth={1.75}>
-                <lineBasicMaterial color={edgeTint(b.color)} transparent opacity={0.55} />
-              </Edges>
-            </mesh>
-          ))}
-        </group>
-      ))}
+      {layered.map(([layerIndex, boxes]) => {
+        // Per-layer focus appearance (D-08/D-09). `visible` drops a HIDDEN build-up layer out of
+        // the scene entirely (group not rendered); `opacity` ghosts a non-focused isolate layer.
+        // At the All default (focusIndex null) -> { visible:true, opacity:1 } so the group renders
+        // exactly as Plan 02 left it (Pitfall 5: transparent stays false at opacity 1).
+        const { visible, opacity } = layerAppearance(layerIndex, focusMode, focusIndex);
+        const transparent = opacity < 1;
+        return (
+          <group
+            key={layerIndex}
+            visible={visible}
+            ref={(g) => {
+              if (g) groupRefs.current.set(layerIndex, g);
+              else groupRefs.current.delete(layerIndex);
+            }}
+          >
+            {boxes.map((b) => (
+              <mesh key={b.id} position={b.center} castShadow receiveShadow>
+                <boxGeometry args={b.size} />
+                {/* Declarative hover glow (D-11): r3f diffs emissiveIntensity and patches the live
+                    material in place — no imperative material.emissive.set, no remount. Keyed by the
+                    box id (= item_id). Individual meshes (D-12) keep per-box emissive trivial.
+                    Ghosting (D-09) sets ONLY transparent/opacity — colour + emissive (heatmap/hover)
+                    stay untouched so both remain legible THROUGH the ghost (Pitfall 4 / SC-4).
+                    transparent is FALSE at opacity 1 so the All default is byte-identical (Pitfall 5). */}
+                <meshStandardMaterial
+                  color={b.color}
+                  emissive={b.color}
+                  emissiveIntensity={hoveredId === b.id ? 0.45 : 0}
+                  roughness={0.62}
+                  metalness={0.04}
+                  transparent={transparent}
+                  opacity={opacity}
+                />
+                <Edges lineWidth={1.75}>
+                  <lineBasicMaterial color={edgeTint(b.color)} transparent opacity={0.55} />
+                </Edges>
+              </mesh>
+            ))}
+          </group>
+        );
+      })}
     </group>
   );
 });
