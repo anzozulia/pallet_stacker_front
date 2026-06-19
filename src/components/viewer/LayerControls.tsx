@@ -16,9 +16,10 @@
 import clsx from 'clsx';
 
 export interface LayerControlsProps {
-  // Current explode amount, 0..1. 0 = Assembled (byte-identical, SC-3).
+  // Current explode amount, 0 or 1. 0 = Assembled (byte-identical, SC-3); 1 = Exploded (full gap).
   explode: number;
-  // Slider change handler — the single owner (ResultPage) bumps explode state + the explodeNonce.
+  // Toggle handler — called with the NEW numeric explode (0 or 1). The single owner (ResultPage)
+  // bumps explode state + the explodeNonce so the camera re-frames on every toggle.
   onExplode: (value: number) => void;
   // Number of base-z layers for the selected pallet (computeLayers). 0 → disabled "No boxes" bar;
   // 1 → "Single layer" (Layers slider + mode toggle disabled). Also the Layers range max.
@@ -46,12 +47,11 @@ export function LayerControls({
   const single = layerCount === 1;
   // The Layers control is meaningful only with >=2 layers; disabled (but Explode stays usable) below.
   const focusDisabled = empty || single;
-  // Explode readout (UI-SPEC): `No boxes` when empty, `Assembled` at exactly 0, else a unitless `x`.
-  const explodeReadout = empty
-    ? 'No boxes'
-    : explode === 0
-      ? 'Assembled'
-      : `${explode.toFixed(1)}x`;
+  // Explode is a binary toggle now: pressed = Exploded (explode 1), unpressed = Assembled (0).
+  const exploded = explode > 0;
+  // Explode readout (UI-SPEC): `No boxes` when empty, else `Exploded`/`Assembled`. Kept visible so
+  // the e2e `getByText('Assembled')` / `getByText('Exploded')` text assertions resolve.
+  const explodeReadout = empty ? 'No boxes' : exploded ? 'Exploded' : 'Assembled';
   // Layers readout (UI-SPEC Copywriting): `No boxes` / `Single layer` for the degenerate counts,
   // `All` at 0/null (the no-op default), else `Layer {k} / {N}` (k 1-based, floor-up, D-08).
   const layersReadout = empty
@@ -68,22 +68,26 @@ export function LayerControls({
     // presets.
     <div className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 select-none">
       <div className="pointer-events-auto flex items-center gap-3 rounded-md border border-[var(--color-d-border)] bg-[#1a2030]/90 px-[10px] py-[6px] font-mono text-xs leading-tight backdrop-blur">
-        {/* Explode portion (08-02, unchanged). */}
+        {/* Explode portion: a single binary toggle button (Assembled ⇄ Exploded), accent-on /
+            neutral-off pill. role=switch + aria-checked so it reads as a toggle; aria-label stays
+            "Explode" so existing flows can target it by name. */}
         <span className="font-semibold text-[var(--color-d-text)]">Explode</span>
-        <input
-          type="range"
-          min={0}
-          max={1}
-          step={0.05}
-          value={explode}
+        <button
+          type="button"
+          role="switch"
+          aria-checked={exploded}
+          aria-label="Explode"
           disabled={empty}
-          onChange={(e) => onExplode(e.currentTarget.valueAsNumber)}
-          aria-label="Explode amount"
-          aria-valuetext={explodeReadout}
-          // Accent fill + thumb on a #1a2030 track (UI-SPEC Color: accent ONLY for the slider).
-          // accent-color tints both the filled track and the thumb natively; disabled dims it.
-          className="h-1 w-40 cursor-pointer appearance-none rounded-full bg-[#0c0f17] accent-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-50"
-        />
+          onClick={() => onExplode(exploded ? 0 : 1)}
+          className={clsx(
+            'cursor-pointer rounded-[5px] border px-[7px] py-[3px] text-[11px] leading-tight transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+            exploded
+              ? 'border-[rgba(124,116,255,0.6)] bg-accent text-white'
+              : 'border-[var(--color-d-border)] bg-[#1a2030] text-[var(--color-d-text-2)] hover:bg-[#222a3d] hover:text-[var(--color-d-text)]',
+          )}
+        >
+          {exploded ? 'On' : 'Off'}
+        </button>
         <span className="w-[68px] text-right tabular-nums text-[var(--color-d-text-2)]">
           {explodeReadout}
         </span>

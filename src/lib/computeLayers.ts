@@ -1,7 +1,7 @@
 // Pure, IO-free layer banding: group an API pallet's placements into horizontal LAYERS
 // by their BASE height (position.z), floor-up. This is the single genuinely-new derivation
-// of Phase 8 — the shared foundation the explode offsets, build-up / isolate visibility, the
-// slider ranges, and the placement-row -> layer lookup (D-12) all consume.
+// of Phase 8 — the shared foundation the explode offset, build-up visibility, the layer
+// stepper range, and the placement-row -> layer lookup (D-12) all consume.
 //
 // Empirical banding risk (same discipline as the Phase-2 mapping risk / cog-map.ts): a box is
 // ALWAYS banded by its BASE (position.z), even when a tall box's TOP spans into the next band's
@@ -29,10 +29,10 @@ export const LAYER_Z_TOLERANCE = 5;
  * The SINGLE source of truth (mm) for the per-layer explode lift unit (median fixture layer
  * height, RESEARCH Open-Q1). Living in this three-free lib module means BOTH the visual offset
  * in Boxes.tsx (Plan 02 Task 1) and the camera extra-height in ResultPage.tsx (Plan 02 Task 2)
- * import the SAME value — never a duplicated numeric literal that could drift. Plan 02 tunes the
- * magnitude HERE only (one place) if the exploded gap reads too small or too large.
+ * import the SAME value — never a duplicated numeric literal that could drift. Tuned HERE only
+ * (one place) if the exploded gap reads too small or too large; bumped to 500 for a clearer gap.
  */
-export const EXPLODE_FIXED_UNIT = 350;
+export const EXPLODE_FIXED_UNIT = 500;
 
 /** One horizontal band of boxes, indexed floor-up from 0. */
 export interface Layer {

@@ -6,8 +6,8 @@ import { dirname, join } from 'node:path';
 // Phase-8 explode slice (RESULT-07 / 08-02) e2e. Proves, as FIVE independently-reported tests
 // against the STUBBED Configure → Run → /result flow (never the live API, mirroring
 // result-viewer.spec.ts's route-interception harness):
-//   1. assembled-default reproduces the Phase-6 view (SC-3) — readout `Assembled`, baseline shot.
-//   2. explode-gaps separates the layers (SC-2) — explode>0 canvas DIFFERS from the assembled shot.
+//   1. assembled-default reproduces the Phase-6 view (SC-3) — toggle off, readout `Assembled`.
+//   2. explode-gaps separates the layers (SC-2) — toggle on canvas DIFFERS from the assembled shot.
 //   3. CoG-hidden-while-exploded (D-06) — the DETERMINISTIC window.__cogVisible hook flips
 //      true→false→true across 0 → max → 0 (NOT a console-error proxy).
 //   4. camera-unchanged-on-switch (D-05/Pitfall 1) — a pallet switch must NOT re-frame the camera.
@@ -77,9 +77,9 @@ function l2(a: readonly number[], b: readonly number[]): number {
   return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 }
 
-/** Locate the Explode native range by its accessible name (UI-SPEC aria-label). */
-function explodeSlider(page: Page) {
-  return page.getByRole('slider', { name: 'Explode amount' });
+/** Locate the Explode toggle button by its accessible name (UI-SPEC aria-label). */
+function explodeToggle(page: Page) {
+  return page.getByRole('switch', { name: 'Explode' });
 }
 
 /** Locate the Layers focus native range by its accessible name (UI-SPEC aria-label). */
@@ -94,9 +94,11 @@ async function setLayer(page: Page, value: number): Promise<void> {
   await page.waitForTimeout(250);
 }
 
-/** Set the Explode slider to `value` (0..1) and wait for the re-fit animation to settle. */
-async function setExplode(page: Page, value: number): Promise<void> {
-  await explodeSlider(page).fill(String(value));
+/** Drive the Explode toggle to the desired binary state and wait for the re-fit to settle. */
+async function setExplode(page: Page, on: boolean): Promise<void> {
+  const toggle = explodeToggle(page);
+  const isOn = (await toggle.getAttribute('aria-checked')) === 'true';
+  if (isOn !== on) await toggle.click();
   // The explode change bumps explodeNonce → CameraPresets re-fits; wait until it reports settled.
   await page.waitForFunction(() => {
     const s = (window as Window & { __cameraState?: { settled?: boolean } }).__cameraState;
@@ -118,8 +120,8 @@ test('assembled-default reproduces the Phase-6 view (SC-3)', async ({ page }) =>
 
   await reachResultViaStubbedFlow(page);
 
-  // On landing the Explode control reads `Assembled` (value 0 = byte-identical assembled stack).
-  await expect(explodeSlider(page)).toHaveValue('0');
+  // On landing the Explode toggle is OFF (assembled) and reads `Assembled` (byte-identical stack).
+  await expect(explodeToggle(page)).toHaveAttribute('aria-checked', 'false');
   await expect(page.getByText('Assembled', { exact: true })).toBeVisible();
 
   // Capture the assembled baseline (scenario 2 diffs against this). No WebGL/three errors.
@@ -131,13 +133,13 @@ test('assembled-default reproduces the Phase-6 view (SC-3)', async ({ page }) =>
 test('explode-gaps separates the layers (SC-2)', async ({ page }) => {
   await reachResultViaStubbedFlow(page);
 
-  // Assembled baseline first (explode 0).
-  await expect(explodeSlider(page)).toHaveValue('0');
+  // Assembled baseline first (toggle off).
+  await expect(explodeToggle(page)).toHaveAttribute('aria-checked', 'false');
   const assembled = await page.locator('[data-testid="r3f-canvas"]').screenshot();
 
-  // Drive Explode to max and let the layers animate apart.
-  await setExplode(page, 1);
-  await expect(page.getByText('1.0x', { exact: true })).toBeVisible();
+  // Toggle Explode ON and let the layers animate apart.
+  await setExplode(page, true);
+  await expect(page.getByText('Exploded', { exact: true })).toBeVisible();
   const exploded = await page.locator('[data-testid="r3f-canvas"]').screenshot();
 
   // The exploded canvas must DIFFER from the assembled one (layers visibly separated, SC-2/SC-3).
@@ -149,21 +151,21 @@ test('CoG-hidden-while-exploded (D-06)', async ({ page }) => {
 
   // CoG toggle is ON by default. Deterministic hook: window.__cogVisible reflects the EXACT gate
   // (cogOn && explode === 0) ResultPage renders on — not a console-error-free proxy.
-  await expect(explodeSlider(page)).toHaveValue('0');
+  await expect(explodeToggle(page)).toHaveAttribute('aria-checked', 'false');
   await page.waitForFunction(
     () => (window as Window & { __cogVisible?: boolean }).__cogVisible === true,
   );
   expect(await readCogVisible(page)).toBe(true);
 
-  // Explode > 0 → CoG hidden.
-  await setExplode(page, 1);
+  // Explode ON → CoG hidden.
+  await setExplode(page, true);
   await page.waitForFunction(
     () => (window as Window & { __cogVisible?: boolean }).__cogVisible === false,
   );
   expect(await readCogVisible(page)).toBe(false);
 
-  // Return to 0 → CoG visible again (respecting the still-ON toggle).
-  await setExplode(page, 0);
+  // Toggle back OFF → CoG visible again (respecting the still-ON toggle).
+  await setExplode(page, false);
   await page.waitForFunction(
     () => (window as Window & { __cogVisible?: boolean }).__cogVisible === true,
   );
@@ -204,7 +206,7 @@ test('compose-with-preset+heatmap (SC-4)', async ({ page }) => {
   await reachResultViaStubbedFlow(page);
 
   // Explode the stack, then exercise a preset (TOP) and the support-heatmap toggle on top of it.
-  await setExplode(page, 1);
+  await setExplode(page, true);
   await page.getByRole('button', { name: 'TOP', exact: true }).click();
   await page.waitForFunction(() => {
     const s = (window as Window & { __cameraState?: { settled?: boolean } }).__cameraState;
