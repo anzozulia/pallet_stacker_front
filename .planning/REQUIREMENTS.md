@@ -38,6 +38,7 @@ Requirements for the initial release. Each maps to a roadmap phase.
 - [x] **RESULT-04**: User can switch between generated pallets and see each one's 3D layout and stats
 - [x] **RESULT-05**: User can browse a per-box placement list (id, type, position, size, orientation, weight) with hover highlighting linked to the 3D scene
 - [x] **RESULT-06**: User can see which items could not be packed, each with its reason
+- [ ] **RESULT-07**: User can make a dense pallet legible via two composable viewer controls: an **Explode** slider that vertically separates the solver's layers (animated, 0 = true assembled stack) and a **Layers** control that reveals layers cumulatively (build-up) or isolates a single layer (dimming/hiding the rest). Both derive from one pure `computeLayers(placements)` model and compose with the existing presets, CoG/heatmap toggles, pallet switcher, and placement-list.
 
 ### Stability Diagnostics
 
@@ -117,6 +118,7 @@ Which phases cover which requirements. Populated during roadmap creation.
 | RESULT-04 | Phase 6 | Complete |
 | RESULT-05 | Phase 6 | Complete |
 | RESULT-06 | Phase 6 | Complete |
+| RESULT-07 | Phase 8 | Pending |
 | DIAG-01 | Phase 6 | Complete |
 | DIAG-02 | Phase 6 | Complete |
 | DATA-01 | Phase 7 | Pending |
@@ -128,8 +130,8 @@ Which phases cover which requirements. Populated during roadmap creation.
 **Note:** BOX-04 (rotation mode) spans two phases by nature — the request-builder *mapping* of the three modes is delivered/tested in Phase 3, and the *user-facing rotation choice* is delivered in Phase 4. It is assigned to Phase 4 above (the phase where the user-observable behavior lands) to keep a one-phase-per-requirement mapping; Phase 3's success criteria reference the underlying mapping.
 
 **Coverage:**
-- v1 requirements: 27 total (the prior "25" summary undercounted the enumerated IDs — all 27 listed IDs are now mapped)
-- Mapped to phases: 27 ✓
+- v1 requirements: 28 total (27 original v1 IDs + RESULT-07 added during Phase 8 planning)
+- Mapped to phases: 28 ✓
 - Unmapped: 0 ✓
 
 Phase distribution:
@@ -140,6 +142,7 @@ Phase distribution:
 - Phase 5 (API Client & Async Polling): PACK-01, PACK-04, PACK-05, PACK-06
 - Phase 6 (Result Page & 3D Wiring): RESULT-03, RESULT-04, RESULT-05, RESULT-06, DIAG-01, DIAG-02
 - Phase 7 (Edge States, Exports & Self-Hosting): DATA-01, HOST-01, HOST-02, HOST-03
+- Phase 8 (Assembly Insight — Layer Explode & Isolation in the 3D Viewer): RESULT-07
 
 ---
 *Requirements defined: 2026-06-03*

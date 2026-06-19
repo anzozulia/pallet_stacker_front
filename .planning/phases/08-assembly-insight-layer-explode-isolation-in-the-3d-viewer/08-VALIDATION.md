@@ -1,8 +1,8 @@
 ---
 phase: 8
 slug: assembly-insight-layer-explode-isolation-in-the-3d-viewer
-status: draft
-nyquist_compliant: false
+status: approved
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-06-19
 ---
@@ -52,6 +52,7 @@ created: 2026-06-19
 | TBD | TBD | 2 | RESULT-07 (SC-3) default byte-identical to assembled | N/A | e2e pixel | `npx playwright test` | ❌ W0 | ⬜ pending |
 | TBD | TBD | 2 | RESULT-07 (SC-4) composes w/ presets, CoG/heatmap, switcher, hover, isolate | N/A | e2e | `npx playwright test` | ❌ W0 | ⬜ pending |
 | TBD | TBD | 2 | RESULT-07 (D-05) camera unchanged on pallet switch | N/A | e2e | `npx playwright test` | ❌ W0 | ⬜ pending |
+| TBD | TBD | 3 | RESULT-07 (D-11) reset-on-switch: explode=0 + focus=default, camera preserved | N/A | e2e | `npx playwright test` | ❌ W0 | ⬜ pending |
 | TBD | TBD | 2 | RESULT-07 (SC-5) interactive frame rate, multi-layer presets | N/A | manual / e2e smoke | `npx playwright test` (render assert) | manual-justified | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
@@ -91,11 +92,13 @@ The `computeLayers.test.ts` must assert (verbatim from `08-RESEARCH.md`):
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 10s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies (Wave 0 tests co-created TDD-style in plans 08-01/08-02)
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references (`computeLayers.test.ts`, `camera-presets.test.ts`, `assembly-insight.spec.ts`)
+- [x] No watch-mode flags (all commands use `vitest run` / `playwright test`)
+- [x] Feedback latency < 10s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+> Note: `wave_0_complete` stays `false` — the Wave 0 spec files are physically created during execution (08-01 Tasks 1–2, 08-02 Task 3). The strategy is compliant; the scaffolding is built when those tasks run.
+
+**Approval:** approved 2026-06-19

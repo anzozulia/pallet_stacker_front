@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 8 context gathered
-last_updated: "2026-06-18T22:16:47.676Z"
+status: executing
+stopped_at: Phase 08 UI-SPEC approved
+last_updated: "2026-06-19T07:30:40.819Z"
 last_activity: "2026-06-18 - Completed quick task 260618-eg4: demo-deploy readiness (README + open-source/self-host docs, branding cleanup, build hardening; Docker image verified serving)"
 progress:
   total_phases: 8
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 
 Phase: 7
 Plan: Not started
-Status: Phase complete — ready for verification
+Status: Ready to execute
 Last activity: 2026-06-18 - Completed quick task 260618-eg4: demo-deploy readiness (README + open-source/self-host docs, branding cleanup, build hardening; Docker image verified serving)
 
 Progress: [██████████] 100%
@@ -187,6 +187,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-18T22:16:47.673Z
-Stopped at: Phase 8 context gathered
-Resume file: .planning/phases/08-assembly-insight-layer-explode-isolation-in-the-3d-viewer/08-CONTEXT.md
+Last session: 2026-06-19T06:22:20.553Z
+Stopped at: Phase 08 UI-SPEC approved
+Resume file: .planning/phases/08-assembly-insight-layer-explode-isolation-in-the-3d-viewer/08-UI-SPEC.md
