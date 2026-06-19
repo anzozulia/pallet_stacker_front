@@ -82,6 +82,18 @@ function explodeSlider(page: Page) {
   return page.getByRole('slider', { name: 'Explode amount' });
 }
 
+/** Locate the Layers focus native range by its accessible name (UI-SPEC aria-label). */
+function layersSlider(page: Page) {
+  return page.getByRole('slider', { name: 'Layer focus' });
+}
+
+/** Set the Layers slider to `value` and let the per-layer visibility/opacity settle. */
+async function setLayer(page: Page, value: number): Promise<void> {
+  await layersSlider(page).fill(String(value));
+  // No camera re-fit on focus change, but let the (optional) opacity ease + a frame or two land.
+  await page.waitForTimeout(250);
+}
+
 /** Set the Explode slider to `value` (0..1) and wait for the re-fit animation to settle. */
 async function setExplode(page: Page, value: number): Promise<void> {
   await explodeSlider(page).fill(String(value));
@@ -203,6 +215,132 @@ test('compose-with-preset+heatmap (SC-4)', async ({ page }) => {
   await page.waitForTimeout(300);
 
   // The controls compose: the canvas still renders and no console errors surfaced.
+  await expect(page.locator('[data-testid="r3f-canvas"]')).toBeVisible();
+  const png = await page.locator('[data-testid="r3f-canvas"]').screenshot();
+  expect(png.byteLength).toBeGreaterThan(0);
+  expect(errors).toHaveLength(0);
+});
+
+// ── 08-03 Layers focus slice ────────────────────────────────────────────────────────────────────
+// P001 (the default-selected pallet) has 2 base-z layers, so k=1 in a 2-layer stack is a meaningful
+// partial focus for both build-up (hide layer 2) and isolate (ghost layer 2).
+
+test('build-up-hides upper layers (D-08)', async ({ page }) => {
+  await reachResultViaStubbedFlow(page);
+
+  // Default landing is All (Build-up full) — byte-identical assembled baseline.
+  await expect(layersSlider(page)).toHaveValue('0');
+  await expect(page.getByText('All', { exact: true })).toBeVisible();
+  const all = await page.locator('[data-testid="r3f-canvas"]').screenshot();
+
+  // Build-up to layer 1 of 2: the upper layer is HIDDEN → the canvas differs from All.
+  await setLayer(page, 1);
+  await expect(page.getByText('Layer 1 / 2', { exact: true })).toBeVisible();
+  const buildup = await page.locator('[data-testid="r3f-canvas"]').screenshot();
+  expect(buildup.equals(all)).toBe(false);
+
+  // Switch the SAME layer to Isolate: now the rest is GHOSTED (present, translucent), not hidden —
+  // so isolate-of-k must differ from build-up-of-k.
+  await page.getByRole('switch', { name: 'Isolate' }).click();
+  await page.waitForTimeout(250);
+  const isolate = await page.locator('[data-testid="r3f-canvas"]').screenshot();
+  expect(isolate.equals(buildup)).toBe(false);
+});
+
+test('isolate-dims the non-focused layers (D-09)', async ({ page }) => {
+  await reachResultViaStubbedFlow(page);
+
+  // Assembled baseline.
+  await expect(layersSlider(page)).toHaveValue('0');
+  const assembled = await page.locator('[data-testid="r3f-canvas"]').screenshot();
+
+  // Isolate layer 1: the rest is ghosted to translucent → canvas differs from assembled.
+  await page.getByRole('switch', { name: 'Isolate' }).click();
+  await setLayer(page, 1);
+  await expect(page.getByText('Layer 1 / 2', { exact: true })).toBeVisible();
+  const isolate = await page.locator('[data-testid="r3f-canvas"]').screenshot();
+  expect(isolate.equals(assembled)).toBe(false);
+});
+
+test('row-click → isolate with persistent selected cue, hover unchanged (D-12)', async ({
+  page,
+}) => {
+  await reachResultViaStubbedFlow(page);
+
+  const assembled = await page.locator('[data-testid="r3f-canvas"]').screenshot();
+
+  // Click a placement-list card: ResultPage isolates that box's layer + marks the row selected.
+  const card = page.locator('[data-placement-card]').first();
+  await card.click();
+  await page.waitForTimeout(300);
+
+  // Persistent selected cue (distinct from hover): the clicked row carries data-selected.
+  await expect(card).toHaveAttribute('data-selected', 'true');
+  // The view changed to an isolated frame (canvas differs from assembled).
+  const isolated = await page.locator('[data-testid="r3f-canvas"]').screenshot();
+  expect(isolated.equals(assembled)).toBe(false);
+
+  // Hover still works as the SEPARATE one-way seam: hovering a card does not error / clear selection.
+  await card.hover();
+  await page.waitForTimeout(150);
+  await expect(card).toHaveAttribute('data-selected', 'true');
+});
+
+test('reset-on-switch resets explode + focus, camera preserved (D-11/D-05)', async ({ page }) => {
+  await reachResultViaStubbedFlow(page);
+
+  // Raise explode and set a layer focus on P001.
+  await setExplode(page, 1);
+  await setLayer(page, 1);
+  await expect(page.getByText('1.0x', { exact: true })).toBeVisible();
+  await expect(page.getByText('Layer 1 / 2', { exact: true })).toBeVisible();
+
+  // Record the camera AFTER the explode re-fit has settled (so the switch comparison is clean).
+  await page.waitForFunction(() => {
+    const s = (window as Window & { __cameraState?: { settled?: boolean } }).__cameraState;
+    return s?.settled === true;
+  });
+  await page.waitForTimeout(250);
+  const before = (await page.evaluate(
+    () => (window as Window & { __cameraState?: unknown }).__cameraState,
+  )) as CamState;
+
+  // Switch pallets: readouts must return to Assembled / All (reset), camera preserved (no snap).
+  await page.getByRole('button', { name: 'P002' }).click();
+  await page.waitForTimeout(600);
+  await expect(page.getByText('Assembled', { exact: true })).toBeVisible();
+  await expect(page.getByText('All', { exact: true })).toBeVisible();
+
+  const after = (await page.evaluate(
+    () => (window as Window & { __cameraState?: unknown }).__cameraState,
+  )) as CamState;
+  // D-05/Pitfall 1: the switch itself does not re-frame the camera (within a small epsilon). The
+  // explode reset sets explodeExtraHeight to 0 so any re-fit targets the assembled frame, no snap.
+  expect(l2(before.position, after.position)).toBeLessThan(2);
+});
+
+test('full compose: build-up + explode + preset + CoG + heatmap (SC-4)', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('console', (msg) => {
+    if (msg.type() === 'error') errors.push(msg.text());
+  });
+
+  await reachResultViaStubbedFlow(page);
+
+  // Build-up to layer 1 AND explode simultaneously, then a preset + both diagnostic toggles.
+  await setLayer(page, 1);
+  await setExplode(page, 1);
+  await page.getByRole('button', { name: 'FRONT', exact: true }).click();
+  await page.waitForFunction(() => {
+    const s = (window as Window & { __cameraState?: { settled?: boolean } }).__cameraState;
+    return s?.settled === true;
+  });
+  // CoG toggle (ON by default) + Support heatmap, both role=switch (ViewerOverlay).
+  await page.getByRole('switch', { name: 'Centre of gravity' }).click();
+  await page.getByRole('switch', { name: 'Support heatmap' }).click();
+  await page.waitForTimeout(300);
+
+  // Everything composes: the canvas renders and no console errors surfaced.
   await expect(page.locator('[data-testid="r3f-canvas"]')).toBeVisible();
   const png = await page.locator('[data-testid="r3f-canvas"]').screenshot();
   expect(png.byteLength).toBeGreaterThan(0);

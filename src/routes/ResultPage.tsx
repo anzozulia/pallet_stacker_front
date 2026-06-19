@@ -107,6 +107,14 @@ export default function ResultPage() {
   const [sel, setSel] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
+  // Layer-focus state (D-08/D-09/D-12). `focusMode` selects Build-up (cumulative reveal) vs Isolate
+  // (ghost the rest); `focusIndex` is the 1-based focused layer or null = "All" (the no-op default,
+  // SC-3). `selectedId` tracks WHICH placement-row click drove the current isolation so PlacementList
+  // can show a persistent selected cue (D-12). All three reset on a pallet switch (D-11, below).
+  const [focusMode, setFocusMode] = useState<'buildup' | 'isolate'>('buildup');
+  const [focusIndex, setFocusIndex] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
   // Diagnostics overlay toggles (DIAG-01/02 / D-10). `cogOn` shows the per-pallet CoG marker —
   // default ON (the differentiator, RESEARCH Open Q2). `heatmap` recolours boxes by support ratio
   // — default OFF (by-type colouring is the default, D-10); the per-card support% is always shown.
@@ -131,6 +139,23 @@ export default function ResultPage() {
   const onExplode = (v: number) => {
     setExplode(v);
     setExplodeNonce((n) => n + 1);
+  };
+
+  // Pallet-switch path (D-11): a switch RESETS both assembly-insight controls — explode back to 0
+  // and layer-focus back to its default (Build-up / All / no selection). The camera is PRESERVED
+  // across the switch itself (D-05/D-02/Pitfall 1): CameraPresets re-measures on measureNonce={selIndex}
+  // WITHOUT animating, and only re-frames on presetNonce/explodeNonce. We DELIBERATELY do NOT bump
+  // explodeNonce here — doing so would fire the explode re-fit effect, which reads bboxRef.current
+  // (now the NEW pallet's just-re-measured bbox) and snap the camera toward the new pallet's frame,
+  // regressing the no-snap-on-switch contract (caught by the camera-unchanged-on-switch e2e). Setting
+  // explode state to 0 (without a nonce bump) silently puts the boxes back to assembled — the next
+  // Explode interaction starts from 0 with explodeExtraHeight 0, exactly the assembled frame.
+  const selectPallet = (i: number) => {
+    setSel(i);
+    setExplode(0);
+    setFocusMode('buildup');
+    setFocusIndex(null);
+    setSelectedId(null);
   };
 
   // D-06 visibility decision (single source of truth): the CoG marker shows only when its toggle
@@ -320,6 +345,8 @@ export default function ResultPage() {
             heatmap={heatmap}
             layerModel={layerModel}
             explode={explode}
+            focusMode={focusMode}
+            focusIndex={focusIndex}
           />
 
           {/* CoG marker (DIAG-01): rendered INSIDE the Canvas, toggle-able (default ON). Fed the
@@ -357,6 +384,10 @@ export default function ResultPage() {
           explode={explode}
           onExplode={onExplode}
           layerCount={layerModel.layers.length}
+          focusMode={focusMode}
+          onFocusMode={setFocusMode}
+          focusIndex={focusIndex}
+          onFocusIndex={setFocusIndex}
         />
 
         <ViewerOverlay
@@ -384,7 +415,7 @@ export default function ResultPage() {
         data-pallet-count={result.pallets.length}
       >
         <SummaryBlock view={view} />
-        <PalletSwitcher pallets={view.pallets} selected={selIndex} onSelect={setSel} />
+        <PalletSwitcher pallets={view.pallets} selected={selIndex} onSelect={selectPallet} />
         {/* Per-selected-pallet placement cards (RESULT-05): the items array is the MappedPallet's
             `PlacementOut & { typeId }`. onHover drives `hoveredId` → the matching mesh glows (D-11). */}
         <PlacementList
@@ -393,6 +424,19 @@ export default function ResultPage() {
           palletLabel={palletLabel}
           typeToLabel={typeToLabel}
           onHover={setHoveredId}
+          // Row click → isolate that box's layer (D-12): map item_id → its 0-based layer via the
+          // computeLayers itemToLayer, then set Isolate focus at that layer (+1 → 1-based) and record
+          // the clicked id for the persistent selected cue. The `li != null` guard keeps a missing
+          // mapping a no-op (T-08-DOS). Reveals the layer if it was hidden (isolate keeps all visible).
+          onIsolate={(id) => {
+            const li = layerModel.itemToLayer.get(id);
+            if (li != null) {
+              setFocusMode('isolate');
+              setFocusIndex(li + 1);
+              setSelectedId(id);
+            }
+          }}
+          selectedId={selectedId}
         />
         {/* Whole-job unpacked panel (RESULT-06): does NOT change on pallet switch. idToType gives
             map-PRIMARY type recovery (C-03). */}
