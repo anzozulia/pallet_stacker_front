@@ -27,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 
 Phase: 08 (assembly-insight-layer-explode-isolation-in-the-3d-viewer) — EXECUTING
 Plan: 3 of 3
-Status: Phase complete — ready for verification
-Last activity: 2026-06-19
+Status: Phase complete — ready for verification (re-test pending after control redesign)
+Last activity: 2026-06-19 - Completed quick task 260619-r3x: simplify Phase 8 assembly-insight controls (Explode toggle, Layers +/- build-up-only, Isolate removed, row-click→build-up)
 
 Progress: [██████████] 100%
 
@@ -183,6 +183,7 @@ None yet.
 | 260617-v8x | 8 fixes: rebrand → "Pallet Packer", Configure footer spacing, Cancel-hover red; result legend type-names, wider rail (15%), distinct selected card; BUGS: CoG marker occlusion (now renders over boxes) + TOP camera end-snap (slerp endpoint matches OrbitControls via three Matrix4.lookAt) | 2026-06-17 | ae069c8 | Verified (visual review pending) | [260617-v8x](./quick/260617-v8x-config-spacing-rebrand-to-pallet-packer-/) |
 | 260617-w8a | Demo box-catalog presets pickable atop Configure page (form.reset prefill; fixed pallet 1200×800×1800/1000kg, only boxes vary). Presets revised TWICE then re-engineered for a genuine "wow" rotation-interlock effect after both grid-trivial and forced-pairing sets were rejected. Final 3 (verified live, ~50 experiment jobs): (1) 900×500 unit + 300×400/300×300 fillers — filler YAWS to wrap the L-gap on both faces, 2pal ~95%; (2) 1000×600 slab + 200×400/200×200 — filler turns to frame top+side, 2pal 100%; (3) single 200×600 carton — six upright + two crosswise per layer, 2pal 100%. Mechanism: dims forced so the only ≥90% fill requires the solver to rotate boxes 90° | 2026-06-18 | bd2c802 | Verified (code; 224 tests + live-API placement/coordinate checks) | [260617-w8a](./quick/260617-w8a-add-demo-box-catalog-presets-pickable-at/) |
 | 260618-eg4 | Demo-deploy readiness: created README.md (15 sections — Docker/compose quick-start, VITE_API_URL build-time config, submit-then-poll, local dev, scripts, testing, deployment), .env.example, CONTRIBUTING.md (full local gate + code-split rule), docker-compose.yml, public/favicon.svg (brand glyph) + index.html favicon/description/theme-color. Rebranded LICENSE + package.json "palletize"→"pallet-packer" (STORAGE_KEY preserved). Hardened .dockerignore (excl .planning/.claude/design/etc.) + added `node scripts/check-code-split.mjs` to CI. Docker image build+serve re-verified (8080, SPA fallback, non-root). No src/runtime/Dockerfile/nginx/dep changes | 2026-06-18 | d7d2156 | Verified (6/6 must-haves; full gate green incl. 14 e2e + docker smoke build) | [260618-eg4](./quick/260618-eg4-demo-deploy-readiness-open-source-self-h/) |
+| 260619-r3x | Simplify Phase 8 assembly-insight controls (RESULT-07) per user feedback — too bulky. Explode: range slider → single Assembled⇄Exploded toggle button (explodeNonce camera re-frame + CoG-hide gate preserved); bumped EXPLODE_FIXED_UNIT 350→500 (explodes a bit more). Layers: removed Isolate mode ENTIRELY (GHOST_OPACITY/focusMode/persistent selectedId+data-selected+ring cue all gone) → build-up-only with −/+ stepper buttons (`All` at top, `Layers 1–k / N` below, clamped [0..N]). Placement-row click now BUILDS UP to that box's layer (was isolate); hover↔mesh highlight kept. Pallet switch still resets explode→assembled + layers→All, camera preserved. Tests updated (e2e 10→9 scenarios). | 2026-06-19 | 4c34162 | Verified (gates green: typecheck, lint, 236 unit, 9 e2e, build+code-split) | [260619-r3x](./quick/260619-r3x-simplify-phase-8-assembly-insight-viewer/) |
 
 ## Deferred Items
 
