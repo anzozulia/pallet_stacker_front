@@ -11,12 +11,15 @@
 //
 // All three/r3f/drei imports stay inside this lazy /result subtree (Pitfall 3).
 
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, useMemo, useRef } from 'react';
 import { Edges } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import { easing } from 'maath';
 import { Color, type Group } from 'three';
 import type { PalletDims, PlacementOut } from '@/lib/fixture-types';
 import { assertWithinEnvelope, mapPlacement } from '@/lib/mapping';
 import { supportColor } from '@/lib/support-scale';
+import { EXPLODE_FIXED_UNIT, type LayerModel } from '@/lib/computeLayers';
 
 export interface BoxesProps {
   // The SELECTED pallet's placements, each tagged with its recovered `typeId` (from the mapped
@@ -37,6 +40,14 @@ export interface BoxesProps {
   // `support_ratio` via the pure `supportColor` scale instead of its by-type palette colour.
   // Default (false/undefined) keeps the by-type colouring — the default per D-10.
   heatmap?: boolean;
+  // The base-z layer banding for this pallet (computeLayers, Plan 01). Boxes are grouped BY
+  // `itemToLayer.get(item_id)` so each layer can be lifted as a unit when exploded (L-01, ≤4
+  // wrapper groups). Default 0 for any item missing from the map (degenerate guard).
+  layerModel: LayerModel;
+  // Explode amount, 0..1 (D-04). 0 = byte-identical assembled stack (no offset, no transparency,
+  // SC-3 / Pitfall 5). >0 lifts each layer group by `layerIndex * explode * EXPLODE_FIXED_UNIT`
+  // (D-04 uniform additive gap), animated each frame via maath easing.damp (D-07).
+  explode: number;
 }
 
 // Edge tint: from the box colour via offsetHSL(0, -0.04, +0.18) (mockup tint()).
@@ -45,7 +56,7 @@ function edgeTint(hex: string): Color {
 }
 
 export const Boxes = forwardRef<Group, BoxesProps>(function Boxes(
-  { items, dimensions, palette, hoveredId, heatmap },
+  { items, dimensions, palette, hoveredId, heatmap, layerModel, explode },
   ref,
 ) {
   const mapped = useMemo(
@@ -66,25 +77,65 @@ export const Boxes = forwardRef<Group, BoxesProps>(function Boxes(
     [items, dimensions, palette, heatmap],
   );
 
+  // Group the mapped boxes BY their base-z layer index (computeLayers, Plan 01). One wrapper
+  // <group> per layer (L-01 — per-layer, NOT per-mesh: ≤4 groups for the fixture) so a whole
+  // layer can be lifted as a unit when exploded. Items missing from the map default to layer 0.
+  const layered = useMemo(() => {
+    const byLayer = new Map<number, typeof mapped>();
+    for (const b of mapped) {
+      const li = layerModel.itemToLayer.get(b.id) ?? 0;
+      const bucket = byLayer.get(li);
+      if (bucket) bucket.push(b);
+      else byLayer.set(li, [b]);
+    }
+    // Stable floor-up order so the wrapper-group array index is the layer index.
+    return [...byLayer.entries()].sort((a, b) => a[0] - b[0]);
+  }, [mapped, layerModel]);
+
+  // One ref per layer wrapper group so useFrame can damp each group's position.y toward its
+  // explode target without re-rendering React (the animation is imperative-per-frame, D-07).
+  const groupRefs = useRef<Map<number, Group>>(new Map());
+
+  // D-07: animate each layer group's vertical offset toward its target every frame. The target is
+  // `layerIndex * explode * EXPLODE_FIXED_UNIT` (D-04 uniform additive gap) — at explode === 0 the
+  // target is 0 for EVERY layer, so the assembled stack is byte-identical (SC-3 / Pitfall 5). The
+  // dt-aware maath easing.damp retargets continuously as the slider drags (smoothTime ~0.18s).
+  useFrame((_, dt) => {
+    for (const [layerIndex, group] of groupRefs.current) {
+      const targetY = layerIndex * explode * EXPLODE_FIXED_UNIT;
+      easing.damp(group.position, 'y', targetY, 0.18, dt);
+    }
+  });
+
   return (
     <group ref={ref}>
-      {mapped.map((b) => (
-        <mesh key={b.id} position={b.center} castShadow receiveShadow>
-          <boxGeometry args={b.size} />
-          {/* Declarative hover glow (D-11): r3f diffs emissiveIntensity and patches the live
-              material in place — no imperative material.emissive.set, no remount. Keyed by the box
-              id (= item_id). Individual meshes (D-12) make per-box emissive trivial (≤19 boxes). */}
-          <meshStandardMaterial
-            color={b.color}
-            emissive={b.color}
-            emissiveIntensity={hoveredId === b.id ? 0.45 : 0}
-            roughness={0.62}
-            metalness={0.04}
-          />
-          <Edges lineWidth={1.75}>
-            <lineBasicMaterial color={edgeTint(b.color)} transparent opacity={0.55} />
-          </Edges>
-        </mesh>
+      {layered.map(([layerIndex, boxes]) => (
+        <group
+          key={layerIndex}
+          ref={(g) => {
+            if (g) groupRefs.current.set(layerIndex, g);
+            else groupRefs.current.delete(layerIndex);
+          }}
+        >
+          {boxes.map((b) => (
+            <mesh key={b.id} position={b.center} castShadow receiveShadow>
+              <boxGeometry args={b.size} />
+              {/* Declarative hover glow (D-11): r3f diffs emissiveIntensity and patches the live
+                  material in place — no imperative material.emissive.set, no remount. Keyed by the
+                  box id (= item_id). Individual meshes (D-12) keep per-box emissive trivial. */}
+              <meshStandardMaterial
+                color={b.color}
+                emissive={b.color}
+                emissiveIntensity={hoveredId === b.id ? 0.45 : 0}
+                roughness={0.62}
+                metalness={0.04}
+              />
+              <Edges lineWidth={1.75}>
+                <lineBasicMaterial color={edgeTint(b.color)} transparent opacity={0.55} />
+              </Edges>
+            </mesh>
+          ))}
+        </group>
       ))}
     </group>
   );

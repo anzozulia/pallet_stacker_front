@@ -17,6 +17,7 @@ import {
   type PresetKind,
   type Vec4Tuple,
   distanceLimitsFromBbox,
+  inflateBboxForExplode,
   presetFromBbox,
   slerpQuat,
 } from '@/lib/camera-presets';
@@ -38,6 +39,14 @@ export interface CameraPresetsProps {
   fallbackBbox?: Bbox;
   // Reports the computed bbox up to the parent (for any chrome that needs it).
   onBbox?: (bbox: Bbox) => void;
+  // Bumped by the parent each time the Explode slider moves (D-05): the camera re-frames to the
+  // growing stack. DISTINCT from presetNonce/measureNonce — see the decoupled explode effect below.
+  // An explode change re-frames; a pallet switch (measureNonce) must NOT (D-02 / Pitfall 1).
+  explodeNonce?: number;
+  // The current explode lift of the TALLEST layer (mm): `(layers.length - 1) * explode *
+  // EXPLODE_FIXED_UNIT` (RESEARCH Pattern 3, computed in ResultPage from the SHARED constant). Fed
+  // to inflateBboxForExplode so the re-fit frames the inflated stack, not the assembled bbox.
+  explodeExtraHeight?: number;
 }
 
 const ANIM_MS = 520;
@@ -50,6 +59,8 @@ export function CameraPresets({
   measureNonce,
   fallbackBbox,
   onBbox,
+  explodeNonce,
+  explodeExtraHeight = 0,
 }: CameraPresetsProps) {
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const camera = useThree((s) => s.camera);
@@ -141,6 +152,42 @@ export function CameraPresets({
     // Re-run ONLY on an explicit preset press (preset change OR nonce bump). `bbox` is
     // intentionally NOT a dep: re-measuring on a swap must not snap the camera.
   }, [preset, presetNonce, camera]);
+
+  // D-05 explode re-fit (the DELIBERATE exception to the no-reframe-on-change discipline): when
+  // the Explode slider moves (`explodeNonce` bumps) re-frame the camera toward the GROWING stack
+  // — inflate the latest measured bbox by `explodeExtraHeight` (the max layer's lift) before
+  // presetFromBbox. This mirrors the preset effect's anim shape so the SAME useFrame drives it.
+  //
+  // CRITICAL (Pitfall 1 / D-02): this effect keys ONLY on [explodeNonce, preset, camera] — NEVER
+  // `bbox`, NEVER `measureNonce`. Adding either would re-fire the re-fit on a PALLET SWITCH (which
+  // re-measures the bbox) and snap the camera, regressing the no-snap-on-switch contract. Reading
+  // the latest bbox via `bboxRef.current` (not the `bbox` state) keeps the frame correct without a
+  // reactive dep. `explodeNonce` is intentionally NOT in the preset effect's deps either, so an
+  // explode and a preset press stay independent triggers.
+  useEffect(() => {
+    const controls = controlsRef.current;
+    if (!controls) return;
+    if (explodeNonce === undefined) return;
+    const inflated = inflateBboxForExplode(bboxRef.current, explodeExtraHeight);
+    const { position, target } = presetFromBbox(inflated, preset);
+    const toPosVec = new Vector3(...position);
+    const toTargetVec = new Vector3(...target);
+    const fromQ = camera.quaternion.clone();
+    const lookM = new Matrix4().lookAt(toPosVec, toTargetVec, camera.up);
+    const toQ = new Quaternion().setFromRotationMatrix(lookM);
+    anim.current = {
+      fromPos: camera.position.clone(),
+      toPos: toPosVec,
+      fromTarget: controls.target.clone(),
+      toTarget: toTargetVec,
+      fromQuat: [fromQ.x, fromQ.y, fromQ.z, fromQ.w],
+      toQuat: [toQ.x, toQ.y, toQ.z, toQ.w],
+      start: performance.now(),
+    };
+    // explodeNonce-ONLY trigger (plus preset/camera identity). Deliberately excludes bbox +
+    // measureNonce + explodeExtraHeight-as-value so a pallet switch never re-frames (D-02).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [explodeNonce, preset, camera]);
 
   useFrame(() => {
     const a = anim.current;
