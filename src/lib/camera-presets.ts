@@ -68,6 +68,23 @@ export function presetFromBbox(bbox: Bbox, which: PresetKind): CameraPreset {
   return { position: [cx + ux * d, cy + uy * d, cz + uz * d], target };
 }
 
+/**
+ * Pure bbox grow-for-explode (D-05): return a NEW Bbox that grows ONLY the Y (up) extent by
+ * `extraHeight` and shifts the centre up by `extraHeight / 2`, so the inflated box still bounds
+ * the original stack as it lifts upward from its base. Explode is vertical-only (A5), so X and Z
+ * (cx, cz, sx, sz) pass through unchanged. `extraHeight === 0` returns a bbox value-equal to the
+ * input (the no-op-at-explode-0 guarantee that protects SC-3). Three-free — keeps the module
+ * jsdom-testable and out of the lazy /result chunk.
+ */
+export function inflateBboxForExplode(bbox: Bbox, extraHeight: number): Bbox {
+  const [cx, cy, cz] = bbox.center;
+  const [sx, sy, sz] = bbox.size;
+  return {
+    center: [cx, cy + extraHeight / 2, cz],
+    size: [sx, sy + extraHeight, sz],
+  };
+}
+
 export type Vec4Tuple = [number, number, number, number]; // quaternion [x, y, z, w]
 
 const DEFAULT_UP: Vec3Tuple = [0, 1, 0];

@@ -5,6 +5,7 @@ import {
   type Bbox,
   type Vec4Tuple,
   distanceLimitsFromBbox,
+  inflateBboxForExplode,
   lookQuaternion,
   presetFromBbox,
   presetQuaternion,
@@ -105,6 +106,31 @@ describe('preset orientation interpolation (#11 smooth-sweep math)', () => {
     const front = presetQuaternion(bbox, 'FRONT');
     expect(quatAngle(slerpQuat(iso, front, 0), iso)).toBeLessThan(1e-6);
     expect(quatAngle(slerpQuat(iso, front, 1), front)).toBeLessThan(1e-6);
+  });
+});
+
+describe('inflateBboxForExplode', () => {
+  // Reuses the off-origin synthetic bbox (center [100,200,300], size [400,600,800]) so the
+  // grow-only-Y-and-recentre-upward behaviour is unambiguous on every axis (D-05 / A5: explode
+  // is vertical-only). Golden literals are hand-stated, not re-derived from the helper.
+  it('extraHeight=0 is a no-op (returns a bbox value-equal to the input) — protects SC-3', () => {
+    const out = inflateBboxForExplode(bbox, 0);
+    expect(out.center).toEqual(bbox.center);
+    expect(out.size).toEqual(bbox.size);
+  });
+
+  it('grows ONLY the Y extent + recentres up; X/Z pass through unchanged (literals)', () => {
+    // center.y = 200 + 600/2 = 500; size.y = 600 + 600 = 1200; X/Z untouched.
+    const out = inflateBboxForExplode(bbox, 600);
+    expect(out.center).toEqual([100, 500, 300]);
+    expect(out.size).toEqual([400, 1200, 800]);
+  });
+
+  it('growth is upward-only: the inflated bbox lowest-Y equals the original lowest-Y', () => {
+    const out = inflateBboxForExplode(bbox, 600);
+    const origLowY = bbox.center[1] - bbox.size[1] / 2;
+    const newLowY = out.center[1] - out.size[1] / 2;
+    expect(newLowY).toBeCloseTo(origLowY, 6);
   });
 });
 
