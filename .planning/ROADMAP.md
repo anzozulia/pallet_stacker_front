@@ -280,7 +280,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 08-01-PLAN.md — pure foundation: three-free `computeLayers(placements)` base-z banding + 8 golden SC-1 tests, pure `inflateBboxForExplode` (D-05 helper) + golden cases, promote `maath` to a direct dep
+- [x] 08-01-PLAN.md — pure foundation: three-free `computeLayers(placements)` base-z banding + 8 golden SC-1 tests, pure `inflateBboxForExplode` (D-05 helper) + golden cases, promote `maath` to a direct dep
 
 **Wave 2** _(blocked on Wave 1)_
 

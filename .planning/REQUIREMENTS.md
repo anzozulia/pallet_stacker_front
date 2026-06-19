@@ -38,7 +38,7 @@ Requirements for the initial release. Each maps to a roadmap phase.
 - [x] **RESULT-04**: User can switch between generated pallets and see each one's 3D layout and stats
 - [x] **RESULT-05**: User can browse a per-box placement list (id, type, position, size, orientation, weight) with hover highlighting linked to the 3D scene
 - [x] **RESULT-06**: User can see which items could not be packed, each with its reason
-- [ ] **RESULT-07**: User can make a dense pallet legible via two composable viewer controls: an **Explode** slider that vertically separates the solver's layers (animated, 0 = true assembled stack) and a **Layers** control that reveals layers cumulatively (build-up) or isolates a single layer (dimming/hiding the rest). Both derive from one pure `computeLayers(placements)` model and compose with the existing presets, CoG/heatmap toggles, pallet switcher, and placement-list.
+- [x] **RESULT-07**: User can make a dense pallet legible via two composable viewer controls: an **Explode** slider that vertically separates the solver's layers (animated, 0 = true assembled stack) and a **Layers** control that reveals layers cumulatively (build-up) or isolates a single layer (dimming/hiding the rest). Both derive from one pure `computeLayers(placements)` model and compose with the existing presets, CoG/heatmap toggles, pallet switcher, and placement-list.
 
 ### Stability Diagnostics
 
@@ -118,7 +118,7 @@ Which phases cover which requirements. Populated during roadmap creation.
 | RESULT-04 | Phase 6 | Complete |
 | RESULT-05 | Phase 6 | Complete |
 | RESULT-06 | Phase 6 | Complete |
-| RESULT-07 | Phase 8 | Pending |
+| RESULT-07 | Phase 8 | Complete |
 | DIAG-01 | Phase 6 | Complete |
 | DIAG-02 | Phase 6 | Complete |
 | DATA-01 | Phase 7 | Pending |

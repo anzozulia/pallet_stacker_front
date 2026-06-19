@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 08 UI-SPEC approved
-last_updated: "2026-06-19T07:30:40.819Z"
-last_activity: "2026-06-18 - Completed quick task 260618-eg4: demo-deploy readiness (README + open-source/self-host docs, branding cleanup, build hardening; Docker image verified serving)"
+last_updated: "2026-06-19T09:28:33.268Z"
+last_activity: 2026-06-19
 progress:
   total_phases: 8
   completed_phases: 6
-  total_plans: 25
-  completed_plans: 25
-  percent: 75
+  total_plans: 28
+  completed_plans: 26
+  percent: 93
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-03)
 
 **Core value:** A user can describe their pallet and boxes and get back a correct, explorable 3D packing plan in seconds — zero signup, single self-hostable Docker container.
-**Current focus:** Phase 06 — result-page-3d-wiring
+**Current focus:** Phase 08 — assembly-insight-layer-explode-isolation-in-the-3d-viewer
 
 ## Current Position
 
-Phase: 7
-Plan: Not started
+Phase: 08 (assembly-insight-layer-explode-isolation-in-the-3d-viewer) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-06-18 - Completed quick task 260618-eg4: demo-deploy readiness (README + open-source/self-host docs, branding cleanup, build hardening; Docker image verified serving)
+Last activity: 2026-06-19
 
-Progress: [██████████] 100%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -81,6 +81,7 @@ _Updated after each plan completion_
 | Phase 06 P03 | 6min | 4 tasks | 8 files |
 | Phase 06 P04 | 11min | 4 tasks | 9 files |
 | Phase 06 P05 | 13 | 3 tasks | 7 files |
+| Phase 08 P01 | 6 | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -152,6 +153,9 @@ Recent decisions affecting current work:
 - [Phase ?]: 06-05: CoG marker default ON (differentiator), support heatmap default OFF (by-type default, D-10); per-card support% always shown
 - [Phase ?]: 06-05: drei <Line> v10 matched the PATTERNS skeleton — no plain <line>+BufferGeometry fallback; drop-line from DECK_TOP_Y to mapCog
 - [Phase ?]: 06-05: Boxes keeps individual meshes (no InstancedMesh, D-12); heatmap recolour + emissive hover stay declarative prop changes
+- [Phase ?]: [08-01]: computeLayers bands by base-z only (floor-up, tall-box-by-base D-13); LAYER_Z_TOLERANCE=5 is a jitter absorber NOT a height bridge; NaN coerced to 0 (T-08-DOS)
+- [Phase ?]: [08-01]: EXPLODE_FIXED_UNIT=350 exported from the three-free lib as the SINGLE shared explode unit (Boxes + ResultPage import one value); Plan 02 tunes here only
+- [Phase ?]: [08-01]: inflateBboxForExplode grows bbox Y only + recentres up, no-op at 0 (SC-3); maath promoted transitive->direct (^0.10.8), pinned quartet byte-unchanged
 
 ### Pending Todos
 
@@ -187,6 +191,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-19T06:22:20.553Z
+Last session: 2026-06-19T09:28:15.277Z
 Stopped at: Phase 08 UI-SPEC approved
-Resume file: .planning/phases/08-assembly-insight-layer-explode-isolation-in-the-3d-viewer/08-UI-SPEC.md
+Resume file: None

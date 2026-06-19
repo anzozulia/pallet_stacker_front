@@ -114,6 +114,10 @@ None - no external service configuration required.
 - The shared layer model + explode constant + camera helper are ready for Plan 02 (explode slice) and Plan 03 (layers focus slice) to compose — no re-derivation of banding required.
 - maath is a direct dep, so `maath.easing.damp` is safe to use in the explode/focus animation wiring.
 
+## Self-Check: PASSED
+
+All created files exist on disk and all four task/summary commits (05cac3a, c69dae7, c068eb0, a0749d6) are present in git history.
+
 ---
 *Phase: 08-assembly-insight-layer-explode-isolation-in-the-3d-viewer*
 *Completed: 2026-06-19*
