@@ -288,6 +288,6 @@ Plans:
 
 **Wave 3** _(blocked on Wave 2)_
 
-- [ ] 08-03-PLAN.md — Layers focus slice: build-up hide + isolate ghost-opacity in Boxes, the Layers slider + Build-up/Isolate toggle, PlacementList row-click -> isolate (+ selected cue), ResultPage focus state + reset-on-switch + row wiring, isolate/build-up/compose/reset e2e + phase gate
+- [x] 08-03-PLAN.md — Layers focus slice: build-up hide + isolate ghost-opacity in Boxes, the Layers slider + Build-up/Isolate toggle, PlacementList row-click -> isolate (+ selected cue), ResultPage focus state + reset-on-switch + row wiring, isolate/build-up/compose/reset e2e + phase gate
 
 **UI hint**: yes

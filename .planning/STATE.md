@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
+status: verifying
 stopped_at: Phase 08 UI-SPEC approved
-last_updated: "2026-06-19T09:38:48.471Z"
+last_updated: "2026-06-19T09:55:06.973Z"
 last_activity: 2026-06-19
 progress:
   total_phases: 8
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 28
-  completed_plans: 27
-  percent: 96
+  completed_plans: 28
+  percent: 100
 ---
 
 # Project State
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-06-03)
 
 Phase: 08 (assembly-insight-layer-explode-isolation-in-the-3d-viewer) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-06-19
 
-Progress: [██████████] 96%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -83,6 +83,7 @@ _Updated after each plan completion_
 | Phase 06 P05 | 13 | 3 tasks | 7 files |
 | Phase 08 P01 | 6 | 3 tasks | 6 files |
 | Phase 08 P02 | ~14min | 3 tasks | 5 files |
+| Phase 08 P08-03 | 22 | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -157,6 +158,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [08-01]: computeLayers bands by base-z only (floor-up, tall-box-by-base D-13); LAYER_Z_TOLERANCE=5 is a jitter absorber NOT a height bridge; NaN coerced to 0 (T-08-DOS)
 - [Phase ?]: [08-01]: EXPLODE_FIXED_UNIT=350 exported from the three-free lib as the SINGLE shared explode unit (Boxes + ResultPage import one value); Plan 02 tunes here only
 - [Phase ?]: [08-01]: inflateBboxForExplode grows bbox Y only + recentres up, no-op at 0 (SC-3); maath promoted transitive->direct (^0.10.8), pinned quartet byte-unchanged
+- [Phase ?]: 08-03: layer-focus is a pure layerAppearance derivation applied to the explode wrapper groups; reset-on-switch resets explode+focus state WITHOUT bumping explodeNonce so the camera is preserved (no snap)
 
 ### Pending Todos
 
@@ -192,6 +194,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-19T09:38:44.219Z
+Last session: 2026-06-19T09:53:03.599Z
 Stopped at: Phase 08 UI-SPEC approved
 Resume file: None
